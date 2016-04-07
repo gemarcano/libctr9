@@ -25,7 +25,6 @@ void ctr_nand_interface_destroy(ctr_nand_interface *io)
 
 int ctr_nand_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
-	ctr_nand_interface* sd = ctx;
 	if (count)
 	{
 		uint8_t *dest = buffer;

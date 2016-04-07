@@ -26,7 +26,6 @@ void ctr_sd_interface_destroy(ctr_sd_interface *io)
 
 int ctr_sd_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
-	ctr_sd_interface* sd = ctx;
 	if (count)
 	{
 		uint8_t *dest = buffer;

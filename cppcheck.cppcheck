@@ -3,5 +3,6 @@
     <root name="./"/>
     <includedir>
         <dir name="/opt/devkitpro/devkitARM/arm-none-eabi/include/"/>
+        <dir name="include/"/>
     </includedir>
 </project>
