@@ -6,8 +6,8 @@ static const ctr_io_interface nand_crypto_base =
 {
 	ctr_nand_crypto_interface_read,
 	ctr_nand_crypto_interface_write,
-	ctr_nand_crypto_interface_sector_read,
-	ctr_nand_crypto_interface_sector_write,
+	ctr_nand_crypto_interface_read_sector,
+	ctr_nand_crypto_interface_write_sector,
 	ctr_nand_crypto_interface_disk_size,
 	ctr_nand_crypto_interface_sector_size
 };
@@ -46,10 +46,10 @@ int ctr_nand_crypto_interface_write(void *ctx, const void *buffer, size_t buffer
 	return res;
 }
 
-int ctr_nand_crypto_interface_sector_read(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_nand_crypto_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
 	ctr_nand_crypto_interface* io = ctx;
-	int res = io->lower_io->sector_read(ctx, buffer, buffer_size, sector, count);
+	int res = io->lower_io->read_sector(ctx, buffer, buffer_size, sector, count);
 	//FIXME check res
 	
 	//we now have raw data, apply crypto
@@ -57,10 +57,10 @@ int ctr_nand_crypto_interface_sector_read(void *ctx, void *buffer, size_t buffer
 	return res;
 }
 
-int ctr_nand_crypto_interface_sector_write(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
+int ctr_nand_crypto_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
 {
 	ctr_nand_crypto_interface* io = ctx;
-	int res = io->lower_io->sector_write(ctx, buffer, buffer_size, sector);
+	int res = io->lower_io->write_sector(ctx, buffer, buffer_size, sector);
 	//FIXME check res
 	
 	//we now have raw data, apply crypto

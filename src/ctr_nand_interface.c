@@ -6,8 +6,8 @@ static const ctr_io_interface nand_base =
 {
 	ctr_nand_interface_read,
 	ctr_nand_interface_write,
-	ctr_nand_interface_sector_read,
-	ctr_nand_interface_sector_write,
+	ctr_nand_interface_read_sector,
+	ctr_nand_interface_write_sector,
 	ctr_nand_interface_disk_size,
 	ctr_nand_interface_sector_size
 };
@@ -103,14 +103,14 @@ int ctr_nand_interface_write(void *ctx, const void *buffer, size_t buffer_size, 
 	return 0;
 }
 
-int ctr_nand_interface_sector_read(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_nand_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
 	size_t read_size = (buffer_size / 512) < count ? buffer_size / 512 : count;
 	int res = sdmmc_nand_readsectors(sector, read_size, (uint8_t*) buffer);
 	return res;
 }
 
-int ctr_nand_interface_sector_write(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
+int ctr_nand_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
 {
 	size_t write_size = (buffer_size / 512);
 	int res = sdmmc_nand_writesectors(sector, write_size, (const uint8_t*)buffer);

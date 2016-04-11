@@ -18,8 +18,8 @@ void ctr_sd_interface_destroy(ctr_sd_interface *io);
 
 int ctr_sd_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count);
 int ctr_sd_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position);
-int ctr_sd_interface_sector_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count);
-int ctr_sd_interface_sector_write(void *ctx, const void *buffer, size_t buffer_size, size_t position);
+int ctr_sd_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count);
+int ctr_sd_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t position);
 size_t ctr_sd_interface_disk_size(void *ctx);
 size_t ctr_sd_interface_sector_size(void *ctx);
 
