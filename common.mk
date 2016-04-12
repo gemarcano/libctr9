@@ -9,5 +9,5 @@ AM_CFLAGS= -flto -std=c11 -Os -g -mword-relocations -fomit-frame-pointer -ffast-
 	-Wshadow -Wsign-conversion -Wstrict-overflow=5 -Wswitch-default \
 	-Wundef -Wno-unused $(INCPATHS) $(C9FLAGS)
 
-#OCFLAGS=--set-section-flags .bss=alloc,load,contents
+OCFLAGS=--set-section-flags .bss=alloc,load,contents
 

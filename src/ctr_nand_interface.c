@@ -15,6 +15,7 @@ static const ctr_io_interface nand_base =
 int ctr_nand_interface_initialize(ctr_nand_interface *io)
 {
 	io->base = nand_base;
+	InitSD();
 	return Nand_Init();
 }
 

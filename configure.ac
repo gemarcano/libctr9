@@ -8,6 +8,7 @@ LT_INIT
 
 AC_PROG_CC
 AM_PROG_AS
+AC_CHECK_TOOL([OBJCOPY],objcopy)
 
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile])
 
