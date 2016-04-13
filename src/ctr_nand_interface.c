@@ -26,6 +26,7 @@ void ctr_nand_interface_destroy(ctr_nand_interface *io)
 
 int ctr_nand_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
+	int res = 0;
 	if (count)
 	{
 		uint8_t *dest = buffer;
@@ -37,7 +38,7 @@ int ctr_nand_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t 
 		size_t sectors_read = 0;
 
 		//read first sector to extract the right number of bytes from it
-		sdmmc_nand_readsectors(base_sector, ++sectors_read, buf);
+		res |= sdmmc_nand_readsectors(base_sector, ++sectors_read, buf);
 
 		const size_t readable = 0x200u - start_location;
 		bytes_read += readable < count ? readable : count;
@@ -48,7 +49,7 @@ int ctr_nand_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t 
 		const size_t mid_sectors = (count-bytes_read)/0x200u;
 		if (mid_sectors)
 		{
-			sdmmc_nand_readsectors(base_sector + sectors_read, mid_sectors, dest + bytes_read);
+			res |= sdmmc_nand_readsectors(base_sector + sectors_read, mid_sectors, dest + bytes_read);
 			sectors_read += mid_sectors;
 			bytes_read += mid_sectors * 0x200u;
 		}
@@ -56,15 +57,16 @@ int ctr_nand_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t 
 		if (bytes_read != count)
 		{
 			//read last sector to extract the right number of bytes from it
-			sdmmc_nand_readsectors(base_sector + sectors_read, 1, buf);
+			res |= sdmmc_nand_readsectors(base_sector + sectors_read, 1, buf);
 			memcpy(dest + bytes_read, buf, count - bytes_read);
 		}
 	}
-	return 0;
+	return res;
 }
 
 int ctr_nand_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position)
 {
+	int res = 0;
 	if (buffer_size)
 	{
 		const uint8_t *source = buffer;
@@ -76,19 +78,19 @@ int ctr_nand_interface_write(void *ctx, const void *buffer, size_t buffer_size, 
 		size_t sectors_written = 0;
 
 		//read first sector to extract the right number of bytes from it
-		sdmmc_nand_readsectors(base_sector, ++sectors_written, buf);
+		res |= sdmmc_nand_readsectors(base_sector, ++sectors_written, buf);
 
 		const size_t writeable = 0x200u - start_location;
 		bytes_written += writeable < buffer_size ? writeable : buffer_size;
 
 		memcpy(buf + start_location, source, bytes_written);
-		sdmmc_nand_writesectors(base_sector, sectors_written, buf);
+		res |= sdmmc_nand_writesectors(base_sector, sectors_written, buf);
 
 		const size_t mid_sectors = (buffer_size-bytes_written)/0x200u;
 		//read all sectors until the last one
 		if (mid_sectors)
 		{
-			sdmmc_nand_writesectors(base_sector + sectors_written, mid_sectors, source + bytes_written);
+			res |= sdmmc_nand_writesectors(base_sector + sectors_written, mid_sectors, source + bytes_written);
 			sectors_written += mid_sectors;
 			bytes_written += mid_sectors * 0x200u;
 		}
@@ -96,18 +98,22 @@ int ctr_nand_interface_write(void *ctx, const void *buffer, size_t buffer_size, 
 		if (bytes_written != buffer_size)
 		{
 			//read last sector to extract the right number of bytes from it
-			sdmmc_nand_readsectors(base_sector + sectors_written, 1, buf);
+			res |= sdmmc_nand_readsectors(base_sector + sectors_written, 1, buf);
 			memcpy(buf, source + bytes_written, buffer_size - bytes_written);
 			sdmmc_nand_writesectors(base_sector + sectors_written, 1, buf);
 		}
 	}
-	return 0;
+	return res;
 }
 
 int ctr_nand_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
-	size_t read_size = (buffer_size / 512) < count ? buffer_size / 512 : count;
-	int res = sdmmc_nand_readsectors(sector, read_size, (uint8_t*) buffer);
+	int res = 0;
+	if (count)
+	{
+		size_t read_size = (buffer_size / 512) < count ? buffer_size / 512 : count;
+		res = sdmmc_nand_readsectors(sector, read_size, (uint8_t*) buffer);
+	}
 	return res;
 }
 
@@ -120,11 +126,11 @@ int ctr_nand_interface_write_sector(void *ctx, const void *buffer, size_t buffer
 
 size_t ctr_nand_interface_disk_size(void *ctx)
 {
-	return 0;
+	return getMMCDevice(0)->total_size * 512u;;
 }
 
 size_t ctr_nand_interface_sector_size(void *ctx)
 {
-	return 512;
+	return 512u;
 }
 

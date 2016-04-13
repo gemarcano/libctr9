@@ -16,6 +16,7 @@ static const ctr_io_interface sd_base =
 int ctr_sd_interface_initialize(ctr_sd_interface *io)
 {
 	io->base = sd_base;
+	InitSD();
 	return SD_Init();
 }
 

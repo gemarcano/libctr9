@@ -333,6 +333,11 @@ static uint32_t calcSDSize(uint8_t* csd, int type)
 
 void InitSD()
 {
+	static int init = 0;
+	if (init) return;
+
+	init = 1;
+
 	//NAND
 	handelNAND.isSDHC = 0;
 	handelNAND.SDOPT = 0;
