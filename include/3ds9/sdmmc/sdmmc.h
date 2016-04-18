@@ -5,6 +5,7 @@
 #define FALSE 0
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define SDMMC_BASE				0x10006000
 
@@ -107,6 +108,8 @@ extern "C" {
 	
 	int sdmmc_nand_readsectors(uint32_t sector_no, uint32_t numsectors, uint8_t *out);
 	int sdmmc_nand_writesectors(uint32_t sector_no, uint32_t numsectors, const uint8_t *in);
+
+	int sdmmc_get_cid(bool isNand, uint32_t *info);
 	
 	mmcdevice *getMMCDevice(int drive);
 	

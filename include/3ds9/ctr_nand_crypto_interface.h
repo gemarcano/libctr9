@@ -4,6 +4,8 @@
 #include "ctr_io_interface.h"
 #include "sdmmc/sdmmc.h"
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,9 +14,14 @@ typedef struct
 {
 	ctr_io_interface base;
 	ctr_io_interface *lower_io;
+	
+	uint8_t keySlot;
+	uint8_t CtrNandCtr[16];
+	uint8_t TwlNandCtr[16];
+
 } ctr_nand_crypto_interface;
 
-int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, unsigned int slot, ctr_io_interface* lower_io);
+int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t keySlot, ctr_io_interface* lower_io);
 void ctr_nand_crypto_interface_destroy(ctr_nand_crypto_interface *io);
 
 int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count);

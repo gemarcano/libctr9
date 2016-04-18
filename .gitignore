@@ -3,3 +3,4 @@ lib
 *.swp
 *.in
 *.o
+.deps
