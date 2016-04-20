@@ -144,14 +144,22 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
         size_t ii = 0;
         for (ii = in; ii != in + AES_BLOCK_SIZE; ii += 4)
         {
-            set_aeswrfifo( *(u32*)(ii) );
+            u32 data = ((u8*)ii)[0];
+            data |= (u32)((u8*)ii)[1] << 8;
+            data |= (u32)((u8*)ii)[2] << 16;
+            data |= (u32)((u8*)ii)[3] << 24;
+            set_aeswrfifo(data);
         }
         if (out)
         {
             while (aescnt_checkread()) ;
             for (ii = out; ii != out + AES_BLOCK_SIZE; ii += 4)
             {
-                *(u32*)ii = read_aesrdfifo();
+                u32 data = read_aesrdfifo();
+                ((u8*)ii)[0] = data;
+                ((u8*)ii)[1] = data >> 8;
+                ((u8*)ii)[2] = data >> 16;
+                ((u8*)ii)[3] = data >> 24;
             }
         }
         curblock++;

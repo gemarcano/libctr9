@@ -109,7 +109,6 @@ static void NO_INLINE sdmmc_send_command(struct mmcdevice *ctx, uint32_t cmd, ui
 	
 	int rUseBuf = ( NULL != rDataPtr );
 	int tUseBuf = ( NULL != tDataPtr );
-	int rUseBuf32 = (rUseBuf && (0 == (3 & ((uint32_t)rDataPtr))));
 	
 	uint16_t status0 = 0;
 	while(1)
@@ -130,27 +129,22 @@ static void NO_INLINE sdmmc_send_command(struct mmcdevice *ctx, uint32_t cmd, ui
 					if(size > 0x1FF)
 					{
 						#ifdef DATA32_SUPPORT
-						if(rUseBuf32)
+						//Gabriel Marcano: This implementation doesn't assume alignment.
+						//I've removed the alignment check doen with former rUseBuf32 as a result
+						for(int i = 0; i<0x200; i+=4)
 						{
-							for(int i = 0; i<0x200; i+=4)
-							{
-								uint32_t data = sdmmc_read32(REG_SDFIFO32);
-								*rDataPtr++ = data;
-								*rDataPtr++ = data >> 8;
-								*rDataPtr++ = data >> 16;
-								*rDataPtr++ = data >> 24;
-							}
+							uint32_t data = sdmmc_read32(REG_SDFIFO32);
+							*rDataPtr++ = data;
+							*rDataPtr++ = data >> 8;
+							*rDataPtr++ = data >> 16;
+							*rDataPtr++ = data >> 24;
 						}
-						else 
+						#else
+						for(int i = 0; i<0x200; i+=2)
 						{
-						#endif
-							for(int i = 0; i<0x200; i+=2)
-							{
-								uint16_t data = sdmmc_read16(REG_SDFIFO);
-								*rDataPtr++ = data;
-								*rDataPtr++ = data >> 8;
-							}
-						#ifdef DATA32_SUPPORT
+							uint16_t data = sdmmc_read16(REG_SDFIFO);
+							*rDataPtr++ = data;
+							*rDataPtr++ = data >> 8;
 						}
 						#endif
 						size -= 0x200;

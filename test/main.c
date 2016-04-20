@@ -14,15 +14,6 @@
 
 #include "test.h"
 
-static void report_error(bool assert, const char *message)
-{
-	if (!assert)
-	{
-		printf(message);
-		printf("\n");
-	}
-}
-
 typedef struct
 {
 	char *buffer;
@@ -55,7 +46,7 @@ static bool nand_test2(void *ctx)
 	size_t buffer_size = data->buffer_size;
 
 	int res = ctr_io_read(&data->nand_io, buffer, buffer_size, 0x100, 4);
-	return !res && strncmp(buffer, "NCSD", 4) == 0;
+	return !res && memcmp(buffer, "NCSD", 4) == 0;
 }
 
 static bool nand_test3(void *ctx)
@@ -65,7 +56,7 @@ static bool nand_test3(void *ctx)
 	size_t buffer_size = data->buffer_size;
 
 	int res = ctr_io_read_sector(&data->nand_io, buffer, buffer_size, 0, 1);
-	return !res && strncmp(buffer + 0x100, "NCSD", 4) == 0;
+	return !res && memcmp(buffer + 0x100, "NCSD", 4) == 0;
 }
 
 static bool nand_test4(void *ctx)
@@ -76,8 +67,8 @@ static bool nand_test4(void *ctx)
 
 	int res = ctr_io_read(&data->nand_io, buffer+0x200, buffer_size-0x200, 0, 0x200);
 	res |= ctr_io_read_sector(&data->nand_io, buffer, 512, 0, 1);
-	
-	return !res && strncmp(buffer + 0x200, buffer, 0x100) == 0;
+
+	return !res && memcmp(buffer + 0x200, buffer, 0x100) == 0;
 }
 
 static bool nand_test5(void *ctx)
@@ -88,7 +79,7 @@ static bool nand_test5(void *ctx)
 
 	int res = ctr_io_read(&data->nand_io, buffer, buffer_size, 0, 0);
 	res |= ctr_io_read_sector(&data->nand_io, buffer, 512, 0, 0);
-	
+
 	return !res;
 }
 
@@ -106,7 +97,7 @@ static bool nand_test7(void *ctx)
 	nand_test_data *data = ctx;
 
 	size_t sector_size = ctr_io_sector_size(&data->nand_io);
-	
+
 	return sector_size == 512u;
 }
 
@@ -120,7 +111,13 @@ static bool nand_test8(void *ctx)
 	int res = ctr_io_read(&data->nand_io, buffer, buffer_size/2, loc, buffer_size/2);
 	res |= ctr_io_read_sector(&data->nand_io, buffer+buffer_size/2, buffer_size/2, loc/512, buffer_size/2/512);
 
-	return !res && strncmp(buffer + buffer_size/2, buffer, buffer_size/2) == 0;
+	bool test1 = memcmp(buffer + buffer_size/2, buffer, buffer_size/2) == 0;
+
+	res |= ctr_io_read(&data->nand_io, buffer, buffer_size/2, loc + 11, buffer_size/2-12);
+
+	bool test2 = memcmp(buffer + buffer_size/2 + 11, buffer, buffer_size/2-12) == 0;
+
+	return !res && test1 && test2;
 
 }
 
@@ -153,7 +150,6 @@ static bool nand_ctrnand_test3(void *ctx)
 
 	uint32_t loc = 0x0B95CA00; //CTRNAND
 	int res = ctr_io_read(&data->io, buffer, buffer_size, loc + 3, 3);
-	buffer[3] = '\0';
 
 	return strncmp("CTR", buffer, 3) == 0;
 }
@@ -166,9 +162,15 @@ static bool nand_ctrnand_test4(void *ctx)
 
 	uint32_t loc = 0x0B95CA00; //CTRNAND
 	int res = ctr_io_read(&data->io, buffer, buffer_size/2, loc, buffer_size/2);
-	res |= ctr_io_read_sector(&data->io, buffer+buffer_size/2, buffer_size/2, loc /0x200, buffer_size/2);
+	res |= ctr_io_read_sector(&data->io, buffer+buffer_size/2, buffer_size/2, loc /0x200, buffer_size/2/512);
 
-	return strncmp(buffer, buffer + buffer_size/2, buffer_size/2) == 0;
+	bool test1 = memcmp(buffer, buffer + buffer_size/2, buffer_size/2) == 0;
+
+	res |= ctr_io_read(&data->io, buffer, buffer_size/2, loc+3, buffer_size/2-4);
+
+	bool test2 = memcmp(buffer, buffer + buffer_size/2 + 3, buffer_size/2 - 4) == 0;
+
+	return !res && test1 && test2;
 }
 
 int main()
@@ -181,7 +183,7 @@ int main()
 	char buffer[0x1000] = {0};
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
 	nand_crypto_test_data nand_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
-	
+
 	ctr_unit_test nand_tests_f[8];
 	ctr_unit_tests nand_tests;
 	ctr_unit_tests_initialize(&nand_tests, "NAND tests", nand_tests_f, 8);

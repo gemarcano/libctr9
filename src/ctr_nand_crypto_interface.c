@@ -71,8 +71,8 @@ static void decryptNand(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 	{
 		uint32_t mode = (location >= 0x0B100000u) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
 		alignas(32) uint8_t ctr[16];
-		
 		alignas(32) uint8_t block_buffer[16];
+		uint32_t amount_read = 0;
 
 		use_aeskey(io->keySlot);
 		
@@ -84,43 +84,50 @@ static void decryptNand(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 		// First block always exists, may or may not be aligned.
 		
 		uint8_t block_offset = location & 0xF;
-		uint8_t section1_size = 16 - block_offset;
-		if (section1_size > count)
+		size_t current_section_size = 16u - block_offset;
+		if (current_section_size > count)
 		{
-			section1_size = count;
+			current_section_size = count;
 		}
 
-		memcpy(block_buffer + block_offset, buffer, section1_size);
+		memcpy(block_buffer + block_offset, buffer, current_section_size);
 
 		set_ctr(ctr);
 		aes_decrypt((void*) block_buffer, (void*) block_buffer, 1, mode);
 		add_ctr(ctr, 0x1);
 
-		memcpy(buffer, block_buffer + block_offset, section1_size);
+
+		memcpy(buffer, block_buffer + block_offset, current_section_size);
+
+		amount_read = current_section_size;
+
+		current_section_size = count - amount_read;
+		current_section_size -= current_section_size % 16;
 
 		// second set may or may not exists (only if count - (0xF - location & 0xF) != 0 and if count - (0xF - location & 0xF) >= 0x10)
-		size_t section2_size = (count - section1_size) / 16;
-		if (section2_size)
+		if (current_section_size)
 		{
-			for (size_t b = 0x0; b < section2_size; b += 0x10, buffer += 0x10)
+			for (size_t b = 0x0; b < current_section_size; b += 0x10)
 			{
 				set_ctr(ctr);
-				aes_decrypt((void*) (buffer + section1_size + b), (void*) (buffer + section1_size + b), 1, mode);
+				aes_decrypt((void*) (buffer + amount_read + b), (void*) (buffer + amount_read + b), 1, mode);
 				add_ctr(ctr, 0x1);
 			}
 		}
 
+		amount_read += current_section_size;
+
 		// last block may or may not exist. Only if (count - (0xF - location & 0xF)) & 0xF != 0
-		uint8_t section3_size = (count - section1_size) % 16;
-		if (section3_size)
+		current_section_size = (count - amount_read) % 16;
+		if (current_section_size)
 		{
-			memcpy(block_buffer, buffer + section1_size + section2_size, section3_size);
+			memcpy(block_buffer, buffer + amount_read, current_section_size);
 
 			set_ctr(ctr);
 			aes_decrypt((void*) block_buffer, (void*) block_buffer, 1, mode);
 			add_ctr(ctr, 0x1);
 
-			memcpy(buffer + section1_size + section2_size, block_buffer, section3_size);
+			memcpy(buffer + amount_read, block_buffer, current_section_size);
 		}
 	}
 }
