@@ -1,5 +1,5 @@
-#include <3ds9/ctr_sd_interface.h>
-#include <3ds9/sdmmc/sdmmc.h>
+#include <ctr9/io/ctr_sd_interface.h>
+#include <ctr9/io/sdmmc/sdmmc.h>
 #include <string.h>
 
 

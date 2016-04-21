@@ -1,9 +1,11 @@
 /* original version by megazig */
-#include <3ds9/aes.h>
+#include <ctr9/aes.h>
 
-void setup_aeskeyX(u8 keyslot, void* keyx)
+//FIXME some things make assumptions about alignemnts!
+
+void setup_aeskeyX(uint8_t keyslot, void* keyx)
 {
-    u32 * _keyx = (u32*)keyx;
+    uint32_t * _keyx = (uint32_t*)keyx;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYXFIFO = _keyx[0];
@@ -11,18 +13,18 @@ void setup_aeskeyX(u8 keyslot, void* keyx)
         *REG_AESKEYXFIFO = _keyx[2];
         *REG_AESKEYXFIFO = _keyx[3];
     } else {
-        u32 old_aescnt = *REG_AESCNT;
-        vu32* reg_aeskeyx = REG_AESKEY0123 + (((0x30u * keyslot) + 0x10u)/4u);
+        uint32_t old_aescnt = *REG_AESCNT;
+        volatile uint32_t* reg_aeskeyx = REG_AESKEY0123 + (((0x30u * keyslot) + 0x10u)/4u);
         *REG_AESCNT = (*REG_AESCNT & ~(AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER));
-        for (u32 i = 0; i < 4u; i++)
+        for (uint32_t i = 0; i < 4u; i++)
             reg_aeskeyx[i] = _keyx[i];
         *REG_AESCNT = old_aescnt;
     }
 }
 
-void setup_aeskeyY(u8 keyslot, void* keyy)
+void setup_aeskeyY(uint8_t keyslot, void* keyy)
 {
-    u32 * _keyy = (u32*)keyy;
+    uint32_t * _keyy = (uint32_t*)keyy;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYYFIFO = _keyy[0];
@@ -30,18 +32,18 @@ void setup_aeskeyY(u8 keyslot, void* keyy)
         *REG_AESKEYYFIFO = _keyy[2];
         *REG_AESKEYYFIFO = _keyy[3];
     } else {
-        u32 old_aescnt = *REG_AESCNT;
-        vu32* reg_aeskeyy = REG_AESKEY0123 + (((0x30u * keyslot) + 0x20u)/4u);
+        uint32_t old_aescnt = *REG_AESCNT;
+        volatile uint32_t* reg_aeskeyy = REG_AESKEY0123 + (((0x30u * keyslot) + 0x20u)/4u);
         *REG_AESCNT = (*REG_AESCNT & ~(AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER));
-        for (u32 i = 0; i < 4u; i++)
+        for (uint32_t i = 0; i < 4u; i++)
             reg_aeskeyy[i] = _keyy[i];
         *REG_AESCNT = old_aescnt;
     }
 }
 
-void setup_aeskey(u8 keyslot, void* key)
+void setup_aeskey(uint8_t keyslot, void* key)
 {
-    u32 * _key = (u32*)key;
+    uint32_t * _key = (uint32_t*)key;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYFIFO = _key[0];
@@ -49,16 +51,16 @@ void setup_aeskey(u8 keyslot, void* key)
         *REG_AESKEYFIFO = _key[2];
         *REG_AESKEYFIFO = _key[3];
     } else {
-        u32 old_aescnt = *REG_AESCNT;
-        vu32* reg_aeskey = REG_AESKEY0123 + ((0x30u * keyslot)/4u);
+        uint32_t old_aescnt = *REG_AESCNT;
+        volatile uint32_t* reg_aeskey = REG_AESKEY0123 + ((0x30u * keyslot)/4u);
         *REG_AESCNT = (*REG_AESCNT & ~(AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER));
-        for (u32 i = 0; i < 4u; i++)
+        for (uint32_t i = 0; i < 4u; i++)
             reg_aeskey[i] = _key[i];
         *REG_AESCNT = old_aescnt;
     }
 }
 
-void use_aeskey(u32 keyno)
+void use_aeskey(uint32_t keyno)
 {
     if (keyno > 0x3F)
         return;
@@ -68,7 +70,7 @@ void use_aeskey(u32 keyno)
 
 void set_ctr(void* iv)
 {
-    u32 * _iv = (u32*)iv;
+    uint32_t * _iv = (uint32_t*)iv;
     *REG_AESCNT = (*REG_AESCNT) | AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *(REG_AESCTR + 0) = _iv[3];
     *(REG_AESCTR + 1) = _iv[2];
@@ -76,15 +78,15 @@ void set_ctr(void* iv)
     *(REG_AESCTR + 3) = _iv[0];
 }
 
-void add_ctr(void* ctr, u32 carry)
+void add_ctr(void* ctr, uint32_t carry)
 {
-    u32 counter[4];
-    u8 *outctr = (u8 *) ctr;
-    u32 sum;
+    uint32_t counter[4];
+    uint8_t *outctr = (uint8_t *) ctr;
+    uint32_t sum;
     int32_t i;
 
     for(i = 0; i < 4; i++) {
-        counter[i] = ((u32)outctr[i*4+0]<<24) | ((u32)outctr[i*4+1]<<16) | ((u32)outctr[i*4+2]<<8) | ((u32)outctr[i*4+3]<<0);
+        counter[i] = ((uint32_t)outctr[i*4+0]<<24) | ((uint32_t)outctr[i*4+1]<<16) | ((uint32_t)outctr[i*4+2]<<8) | ((uint32_t)outctr[i*4+3]<<0);
     }
 
     for(i=3; i>=0; i--)
@@ -108,10 +110,10 @@ void add_ctr(void* ctr, u32 carry)
     }
 }
 
-void aes_decrypt(void* inbuf, void* outbuf, size_t size, u32 mode)
+void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode)
 {
-    u32 in  = (u32)inbuf;
-    u32 out = (u32)outbuf;
+    uint32_t in  = (uint32_t)inbuf;
+    uint32_t out = (uint32_t)outbuf;
     size_t block_count = size;
     size_t blocks;
     while (block_count != 0)
@@ -132,10 +134,10 @@ void aes_decrypt(void* inbuf, void* outbuf, size_t size, u32 mode)
 
 void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
 {
-    u32 in  = (u32)inbuf;
+    uint32_t in  = (uint32_t)inbuf;
     if (!in) return;
 
-    u32 out = (u32)outbuf;
+    uint32_t out = (uint32_t)outbuf;
     size_t curblock = 0;
     while (curblock != blocks)
     {
@@ -144,10 +146,10 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
         size_t ii = 0;
         for (ii = in; ii != in + AES_BLOCK_SIZE; ii += 4)
         {
-            u32 data = ((u8*)ii)[0];
-            data |= (u32)((u8*)ii)[1] << 8;
-            data |= (u32)((u8*)ii)[2] << 16;
-            data |= (u32)((u8*)ii)[3] << 24;
+            uint32_t data = ((uint8_t*)ii)[0];
+            data |= (uint32_t)((uint8_t*)ii)[1] << 8;
+            data |= (uint32_t)((uint8_t*)ii)[2] << 16;
+            data |= (uint32_t)((uint8_t*)ii)[3] << 24;
             set_aeswrfifo(data);
         }
         if (out)
@@ -155,44 +157,44 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
             while (aescnt_checkread()) ;
             for (ii = out; ii != out + AES_BLOCK_SIZE; ii += 4)
             {
-                u32 data = read_aesrdfifo();
-                ((u8*)ii)[0] = data;
-                ((u8*)ii)[1] = data >> 8;
-                ((u8*)ii)[2] = data >> 16;
-                ((u8*)ii)[3] = data >> 24;
+                uint32_t data = read_aesrdfifo();
+                ((uint8_t*)ii)[0] = data;
+                ((uint8_t*)ii)[1] = data >> 8;
+                ((uint8_t*)ii)[2] = data >> 16;
+                ((uint8_t*)ii)[3] = data >> 24;
             }
         }
         curblock++;
     }
 }
 
-void set_aeswrfifo(u32 value)
+void set_aeswrfifo(uint32_t value)
 {
     *REG_AESWRFIFO = value;
 }
 
-u32 read_aesrdfifo(void)
+uint32_t read_aesrdfifo(void)
 {
     return *REG_AESRDFIFO;
 }
 
-u32 aes_getwritecount()
+uint32_t aes_getwritecount()
 {
     return *REG_AESCNT & 0x1F;
 }
 
-u32 aes_getreadcount()
+uint32_t aes_getreadcount()
 {
     return (*REG_AESCNT >> 5) & 0x1F;
 }
 
-u32 aescnt_checkwrite()
+uint32_t aescnt_checkwrite()
 {
     size_t ret = aes_getwritecount();
     return (ret > 0xF);
 }
 
-u32 aescnt_checkread()
+uint32_t aescnt_checkread()
 {
     size_t ret = aes_getreadcount();
     return (ret <= 3);

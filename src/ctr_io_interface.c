@@ -1,4 +1,4 @@
-#include <3ds9/ctr_io_interface.h>
+#include <ctr9/io/ctr_io_interface.h>
 
 int ctr_io_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)
 {

@@ -1,5 +1,5 @@
-#include <3ds9/ctr_nand_interface.h>
-#include <3ds9/sdmmc/sdmmc.h>
+#include <ctr9/io/ctr_nand_interface.h>
+#include <ctr9/io/sdmmc/sdmmc.h>
 #include <string.h>
 
 static const ctr_io_interface nand_base =
@@ -117,10 +117,20 @@ int ctr_nand_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, 
 	return res;
 }
 
+#include <ctr/printf.h>
+
 int ctr_nand_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
 {
 	size_t write_size = (buffer_size / 512);
-	int res = sdmmc_nand_writesectors(sector, write_size, (const uint8_t*)buffer);
+	int res;
+	if (write_size)
+	{
+		res = sdmmc_nand_writesectors(sector, write_size, (const uint8_t*)buffer);
+	}
+	else
+	{
+		res = 1; //FIXME standardize return
+	}
 	return res;
 }
 

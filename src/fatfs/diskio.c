@@ -7,8 +7,8 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include <3ds9/fatfs/diskio.h>		/* FatFs lower layer API */
-#include <3ds9/sdmmc/sdmmc.h>
+#include <ctr9/fatfs/diskio.h>		/* FatFs lower layer API */
+#include <ctr9/io/sdmmc/sdmmc.h>
 
 static DSTATUS status = STA_NOINIT;
 

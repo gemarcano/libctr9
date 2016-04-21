@@ -1,19 +1,19 @@
-#include <3ds9/sha.h>
+#include <ctr9/sha.h>
 #include <string.h>
 
-void sha_init(u32 mode)
+void sha_init(uint32_t mode)
 {
     while(*REG_SHACNT & 1);
     *REG_SHACNT = mode | SHA_CNT_OUTPUT_ENDIAN | SHA_NORMAL_ROUND;
 }
 
-void sha_update(const void* src, u32 size)
+void sha_update(const void* src, uint32_t size)
 {    
-    const u32* src32 = (const u32*)src;
+    const uint32_t* src32 = (const uint32_t*)src;
     
     while(size >= 0x40) {
         while(*REG_SHACNT & 1);
-        for(u32 i = 0; i < 4; i++) {
+        for(uint32_t i = 0; i < 4; i++) {
             *REG_SHAINFIFO = *src32++;
             *REG_SHAINFIFO = *src32++;
             *REG_SHAINFIFO = *src32++;

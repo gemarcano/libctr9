@@ -32,7 +32,7 @@
 #include <dirent.h>
 #include <errno.h>
 
-#include <3ds9/sdmmc/sdmmc.h>
+#include <ctr9/io/sdmmc/sdmmc.h>
 //#include "DrawCharacter.h"
 
 #define DATA32_SUPPORT
@@ -171,9 +171,9 @@ static void NO_INLINE sdmmc_send_command(struct mmcdevice *ctx, uint32_t cmd, ui
 						for(int i = 0; i<0x200; i+=4)
 						{
 							uint32_t data = *tDataPtr++;
-							data |= (uint8_t)(*tDataPtr++ << 8);
-							data |= (uint8_t)(*tDataPtr++ << 16);
-							data |= (uint8_t)(*tDataPtr++ << 24);
+							data |= (uint32_t)*tDataPtr++ << 8;
+							data |= (uint32_t)*tDataPtr++ << 16;
+							data |= (uint32_t)*tDataPtr++ << 24;
 							sdmmc_write32(REG_SDFIFO32, data);
 						}
 						#else

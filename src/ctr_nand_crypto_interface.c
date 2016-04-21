@@ -1,8 +1,8 @@
-#include <3ds9/ctr_nand_crypto_interface.h>
-#include <3ds9/sdmmc/sdmmc.h>
+#include <ctr9/io/ctr_nand_crypto_interface.h>
+#include <ctr9/io/sdmmc/sdmmc.h>
 #include <string.h>
-#include <3ds9/aes.h>
-#include <3ds9/sha.h>
+#include <ctr9/aes.h>
+#include <ctr9/sha.h>
 
 #include <stdalign.h>
 

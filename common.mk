@@ -1,4 +1,4 @@
-INCPATHS=-I$(top_srcdir)/include -I$(top_srcdir)/tmp/
+INCPATHS=-I$(top_srcdir)/include 
 C9FLAGS=-mcpu=arm946e-s -march=armv5te -mlittle-endian -mword-relocations
 
 #THUMBFLAGS=-mthumb -mthumb-interwork

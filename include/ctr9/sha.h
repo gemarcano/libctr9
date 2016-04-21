@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include <stdint.h>
 
 #define REG_SHACNT      ((volatile uint32_t*)0x1000A000)
 #define REG_SHABLKCNT   ((volatile uint32_t*)0x1000A004)
@@ -22,7 +22,7 @@
 #define SHA1_MODE               0x00000020u
 
 
-void sha_init(u32 mode);
-void sha_update(const void* src, u32 size);
+void sha_init(uint32_t mode);
+void sha_update(const void* src, uint32_t size);
 void sha_get(void* res);
 

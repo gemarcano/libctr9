@@ -48,5 +48,5 @@ size_t ctr_io_sector_size(void *io);
 #endif//__cplusplus
 
 
-#endif//DS39_IO_INTERFACE_H_
+#endif//CTR_IO_INTERFACE_H_
 

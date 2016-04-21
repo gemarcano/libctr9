@@ -1,6 +1,4 @@
-#include <3ds9/io.h>
-#include <3ds9/ctr_nand_interface.h>
-#include <3ds9/ctr_nand_crypto_interface.h>
+#include <ctr9/io.h>
 
 #include <string.h>
 #include <stdbool.h>
@@ -10,7 +8,7 @@
 #include <ctr/headers.h>
 #include <ctr/hid.h>
 
-#include <3ds9/i2c.h>
+#include <ctr9/i2c.h>
 
 #include "test.h"
 
@@ -121,6 +119,65 @@ static bool nand_test8(void *ctx)
 
 }
 
+static bool nand_test9(void *ctx)
+{
+	nand_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+	const char* text = "TEST";
+	int res = ctr_io_write(&data->nand_io, text, 5, 0x5A000*0x200);
+	ctr_io_read(&data->nand_io, buffer, buffer_size, 0x5A000*0x200, 5);
+
+	bool test1 = !memcmp(text, buffer, 5);
+
+	res |= ctr_io_write(&data->nand_io, text, 5, 0x5A000*0x200-3);
+	ctr_io_read(&data->nand_io, buffer+5, buffer_size-5, 0x5A000*0x200-3, 5);
+
+	bool test2 = !memcmp(text, buffer+5, 5);
+
+	return !res && test1 && test2;
+}
+
+static bool nand_test10(void *ctx)
+{
+	nand_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+	char text[2048];
+
+	for(size_t i = 0; i < 2048; ++i)
+	{
+		text[i] = (char)i;
+	}
+
+	uint32_t loc = 0x5A000*0x200-3;
+
+	int res = ctr_io_write(&data->nand_io, text, 2048, loc);
+	ctr_io_read(&data->nand_io, buffer, buffer_size, loc, 2048);
+
+	return !res && !memcmp(text, buffer, 2048);
+}
+
+static bool nand_test11(void *ctx)
+{
+	nand_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+	char text[2048];
+
+	for(size_t i = 0; i < 2048; ++i)
+	{
+		text[i] = (char)i;
+	}
+
+	uint32_t loc = 0x5A000-3;
+
+	int res = ctr_io_write_sector(&data->nand_io, text, 2048, loc);
+	ctr_io_read_sector(&data->nand_io, buffer, buffer_size, loc, 2048);
+
+	return !res && !memcmp(text, buffer, 2048);
+}
+
 static bool nand_ctrnand_test1(void *ctx)
 {
 	nand_crypto_test_data *data = ctx;
@@ -184,9 +241,9 @@ int main()
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
 	nand_crypto_test_data nand_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
 
-	ctr_unit_test nand_tests_f[8];
+	ctr_unit_test nand_tests_f[11];
 	ctr_unit_tests nand_tests;
-	ctr_unit_tests_initialize(&nand_tests, "NAND tests", nand_tests_f, 8);
+	ctr_unit_tests_initialize(&nand_tests, "NAND tests", nand_tests_f, 11);
 	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_initialize", &nand_ctx, nand_test1 } );
 	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_read", &nand_ctx, nand_test2 } );
 	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_read_sector", &nand_ctx, nand_test3 } );
@@ -195,6 +252,9 @@ int main()
 	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_disk_size", &nand_ctx, nand_test6 } );
 	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_sector_size", &nand_ctx, nand_test7 } );
 	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_read larger than a sector", &nand_ctx, nand_test8 } );
+	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_write", &nand_ctx, nand_test9 } );
+	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_write 2048 across sectors", &nand_ctx, nand_test10 } );
+	ctr_unit_tests_add_test(&nand_tests, (ctr_unit_test){ "ctr_nand_write 2048 across sectors", &nand_ctx, nand_test11 } );
 
 	ctr_unit_test nand_crypto_tests_f[4];
 	ctr_unit_tests nand_crypto_tests;
