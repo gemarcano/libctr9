@@ -96,7 +96,6 @@ static void decryptNand(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 		aes_decrypt((void*) block_buffer, (void*) block_buffer, 1, mode);
 		add_ctr(ctr, 0x1);
 
-
 		memcpy(buffer, block_buffer + block_offset, current_section_size);
 
 		amount_read = current_section_size;
@@ -139,12 +138,15 @@ void ctr_nand_crypto_interface_destroy(ctr_nand_crypto_interface *io)
 
 int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
-	ctr_nand_crypto_interface* io = ctx;
-	int res = io->lower_io->read(ctx, buffer, buffer_size, position, count);
-	//FIXME check res
-	
-	//we now have raw data, apply crypto
-	decryptNand(io, (uint8_t*)buffer, position, count);
+	int res = 0;
+	if (count)
+	{
+		ctr_nand_crypto_interface* io = ctx;
+		res = io->lower_io->read(ctx, buffer, buffer_size, position, count);
+		
+		//we now have raw data, apply crypto
+		decryptNand(io, (uint8_t*)buffer, position, count < buffer_size ? count : buffer_size);
+	}
 	
 	return res;
 }
@@ -152,33 +154,53 @@ int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, 
 int ctr_nand_crypto_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position)
 {
 	ctr_nand_crypto_interface* io = ctx;
-	int res = io->lower_io->write(ctx, buffer, buffer_size, position);
-	//FIXME check res
-	
-	//we now have raw data, apply crypto
+	uint8_t buf[0x200*4];
+	int res = 0;
+	for (size_t i = 0; i < buffer_size && !res; i += sizeof(buf))
+	{
+		size_t write_size = buffer_size - i > sizeof(buf) ? sizeof(buf) : buffer_size - i;
+		memcpy(buf, buffer, write_size);
+
+		decryptNand(io, buf, position + i, write_size);
+		res |= io->lower_io->write(ctx, buf, write_size, position + i);
+	}
 
 	return res;
 }
 
 int ctr_nand_crypto_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
-	ctr_nand_crypto_interface* io = ctx;
-	int res = io->lower_io->read_sector(ctx, buffer, buffer_size, sector, count);
-	//FIXME check res
-	
-	//we now have raw data, apply crypto
-	decryptNandSector(io, (uint8_t*)buffer, sector, count);
+	int res = 0;
+	if (count)
+	{
+		ctr_nand_crypto_interface* io = ctx;
+		res = io->lower_io->read_sector(ctx, buffer, buffer_size, sector, count);
+		
+		//we now have raw data, apply crypto
+		decryptNandSector(io, (uint8_t*)buffer, sector, count < buffer_size/0x200 ? count : buffer_size/0x200 );
+	}
 	return res;
 }
 
 int ctr_nand_crypto_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
 {
-	ctr_nand_crypto_interface* io = ctx;
-	int res = io->lower_io->write_sector(ctx, buffer, buffer_size, sector);
-	//FIXME check res
-	
-	//we now have raw data, apply crypto
+	int res = 0;
+	size_t number_of_sectors = buffer_size / 0x200;
 
+	if (number_of_sectors)
+	{
+		ctr_nand_crypto_interface* io = ctx;
+		uint8_t buf[0x200*4];
+		for (size_t i = 0; i < number_of_sectors && !res; i += sizeof(buf) / 0x200)
+		{
+			size_t write_sectors = ((number_of_sectors - i) >= (sizeof(buf) / 0x200) ? sizeof(buf) / 0x200 : buffer_size/0x200 - i);
+			
+			memcpy(buf, buffer, write_sectors * 0x200);
+
+			decryptNandSector(io, buf, sector + i, write_sectors);
+			res |= io->lower_io->write_sector(ctx, buf, write_sectors * 0x200, sector + i);
+		}
+	}
 	return res;
 }
 
