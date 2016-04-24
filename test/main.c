@@ -9,6 +9,10 @@
 #include <ctr/hid.h>
 
 #include <ctr9/i2c.h>
+#include <ctr9/io/fatfs/ff.h>
+#include <ctr9/io/fatfs/diskio.h>
+
+#define SD 3
 
 #include "test.h"
 
@@ -334,11 +338,33 @@ int main()
 	ctr_sd_interface sd_io;
 	ctr_sd_interface_initialize(&sd_io);
 
-	ctr_sd_interface_destroy(&sd_io);
-	ctr_nand_interface_destroy(&nand_ctx.nand_io);
+	//ctr_sd_interface_destroy(&sd_io);
+	//ctr_nand_interface_destroy(&nand_ctx.nand_io);
 
 	printf("Press any key to continue...\n");
+	
+	FATFS fs = { 0 };
+	FIL test_file = { 0 };
+
+	disk_prepare(0, &nand_crypto_ctx.io);
+
+	int res2 = 0;
+	if ((res2 = f_mount(&fs, "CTRNAND:", 1)) != FR_OK)
+	{
+		printf("WTF MOUNT FAILED; %d\n", res2);
+	}
+	else if ((res2 = f_open(&test_file, "CTRNAND:/rw/sys/SecureInfo_A", FA_READ)) != FR_OK)
+	{
+		printf("WTF READ OPEN FAILED; %d\n", res2);
+	}
+	else
+	{
+		printf("Size: %d\n", f_size(&test_file));
+	}
+
 	input_wait();
+	
+	printf("I'm alive, I swear!\n");
 
 	ctr_rtc_gettime();
 

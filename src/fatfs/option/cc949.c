@@ -3,7 +3,7 @@
 /* CP949 (Korean EUC-KR)                                                  */
 /*------------------------------------------------------------------------*/
 
-#include "../ff.h"
+#include <ctr9/io/fatfs/ff.h>
 
 
 #if !_USE_LFN || _CODE_PAGE != 949

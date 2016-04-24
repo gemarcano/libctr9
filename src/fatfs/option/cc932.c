@@ -3,7 +3,7 @@
 /* CP932 (Japanese Shift-JIS)                                             */
 /*------------------------------------------------------------------------*/
 
-#include "../ff.h"
+#include <ctr9/io/fatfs/ff.h>
 
 #define _TINY_TABLE	0
 

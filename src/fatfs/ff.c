@@ -16,9 +16,8 @@
 /----------------------------------------------------------------------------*/
 
 
-#include "ff.h"			/* Declarations of FatFs API */
-#include "diskio.h"		/* Declarations of disk I/O functions */
-
+#include <ctr9/io/fatfs/ff.h>			/* Declarations of FatFs API */
+#include <ctr9/io/fatfs/diskio.h>		/* Declarations of disk I/O functions */
 
 /*--------------------------------------------------------------------------
 

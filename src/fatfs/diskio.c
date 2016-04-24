@@ -7,11 +7,8 @@
 /* storage control modules to the FatFs module with a defined API.       */
 /*-----------------------------------------------------------------------*/
 
-#include "diskio.h"		/* FatFs lower layer API */
-#include "../../io.h"
-#include "usbdisk.h"	/* Example: Header file of existing USB MSD control module */
-#include "atadrive.h"	/* Example: Header file of existing ATA harddisk control module */
-#include "sdcard.h"		/* Example: Header file of existing MMC/SDC contorl module */
+#include <ctr9/io/fatfs/diskio.h>		/* FatFs lower layer API */
+#include <ctr9/io.h>
 
 /* Definitions of physical drive number for each drive */
 #define CTRNAND	0
@@ -20,8 +17,27 @@
 #define SD		3
 #define EMU1	4
 
-static ctr_nand_interface nand;
-static ctr_nand_crypto_interface ctrnand;
+static ctr_nand_crypto_interface *ctrnand;
+static ctr_sd_interface *sd_disk;
+
+void disk_prepare(BYTE pdrv, void *io)
+{
+	
+	switch (pdrv) {
+	case CTRNAND :
+		ctrnand = (ctr_nand_crypto_interface*)io;
+		break;
+	case TWL :
+	case TWLP :
+	case SD :
+		sd_disk = (ctr_sd_interface*)io;
+		break;
+	case EMU1 :
+	default:
+		break;
+	}
+}
+
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -36,14 +52,14 @@ DSTATUS disk_status (
 
 	switch (pdrv) {
 	case CTRNAND :
-		result = ATA_disk_status();
 
-		// translate the reslut code here
-
-		return stat;
+		return STA_NOINIT;
 
 	case TWL :
 	case TWLP :
+	case SD :
+		
+		return 0;
 	case EMU1 :
 	default:
 		break;
@@ -66,15 +82,14 @@ DSTATUS disk_initialize (
 
 	switch (pdrv) {
 	case CTRNAND :
-		result = ctr_nand_interface_initialize(&nand);
-		result = ctr_nand_crypto_interface(&ctrnand, 0x04, &nand); //FIXME make sure NAND is initialized and keyslot is correct!;
-
+		if (ctrnand) return 0;
+		return STA_NOINIT;
 		// translate the reslut code here
-
-		return stat;
-
 	case TWL :
 	case TWLP:
+	case SD:
+		if (sd_disk) return 0;
+		return STA_NOINIT;
 	case EMU1:
 	default :
 		break;
@@ -87,6 +102,8 @@ DSTATUS disk_initialize (
 /*-----------------------------------------------------------------------*/
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
+
+#define CTRNAND_LOCATION 0x0B930000
 
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
@@ -101,11 +118,9 @@ DRESULT disk_read (
 	switch (pdrv) {
 	case CTRNAND :
 		// translate the arguments here
-		result = ctr_io_read_sector(&ctrnand, MMC_disk_read(buff, sector + 0x0B95CA00/0x200, count);
+		result = ctr_io_read_sector(ctrnand, buff, count*512, sector + CTRNAND_LOCATION/0x200, count);
 
-		// translate the reslut code here
-
-		return res;
+		return RES_OK;
 
 	case TWL :
 	case TWLP:
@@ -137,11 +152,11 @@ DRESULT disk_write (
 	case CTRNAND :
 		// translate the arguments here
 
-		result = ATA_disk_write(buff, sector, count);
+		//result = ATA_disk_write(buff, sector, count);
 
 		// translate the reslut code here
 
-		return res;
+		return RES_OK;
 
 	case TWL :
 	case TWLP :
@@ -169,23 +184,25 @@ DRESULT disk_ioctl (
 	int result;
 
 	switch (pdrv) {
-	case ATA :
+	case CTRNAND :
 
 		// Process of the command for the ATA drive
 
 		return res;
 
-	case MMC :
+	case TWL :
 
 		// Process of the command for the MMC/SD card
 
 		return res;
 
-	case USB :
+	case TWLP :
 
 		// Process of the command the USB drive
 
 		return res;
+	default:
+		break;
 	}
 
 	return RES_PARERR;

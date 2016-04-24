@@ -43,7 +43,7 @@
 /* This option switches f_mkfs() function. (0:Disable or 1:Enable) */
 
 
-#define	_USE_FASTSEEK	1
+#define	_USE_FASTSEEK	0
 /* This option switches fast seek function. (0:Disable or 1:Enable) */
 
 
@@ -153,7 +153,7 @@
 
 
 #define _STR_VOLUME_ID	1
-#define _VOLUME_STRS	"CTRNAND","TWL","TWLP","SD1","EMU1","EMU2","EMU3"
+#define _VOLUME_STRS	"CTRNAND","TWL","TWLP","SD","EMU1","EMU2","EMU3"
 /* _STR_VOLUME_ID switches string support of volume ID.
 /  When _STR_VOLUME_ID is set to 1, also pre-defined strings can be used as drive
 /  number in the path name. _VOLUME_STRS defines the drive ID strings for each
@@ -216,9 +216,9 @@
 /  Note that enabling exFAT discards C89 compatibility. */
 
 
-#define _FS_NORTC	0
-#define _NORTC_MON	3
-#define _NORTC_MDAY	1
+#define _FS_NORTC	1
+#define _NORTC_MON	4	
+#define _NORTC_MDAY	22
 #define _NORTC_YEAR	2016
 /* The option _FS_NORTC switches timestamp functiton. If the system does not have
 /  any RTC function or valid timestamp is not needed, set _FS_NORTC = 1 to disable

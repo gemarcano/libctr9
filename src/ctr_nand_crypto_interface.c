@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
 #include <ctr9/io/ctr_nand_crypto_interface.h>
 #include <ctr9/io/sdmmc/sdmmc.h>
 #include <string.h>
@@ -6,7 +14,7 @@
 
 #include <stdalign.h>
 
-//FIXME these are unique per instamce... or are they?
+//FIXME these are unique per instance... or are they?
 
 static const ctr_io_interface nand_crypto_base =
 {
@@ -18,57 +26,66 @@ static const ctr_io_interface nand_crypto_base =
 	ctr_nand_crypto_interface_sector_size
 };
 
+static inline void process_aes_ctr_block(void *buffer, uint8_t *ctr, uint32_t mode)
+{
+	set_ctr(ctr);
+	aes_decrypt(buffer, buffer, 1, mode);
+	add_ctr(ctr, 0x1);		
+}
+
 int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t keySlot, ctr_io_interface *lower_io)
 {
 	io->base = nand_crypto_base;
 	io->lower_io = lower_io;
 	io->keySlot = keySlot;
 
-	// STEP #1: Get NAND CID, set up TWL/CTR counter
+	//Get the nonces for CTRNAND and TWL decryption
 	uint32_t NandCid[4];
-	uint8_t shasum[32];
+	alignas(32) uint8_t shasum[32];
 
 	sdmmc_get_cid(true, NandCid);
+	
 	sha_init(SHA256_MODE);
 	sha_update((uint8_t*)NandCid, 16);
 	sha_get(shasum);
 	memcpy(io->CtrNandCtr, shasum, 16);
+
 	sha_init(SHA1_MODE);
 	sha_update((uint8_t*)NandCid, 16);
 	sha_get(shasum);
-	for(uint32_t i = 0; i < 16; i++) // little endian and reversed order
+	for(uint32_t i = 0; i < 16u; i++) // little endian and reversed order
 		io->TwlNandCtr[i] = shasum[15-i];
 
 	return 0;
 }
 
 
-static void decryptNandSector(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t sector, uint32_t count)
+static void applyAESCTRSector(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t sector, uint32_t count)
 {
-	uint32_t mode = (sector >= (0x0B100000u / 0x200)) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
-	alignas(32) uint8_t ctr[16];
-	
-	// copy NAND CTR and increment it
-	memcpy(ctr, (sector >= (0x0B100000 / 0x200)) ? io->CtrNandCtr : io->TwlNandCtr, 16);
-	add_ctr(ctr, sector * (0x200/0x10));
-	
-	// decrypt the data
-	use_aeskey(io->keySlot);
-	for (uint32_t s = 0; s < count; s++)
+	if (count)
 	{
-		for (uint32_t b = 0x0; b < 0x200; b += 0x10, buffer += 0x10)
+		//FIXME perhaps let mode be set at construction time?
+		uint32_t mode = (sector >= (0x0B100000u / 0x200)) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
+
+		alignas(32) uint8_t ctr[16];
+
+		memcpy(ctr, (sector >= (0x0B100000 / 0x200)) ? io->CtrNandCtr : io->TwlNandCtr, 16);
+		add_ctr(ctr, sector * (0x200 / 0x10));
+		
+		//apply AES CTR to the data
+		use_aeskey(io->keySlot);
+		for (uint32_t block = 0; block < (count * 0x200 / 0x10); ++block)
 		{
-			set_ctr(ctr);
-			aes_decrypt((void*) buffer, (void*) buffer, 1, mode);
-			add_ctr(ctr, 0x1);
+			process_aes_ctr_block(buffer + (block * 0x10), ctr, mode);
 		}
 	}
 } 
 
-static void decryptNand(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t location, uint32_t count)
+static void applyAESCTR(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t location, uint32_t count)
 {
 	if (count)
 	{
+		//FIXME Maybe move mode out?
 		uint32_t mode = (location >= 0x0B100000u) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
 		alignas(32) uint8_t ctr[16];
 		alignas(32) uint8_t block_buffer[16];
@@ -76,13 +93,10 @@ static void decryptNand(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 
 		use_aeskey(io->keySlot);
 		
-		// copy NAND CTR and increment it
 		memcpy(ctr, (location >= 0x0B100000 ) ? io->CtrNandCtr : io->TwlNandCtr, 16);
 		add_ctr(ctr, location / 0x10);
 
-		//Three parts: First block, all blocks which are aligned, last block
-		// First block always exists, may or may not be aligned.
-		
+		//Section 1: First block always exists, may or may not be aligned to block boundaries.
 		uint8_t block_offset = location & 0xF;
 		size_t current_section_size = 16u - block_offset;
 		if (current_section_size > count)
@@ -91,41 +105,31 @@ static void decryptNand(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 		}
 
 		memcpy(block_buffer + block_offset, buffer, current_section_size);
-
-		set_ctr(ctr);
-		aes_decrypt((void*) block_buffer, (void*) block_buffer, 1, mode);
-		add_ctr(ctr, 0x1);
-
+		process_aes_ctr_block(block_buffer, ctr, mode);
 		memcpy(buffer, block_buffer + block_offset, current_section_size);
 
 		amount_read = current_section_size;
 
+		//Section 2: All intermediate blocks (may not exist)
 		current_section_size = count - amount_read;
 		current_section_size -= current_section_size % 16;
 
-		// second set may or may not exists (only if count - (0xF - location & 0xF) != 0 and if count - (0xF - location & 0xF) >= 0x10)
 		if (current_section_size)
 		{
-			for (size_t b = 0x0; b < current_section_size; b += 0x10)
+			for (size_t byte = 0x0; byte < current_section_size; byte += 0x10)
 			{
-				set_ctr(ctr);
-				aes_decrypt((void*) (buffer + amount_read + b), (void*) (buffer + amount_read + b), 1, mode);
-				add_ctr(ctr, 0x1);
+				process_aes_ctr_block(buffer + amount_read + byte, ctr, mode);
 			}
 		}
 
 		amount_read += current_section_size;
 
-		// last block may or may not exist. Only if (count - (0xF - location & 0xF)) & 0xF != 0
+		//Section 3: Last block may or may not exist. May or may not end at a block boundary.
 		current_section_size = (count - amount_read) % 16;
 		if (current_section_size)
 		{
 			memcpy(block_buffer, buffer + amount_read, current_section_size);
-
-			set_ctr(ctr);
-			aes_decrypt((void*) block_buffer, (void*) block_buffer, 1, mode);
-			add_ctr(ctr, 0x1);
-
+			process_aes_ctr_block(block_buffer, ctr, mode);
 			memcpy(buffer + amount_read, block_buffer, current_section_size);
 		}
 	}
@@ -145,7 +149,7 @@ int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, 
 		res = io->lower_io->read(ctx, buffer, buffer_size, position, count);
 		
 		//we now have raw data, apply crypto
-		decryptNand(io, (uint8_t*)buffer, position, count < buffer_size ? count : buffer_size);
+		applyAESCTR(io, (uint8_t*)buffer, position, count < buffer_size ? count : buffer_size);
 	}
 	
 	return res;
@@ -154,14 +158,14 @@ int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, 
 int ctr_nand_crypto_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position)
 {
 	ctr_nand_crypto_interface* io = ctx;
-	uint8_t buf[0x200*4];
+	alignas(32) uint8_t buf[0x200*4];
 	int res = 0;
 	for (size_t i = 0; i < buffer_size && !res; i += sizeof(buf))
 	{
 		size_t write_size = buffer_size - i > sizeof(buf) ? sizeof(buf) : buffer_size - i;
 		memcpy(buf, buffer, write_size);
 
-		decryptNand(io, buf, position + i, write_size);
+		applyAESCTR(io, buf, position + i, write_size);
 		res |= io->lower_io->write(ctx, buf, write_size, position + i);
 	}
 
@@ -175,9 +179,7 @@ int ctr_nand_crypto_interface_read_sector(void *ctx, void *buffer, size_t buffer
 	{
 		ctr_nand_crypto_interface* io = ctx;
 		res = io->lower_io->read_sector(ctx, buffer, buffer_size, sector, count);
-		
-		//we now have raw data, apply crypto
-		decryptNandSector(io, (uint8_t*)buffer, sector, count < buffer_size/0x200 ? count : buffer_size/0x200 );
+		applyAESCTRSector(io, (uint8_t*)buffer, sector, count < buffer_size/0x200 ? count : buffer_size/0x200 );
 	}
 	return res;
 }
@@ -197,7 +199,7 @@ int ctr_nand_crypto_interface_write_sector(void *ctx, const void *buffer, size_t
 			
 			memcpy(buf, buffer, write_sectors * 0x200);
 
-			decryptNandSector(io, buf, sector + i, write_sectors);
+			applyAESCTRSector(io, buf, sector + i, write_sectors);
 			res |= io->lower_io->write_sector(ctx, buf, write_sectors * 0x200, sector + i);
 		}
 	}

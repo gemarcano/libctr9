@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
 #include <ctr9/io/ctr_nand_interface.h>
 #include <ctr9/io/sdmmc/sdmmc.h>
 #include <string.h>
@@ -127,9 +135,10 @@ int ctr_nand_interface_write(void *ctx, const void *buffer, size_t buffer_size, 
 int ctr_nand_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
 	int res = 0;
-	if (count)
+	size_t read_size = (buffer_size / 512) < count ? buffer_size / 512 : count;
+	if (read_size)
 	{
-		size_t read_size = (buffer_size / 512) < count ? buffer_size / 512 : count;
+		//What if read_size == 0?
 		res = sdmmc_nand_readsectors(sector, read_size, (uint8_t*) buffer);
 	}
 	return res;

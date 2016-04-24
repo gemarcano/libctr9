@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
 #include <ctr9/io/ctr_io_interface.h>
 
 int ctr_io_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)

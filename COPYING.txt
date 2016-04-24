@@ -14,3 +14,16 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Only code written by Gabriel Marcano is under the terms of the GPL as
+outlined above. Other projects in use and their licenses:
+
+    sdmmc by Normmatt: Licensed under the MPL 2.0 (refer to sdmmc.h an
+        sdmmc.c)
+	aes taken from Godmode9 by d0k3: Licensed under the GPL 3.0 or 2.0 ???
+		seems to have been originally written by megazig
+	fatfs by ChaN: BSD-style licenced. Refer to
+	    http://elm-chan.org/fsw/ff/en/appnote.html#license for more
+		information.
+
+	
