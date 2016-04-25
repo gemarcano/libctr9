@@ -32,6 +32,13 @@ typedef struct
 	ctr_nand_interface *lower_io;
 } nand_crypto_test_data;
 
+typedef struct
+{
+	char *buffer;
+	size_t buffer_size;
+	ctr_sd_interface io;
+} sd_test_data;
+
 static bool nand_test1(void *ctx)
 {
 	nand_test_data *data = ctx;
@@ -277,8 +284,6 @@ static bool nand_ctrnand_test6(void *ctx)
 	int res = ctr_io_write_sector(&data->io, text, text_size, loc);
 	res |= ctr_io_read_sector(&data->io, buffer, buffer_size, loc, 1);
 
-	
-
 	bool test1 = !memcmp(buffer, text, text_size);
 
 	for (size_t i = 0; i < sizeof(text); ++i)
@@ -296,6 +301,52 @@ static bool nand_ctrnand_test6(void *ctx)
 	return !res && test1 && test2;
 }
 
+static bool sd_test1(void *ctx)
+{
+	sd_test_data *data = ctx;
+
+	int res = ctr_sd_interface_initialize(&data->io);
+
+	return !res;
+}
+
+static bool sd_test2(void *ctx)
+{
+	sd_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+
+	uint32_t loc = 0;
+	int res = ctr_io_read(&data->io, buffer, buffer_size/2, loc, buffer_size/2);
+	res |= ctr_io_read_sector(&data->io, buffer+buffer_size/2, buffer_size/2, loc /0x200, buffer_size/2/512);
+	bool test1 = memcmp(buffer, buffer + buffer_size/2, buffer_size/2) == 0;
+
+	res |= ctr_io_read(&data->io, buffer, buffer_size/2, loc+3, buffer_size/2-4);
+
+	bool test2 = memcmp(buffer, buffer + buffer_size/2 + 3, buffer_size/2 - 4) == 0;
+
+	return !res && test1 && test2;
+}
+
+static bool sd_test3(void *ctx)
+{
+	FATFS fs = { 0 };
+	FIL test_file = { 0 };
+
+	sd_test_data *data = ctx;
+	disk_prepare(3, &data->io);
+
+	int res2 = 0;
+	if ((res2 = f_mount(&fs, "SD:", 1)) == FR_OK &&
+	(res2 = f_open(&test_file, "SD:/otp.bin", FA_READ)) == FR_OK)
+	{
+		size_t size = f_size(&test_file);
+		f_close(&test_file);
+		return size == 256;
+	}
+	return false;
+}
+
 int main()
 {
 	draw_init((draw_s*)0x23FFFE00);
@@ -306,6 +357,7 @@ int main()
 	char buffer[0x1000] = {0};
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
 	nand_crypto_test_data nand_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
+	sd_test_data sd_ctx = {buffer, sizeof(buffer), {{0}}};
 
 	ctr_unit_test nand_tests_f[11];
 	ctr_unit_tests nand_tests;
@@ -332,23 +384,24 @@ int main()
 	ctr_unit_tests_add_test(&nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_write", &nand_crypto_ctx, nand_ctrnand_test5 });
 	ctr_unit_tests_add_test(&nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_write_sector", &nand_crypto_ctx, nand_ctrnand_test6 });
 
+	ctr_unit_test sd_tests_f[3];
+	ctr_unit_tests sd_tests;
+	ctr_unit_tests_initialize(&sd_tests, "SD tests", sd_tests_f, 3);
+	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_initialize", &sd_ctx, sd_test1});
+	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_read* compare", &sd_ctx, sd_test2});
+	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_interface FATFS read", &sd_ctx, sd_test3});
+
 	int res = ctr_execute_unit_tests(&nand_tests);
-	res = ctr_execute_unit_tests(&nand_crypto_tests);
+	res |= ctr_execute_unit_tests(&nand_crypto_tests);
+	res |= ctr_execute_unit_tests(&sd_tests);
 
-	ctr_sd_interface sd_io;
-	ctr_sd_interface_initialize(&sd_io);
-
-	//ctr_sd_interface_destroy(&sd_io);
-	//ctr_nand_interface_destroy(&nand_ctx.nand_io);
-
-	printf("Press any key to continue...\n");
-	
 	FATFS fs = { 0 };
 	FIL test_file = { 0 };
 
 	disk_prepare(0, &nand_crypto_ctx.io);
 
 	int res2 = 0;
+	printf("trying to mount\n");
 	if ((res2 = f_mount(&fs, "CTRNAND:", 1)) != FR_OK)
 	{
 		printf("WTF MOUNT FAILED; %d\n", res2);
@@ -362,22 +415,15 @@ int main()
 		printf("Size: %d\n", f_size(&test_file));
 	}
 
+	ctr_sd_interface_destroy(&sd_ctx.io);
+	ctr_nand_crypto_interface_destroy(&nand_crypto_ctx.io);
+	ctr_nand_interface_destroy(&nand_ctx.nand_io);
+
+	printf("Press any key to continue...\n");
 	input_wait();
 	
 	printf("I'm alive, I swear!\n");
-
-	ctr_rtc_gettime();
-
-	input_wait();
-
 	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
-
-	while (*REG_HID & HID_START)
-	{
-	//	input_wait();
-		printf("%d\n", i2cReadRegister(I2C_DEV_MCU, 0x10) & 0x4);
-	}
-
 	return 0;
 }
 

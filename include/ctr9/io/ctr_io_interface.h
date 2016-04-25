@@ -144,10 +144,10 @@ int ctr_io_write(void *io, const void *buffer, size_t buffer_size, size_t positi
  */
 int ctr_io_read_sector(void *io, void *buffer, size_t buffer_size, size_t sector, size_t count);
 
-/**	@brief Wrotes sectors from the given io interface.
+/**	@brief Writes sectors from the given io interface.
  *
  *	This function uses the virtual table in the io interface given to call the
- *	correct function to handle the wrtie sectors request.
+ *	correct function to handle the write sectors request.
  *
  *	@param[in,out] io The io interface to use for writing.
  *	@param[in] buffer Pointer to the buffer.
