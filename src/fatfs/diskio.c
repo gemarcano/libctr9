@@ -38,6 +38,13 @@ static struct
 	DSTATUS status;
 } twl_state;
 
+static struct
+{
+	ctr_io_interface *io;
+	DSTATUS status;
+} emu1_state;
+
+
 void disk_prepare(BYTE pdrv, void *io)
 {
 	
@@ -53,9 +60,12 @@ void disk_prepare(BYTE pdrv, void *io)
 		break;
 	case SD :
 		sd_state.io = (ctr_sd_interface*)io;
-		ctrnand_state.status = STA_NOINIT;
+		sd_state.status = STA_NOINIT;
 		break;
 	case EMU1 :
+		emu1_state.io = (ctr_io_interface*)io;
+		emu1_state.status = STA_NOINIT;
+		break;
 	default:
 		break;
 	}
@@ -83,7 +93,9 @@ DSTATUS disk_status (
 	case SD :
 		stat = sd_state.status;
 		break;
-	case EMU1 :
+	case EMU1: 
+		stat = emu1_state.status;
+		break;
 	default:
 		break;
 	}
@@ -136,6 +148,16 @@ DSTATUS disk_initialize (
 		}
 		break;
 	case EMU1:
+		if (emu1_state.io && ctr_io_disk_size(emu1_state.io))
+		{
+			stat = emu1_state.status = 0;
+		}
+		else
+		{
+			stat = emu1_state.status |= STA_NOINIT;
+		}
+		break;
+
 	default :
 		break;
 	}
@@ -202,7 +224,18 @@ DRESULT disk_read (
 		{
 			result = RES_NOTRDY;
 		}
+		break;
 	case EMU1:
+		if (!(emu1_state.status & STA_NOINIT))
+		{
+			result = ctr_io_read_sector(emu1_state.io, buff, count*512, sector, count);
+			res = result ? RES_ERROR : RES_OK;
+		}
+		else
+		{
+			result = RES_NOTRDY;
+		}
+		break;
 	default:
 		break;
 	}
@@ -330,6 +363,37 @@ static inline DRESULT sd_handle_ioctl(BYTE cmd, void *buff)
 	return RES_NOTRDY;
 }
 
+static inline DRESULT emu1_handle_ioctl(BYTE cmd, void *buff)
+{
+	switch (cmd)
+	{
+	case GET_SECTOR_COUNT:
+		{
+			if (!(emu1_state.status & STA_NOINIT))
+			{
+				size_t size = ctr_io_disk_size(emu1_state.io);
+				*(DWORD*)buff = size / ctr_io_sector_size(emu1_state.io);
+				return RES_OK;
+			}
+			return RES_NOTRDY;
+		}
+	case GET_SECTOR_SIZE:
+		if (!(emu1_state.status & STA_NOINIT))
+		{
+			*(WORD*)buff = ctr_io_sector_size(emu1_state.io);
+			return RES_OK;
+		}
+		return RES_NOTRDY;
+	case GET_BLOCK_SIZE:
+		*(DWORD*)buff = 1; //Not sure what the block size for emu is...
+	case CTRL_TRIM:
+	case CTRL_SYNC:
+		return RES_OK;
+	default:
+		return RES_PARERR;
+	}
+	return RES_NOTRDY;
+}
 DRESULT disk_ioctl (
 	BYTE pdrv,		/* Physical drive nmuber (0..) */
 	BYTE cmd,		/* Control code */
@@ -346,7 +410,9 @@ DRESULT disk_ioctl (
 
 	case SD:	
 		return sd_handle_ioctl(cmd, buff);
-
+	case EMU1:
+		return emu1_handle_ioctl(cmd, buff);
+	
 	default:
 		break;
 	}
