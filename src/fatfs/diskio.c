@@ -1,10 +1,10 @@
 /*-----------------------------------------------------------------------*/
-/* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2016        */
+/* Low level disk I/O module skeleton for FatFs	 (C)ChaN, 2016		*/
 /*-----------------------------------------------------------------------*/
-/* If a working storage control module is available, it should be        */
+/* If a working storage control module is available, it should be		*/
 /* attached to the FatFs via a glue function rather than modifying it.   */
-/* This is an example of glue functions to attach various exsisting      */
-/* storage control modules to the FatFs module with a defined API.       */
+/* This is an example of glue functions to attach various exsisting	  */
+/* storage control modules to the FatFs module with a defined API.	   */
 /*-----------------------------------------------------------------------*/
 
 #include <ctr9/io/fatfs/diskio.h>		/* FatFs lower layer API */
@@ -32,6 +32,12 @@ static struct
 	DSTATUS status;
 } sd_state;
 
+static struct
+{
+	ctr_nand_crypto_interface *io;
+	DSTATUS status;
+} twl_state;
+
 void disk_prepare(BYTE pdrv, void *io)
 {
 	
@@ -42,6 +48,8 @@ void disk_prepare(BYTE pdrv, void *io)
 		break;
 	case TWL :
 	case TWLP :
+		twl_state.io = (ctr_nand_crypto_interface*)io;
+		twl_state.status = STA_NOINIT;
 		break;
 	case SD :
 		sd_state.io = (ctr_sd_interface*)io;
@@ -55,7 +63,7 @@ void disk_prepare(BYTE pdrv, void *io)
 
 
 /*-----------------------------------------------------------------------*/
-/* Get Drive Status                                                      */
+/* Get Drive Status													  */
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_status (
@@ -70,6 +78,7 @@ DSTATUS disk_status (
 		break;
 	case TWL :
 	case TWLP :
+		stat = twl_state.status;
 		break;
 	case SD :
 		stat = sd_state.status;
@@ -83,7 +92,7 @@ DSTATUS disk_status (
 
 
 /*-----------------------------------------------------------------------*/
-/* Inidialize a Drive                                                    */
+/* Inidialize a Drive													*/
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_initialize (
@@ -106,6 +115,15 @@ DSTATUS disk_initialize (
 		break;
 	case TWL :
 	case TWLP:
+		if (twl_state.io && ctr_io_disk_size(twl_state.io))
+		{
+			//FIXME check if we can read a known text
+			stat = twl_state.status = 0;
+		}
+		else
+		{
+			stat = twl_state.status |= STA_NOINIT;
+		}
 		break;
 	case SD:
 		if (sd_state.io && ctr_io_disk_size(sd_state.io))
@@ -126,10 +144,12 @@ DSTATUS disk_initialize (
 
 
 /*-----------------------------------------------------------------------*/
-/* Read Sector(s)                                                        */
+/* Read Sector(s)														*/
 /*-----------------------------------------------------------------------*/
-
+#include <ctr/printf.h>
 #define CTRNAND_LOCATION 0x0B930000
+#define TWLN_LOCATION 0x00012E00
+#define TWLP_LOCATION 0x09011A00
 
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
@@ -157,6 +177,21 @@ DRESULT disk_read (
 
 	case TWL :
 	case TWLP:
+		{
+			size_t loc = pdrv == TWL ? TWLN_LOCATION/0x200 : TWLP_LOCATION/0x200;
+			if (!(twl_state.status & STA_NOINIT))
+			{
+				result = ctr_io_read_sector(twl_state.io, buff, count*512, sector + loc, count);
+				res = result ? RES_ERROR : RES_OK;
+			}
+			else
+			{
+				result = RES_NOTRDY;
+			}
+			return RES_OK;
+		}
+		break;
+			
 	case SD:
 		if (!(sd_state.status & STA_NOINIT))
 		{
@@ -178,7 +213,7 @@ DRESULT disk_read (
 
 
 /*-----------------------------------------------------------------------*/
-/* Write Sector(s)                                                       */
+/* Write Sector(s)													   */
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_write (
@@ -214,7 +249,7 @@ DRESULT disk_write (
 
 
 /*-----------------------------------------------------------------------*/
-/* Miscellaneous Functions                                               */
+/* Miscellaneous Functions											   */
 /*-----------------------------------------------------------------------*/
 
 static inline size_t nand_sector_count_handler(BYTE partition)

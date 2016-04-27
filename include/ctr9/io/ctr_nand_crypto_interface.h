@@ -20,6 +20,11 @@
 extern "C" {
 #endif
 
+typedef enum
+{
+	NAND_CTR, NAND_TWL
+} ctr_nand_crypto_type;
+
 /**	@brief Filter io interface to apply encryption while reading NAND.
  */
 typedef struct
@@ -28,8 +33,8 @@ typedef struct
 	ctr_io_interface *lower_io;
 	
 	uint8_t keySlot;
-	uint8_t CtrNandCtr[16];
-	uint8_t TwlNandCtr[16];
+	uint8_t ctr[16];
+	uint32_t mode;
 
 } ctr_nand_crypto_interface;
 
@@ -37,6 +42,8 @@ typedef struct
  *
  *	@param[out] io NAND io crypto interface to initialize.
  *	@param[in] key_slot Nintendo 3DS AES key slot to use for CTR.
+ *	@param[in] crypto_type Type of the system to taylor encryption to. CTR and
+ *		TWL sections handle encryption slightly differently.
  *	@param[in,out] lower_io io interface to use as NAND. The filter does not
  *		gain ownership of the lower_io interface, it merely uses it. This
  *		pointer must remain valid while the crypto io interface object is in
@@ -45,7 +52,7 @@ typedef struct
  *	@post The io interface has been initialized and can be used for decrypting
  *      NAND.
  */
-int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t key_slot, ctr_io_interface* lower_io);
+int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t key_slot, ctr_nand_crypto_type crypto_type, ctr_io_interface* lower_io);
 
 /** @brief Destroys the given NAND crypto io interface object.
  *

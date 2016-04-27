@@ -27,12 +27,12 @@ _entry:
     mcr p15, 0, r0, c5, c0, 3 @ write instruction access
 
     @ Set MPU permissions and cache settings
-    ldr r0, =0xFFFF001D @ ffff0000 32k
-    ldr r1, =0x01FF801D @ 01ff8000 32k
-    ldr r2, =0x08000027 @ 08000000 1M
-    ldr r3, =0x10000021 @ 10000000 128k
-    ldr r4, =0x10100025 @ 10100000 512k
-    ldr r5, =0x20000035 @ 20000000 128M
+    ldr r0, =0xFFFF001D @ ffff0000 32k | bootrom unprotected
+    ldr r1, =0x3000801B @ fff00000 16k | dtcm
+	ldr r2, =0x01FF801D @ 01ff8000 32k | itcm
+    ldr r3, =0x08000029 @ 08000000 2M  | arm9 mem
+    ldr r4, =0x10000029 @ 10000000 2M  | io mem
+    ldr r5, =0x20000037 @ 20000000 256M| fcram
     ldr r6, =0x1FF00027 @ 1FF00000 1M
     ldr r7, =0x1800002D @ 18000000 8M
     mcr p15, 0, r0, c6, c0, 0
@@ -57,10 +57,10 @@ _entry:
 
 	@ Enable caches and turn on MPU
     mrc p15, 0, r0, c1, c0, 0  @ read control register
-    orr r0, r0, #(1<<12)       @ - instruction cache enable
-    @bic r0, r0, #(1<<12)       @ - instruction cache enable
+    orr r0, r0, #(1<<18) @ - itcm enable
+	bic r0, r0, #(1<<19)
+	orr r0, r0, #(1<<12)       @ - instruction cache enable
     orr r0, r0, #(1<<2)        @ - data cache enable
-    @bic r0, r0, #(1<<2)        @ - data cache enable
     orr r0, r0, #(1<<0)        @ - mpu enable
     mcr p15, 0, r0, c1, c0, 0  @ write control register
 

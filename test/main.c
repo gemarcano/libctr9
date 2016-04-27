@@ -193,7 +193,7 @@ static bool nand_ctrnand_test1(void *ctx)
 {
 	nand_crypto_test_data *data = ctx;
 
-	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, &data->lower_io->base);
+	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, &data->lower_io->base);
 
 	return !res;
 }
@@ -347,6 +347,78 @@ static bool sd_test3(void *ctx)
 	return false;
 }
 
+#include <ctr9/aes.h>
+#include <stdalign.h>
+
+static bool twl_test1(void *ctx)
+{
+	
+	nand_crypto_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+
+
+	if ((*(volatile uint32_t*) 0x101401C0) == 0) { // only for a9lh
+		uint32_t* TwlCustId = (uint32_t*) (0x01FFB808);
+		alignas(32) uint8_t TwlKeyX[16];
+		alignas(32) uint8_t TwlKeyY[16];
+		
+		// thanks b1l1s & Normmatt
+		// see source from https://gbatemp.net/threads/release-twltool-dsi-downgrading-save-injection-etc-multitool.393488/
+		const char* nintendo = "NINTENDO";
+		uint32_t* TwlKeyXW = (uint32_t*) TwlKeyX;
+		TwlKeyXW[0] = (TwlCustId[0] ^ 0xB358A6AF) | 0x80000000;
+		TwlKeyXW[3] = TwlCustId[1] ^ 0x08C267B7;
+		memcpy(TwlKeyX + 4, nintendo, 8);
+		
+		// see: https://www.3dbrew.org/wiki/Memory_layout#ARM9_ITCM
+		uint32_t TwlKeyYW3 = 0xE1A00005;
+		memcpy(TwlKeyY, (uint8_t*) 0x01FFD3C8, 12);
+		memcpy(TwlKeyY + 12, &TwlKeyYW3, 4);
+		
+		setup_aeskeyX(0x03, TwlKeyX);
+		setup_aeskeyY(0x03, TwlKeyY);
+		use_aeskey(0x03);
+	}
+
+	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x03, NAND_TWL, &data->lower_io->base);
+
+	return !res;
+}
+
+static bool twl_test2(void *ctx)
+{
+	FATFS fs = { 0 };
+	FIL test_file = { 0 };
+	
+	nand_crypto_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+
+	ctr_io_read_sector(&data->io, buffer, buffer_size, 0x00012E00/0x200 + 1, 1);
+	
+	disk_prepare(1, &data->io);
+
+	bool test1 = false, test2 = false;
+	int res2 = 0;
+	if ((res2 = f_mount(&fs, "TWL:", 1)) == FR_OK &&
+	(res2 |= f_open(&test_file, "TWL:/sys/TWLFontTable.dat", FA_READ)) == FR_OK)
+	{
+		size_t size = f_size(&test_file);
+		f_close(&test_file);
+		test1 = size == 863296;
+	}
+
+	if ((res2 |= f_mount(&fs, "TWLP:", 1)) == FR_OK &&
+	(res2 |= f_open(&test_file, "TWLP:/photo/private/ds/app/484E494A/pit.bin", FA_READ)) == FR_OK)
+	{
+		size_t size = f_size(&test_file);
+		f_close(&test_file);
+		test2 = size == 8032;
+	}
+	return !res2 && test1 && test2;
+}
+
 int main()
 {
 	draw_init((draw_s*)0x23FFFE00);
@@ -357,6 +429,7 @@ int main()
 	char buffer[0x1000] = {0};
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
 	nand_crypto_test_data nand_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
+	nand_crypto_test_data twl_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
 	sd_test_data sd_ctx = {buffer, sizeof(buffer), {{0}}};
 
 	ctr_unit_test nand_tests_f[11];
@@ -391,9 +464,16 @@ int main()
 	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_read* compare", &sd_ctx, sd_test2});
 	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_interface FATFS read", &sd_ctx, sd_test3});
 
+	ctr_unit_test twl_crypto_tests_f[2];
+	ctr_unit_tests twl_crypto_tests;
+	ctr_unit_tests_initialize(&twl_crypto_tests, "TWL tests", twl_crypto_tests_f, 2);
+	ctr_unit_tests_add_test(&twl_crypto_tests, (ctr_unit_test){ "twl_crypto_initialize", &twl_crypto_ctx, twl_test1 });
+	ctr_unit_tests_add_test(&twl_crypto_tests, (ctr_unit_test){ "twl mount and read", &twl_crypto_ctx, twl_test2 });
+
 	int res = ctr_execute_unit_tests(&nand_tests);
 	res |= ctr_execute_unit_tests(&nand_crypto_tests);
 	res |= ctr_execute_unit_tests(&sd_tests);
+	res |= ctr_execute_unit_tests(&twl_crypto_tests);
 
 	FATFS fs = { 0 };
 	FIL test_file = { 0 };

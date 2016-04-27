@@ -33,11 +33,12 @@ static inline void process_aes_ctr_block(void *buffer, uint8_t *ctr, uint32_t mo
 	add_ctr(ctr, 0x1);		
 }
 
-int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t keySlot, ctr_io_interface *lower_io)
+int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
 {
 	io->base = nand_crypto_base;
 	io->lower_io = lower_io;
 	io->keySlot = keySlot;
+	io->mode = AES_CNT_CTRNAND_MODE;
 
 	//Get the nonces for CTRNAND and TWL decryption
 	uint32_t NandCid[4];
@@ -45,17 +46,30 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t 
 
 	sdmmc_get_cid(true, NandCid);
 	
-	sha_init(SHA256_MODE);
-	sha_update((uint8_t*)NandCid, 16);
-	sha_get(shasum);
-	memcpy(io->CtrNandCtr, shasum, 16);
+	switch (crypto_type)
+	{
+		case NAND_CTR:
+			sha_init(SHA256_MODE);
+			sha_update((uint8_t*)NandCid, 16);
+			sha_get(shasum);
+			memcpy(io->ctr, shasum, 16);
+			io->mode = AES_CNT_CTRNAND_MODE;
+			break;
 
-	sha_init(SHA1_MODE);
-	sha_update((uint8_t*)NandCid, 16);
-	sha_get(shasum);
-	for(uint32_t i = 0; i < 16u; i++) // little endian and reversed order
-		io->TwlNandCtr[i] = shasum[15-i];
+		case NAND_TWL:
+			sha_init(SHA1_MODE);
+			sha_update((uint8_t*)NandCid, 16);
+			sha_get(shasum);
+			for(uint32_t i = 0; i < 16u; i++) // little endian and reversed order
+			{
+				io->ctr[i] = shasum[15-i];
+			}
+			io->mode = AES_CNT_TWLNAND_MODE;
+			break;
 
+		default:
+			return 1; //Unknown type
+	}
 	return 0;
 }
 
@@ -65,11 +79,11 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *io, uint8_t* buffer, ui
 	if (count)
 	{
 		//FIXME perhaps let mode be set at construction time?
-		uint32_t mode = (sector >= (0x0B100000u / 0x200)) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
+		uint32_t mode = io->mode; 
 
 		alignas(32) uint8_t ctr[16];
 
-		memcpy(ctr, (sector >= (0x0B100000 / 0x200)) ? io->CtrNandCtr : io->TwlNandCtr, 16);
+		memcpy(ctr, io->ctr, 16);
 		add_ctr(ctr, sector * (0x200 / 0x10));
 		
 		//apply AES CTR to the data
@@ -86,14 +100,14 @@ static void applyAESCTR(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 	if (count)
 	{
 		//FIXME Maybe move mode out?
-		uint32_t mode = (location >= 0x0B100000u) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
+		uint32_t mode = io->mode; 
 		alignas(32) uint8_t ctr[16];
 		alignas(32) uint8_t block_buffer[16];
 		uint32_t amount_read = 0;
 
 		use_aeskey(io->keySlot);
 		
-		memcpy(ctr, (location >= 0x0B100000 ) ? io->CtrNandCtr : io->TwlNandCtr, 16);
+		memcpy(ctr, io->ctr, 16);
 		add_ctr(ctr, location / 0x10);
 
 		//Section 1: First block always exists, may or may not be aligned to block boundaries.
