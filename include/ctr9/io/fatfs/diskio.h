@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 #include "integer.h"
-
+#include <stddef.h>
 
 /* Status of Disk Functions */
 typedef BYTE	DSTATUS;
@@ -28,7 +28,6 @@ typedef enum {
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 
-void disk_prepare(BYTE pdrv, void *io);
 DSTATUS disk_initialize (BYTE pdrv);
 DSTATUS disk_status (BYTE pdrv);
 DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
@@ -72,6 +71,16 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
 #define ATA_GET_REV			20	/* Get F/W revision */
 #define ATA_GET_MODEL		21	/* Get model name */
 #define ATA_GET_SN			22	/* Get serial number */
+
+/* Custom IOCTLs */
+#define CTR_SETUP_DISK		23
+
+typedef struct
+{
+	void *io;
+	size_t sector_offset;
+	size_t sectors;
+} ctr_setup_disk_parameters;
 
 #ifdef __cplusplus
 }

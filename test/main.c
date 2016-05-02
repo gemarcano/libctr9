@@ -334,7 +334,8 @@ static bool sd_test3(void *ctx)
 	FIL test_file = { 0 };
 
 	sd_test_data *data = ctx;
-	disk_prepare(3, &data->io);
+	ctr_setup_disk_parameters params = {&data->io, 0, ctr_io_disk_size(&data->io)};
+	disk_ioctl(3, CTR_SETUP_DISK, &params);
 
 	int res2 = 0;
 	if ((res2 = f_mount(&fs, "SD:", 1)) == FR_OK &&
@@ -395,7 +396,8 @@ static bool twl_test2(void *ctx)
 	char *buffer = data->buffer;
 	size_t buffer_size = data->buffer_size;
 
-	disk_prepare(1, &data->io);
+	ctr_setup_disk_parameters params = { &data->io, 0x00012E00/0x200, 0x08FB5200/0x200 }; 
+	disk_ioctl(1, CTR_SETUP_DISK, &params);
 	bool test1 = false, test2 = false;
 	int res2 = 0;
 	if ((res2 = f_mount(&fs, "TWL:", 1)) == FR_OK &&
@@ -418,6 +420,9 @@ static bool twl_test2(void *ctx)
 		}
 	}
 
+	params = (ctr_setup_disk_parameters){&data->io, 0x09011A00/0x200, 0x020B6600/0x200};
+	disk_ioctl(2, CTR_SETUP_DISK, &params);
+
 	if ((res2 |= f_mount(&fs, "TWLP:", 1)) == FR_OK &&
 	(res2 |= f_open(&test_file, "TWLP:/photo/private/ds/app/484E494A/pit.bin", FA_READ)) == FR_OK)
 	{
@@ -438,8 +443,9 @@ static bool twl_test3(void *ctx)
 	size_t buffer_size = data->buffer_size;
 
 	ctr_io_read_sector(&data->io, buffer, buffer_size, 0x00012E00/0x200 + 1, 1);
-	
-	disk_prepare(4, &data->io);
+
+	ctr_setup_disk_parameters params = { &data->io, 0, ctr_io_disk_size(&data->io)/0x200 };
+	disk_ioctl(4, CTR_SETUP_DISK, &params);
 
 	bool test1 = false;
 	int res2 = 0;
@@ -523,7 +529,8 @@ int main()
 	FATFS fs = { 0 };
 	FIL test_file = { 0 };
 
-	disk_prepare(0, &nand_crypto_ctx.io);
+	ctr_setup_disk_parameters params = {&nand_crypto_ctx.io, 0x0B930000/0x200, 0x2F5D0000/0x200};
+	disk_ioctl(0, CTR_SETUP_DISK, &params);
 
 	int res2 = 0;
 	printf("trying to mount\n");
