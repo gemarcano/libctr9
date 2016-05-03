@@ -990,7 +990,7 @@ DWORD get_fat (	/* 0xFFFFFFFF:Disk error, 1:Internal error, 2..0x7FFFFFFF:Cluste
 			if (move_window(fs, fs->fatbase + (bc / SS(fs))) != FR_OK) break;
 			wc = fs->win[bc++ % SS(fs)];
 			if (move_window(fs, fs->fatbase + (bc / SS(fs))) != FR_OK) break;
-			wc |= fs->win[bc % SS(fs)] << 8;
+			wc |= (UINT)fs->win[bc % SS(fs)] << 8;
 			val = clst & 1 ? wc >> 4 : (wc & 0xFFF);
 			break;
 
@@ -1090,6 +1090,8 @@ FRESULT put_fat (	/* FR_OK(0):succeeded, !=0:error */
 			st_dword(&fs->win[clst * 4 % SS(fs)], val);
 			fs->wflag = 1;
 			break;
+		default:
+			break; /* Unknown filesystem encountered! */
 		}
 	}
 	return res;
@@ -1474,7 +1476,7 @@ FRESULT dir_next (	/* FR_OK(0):succeeded, FR_NO_FILE:End of table, FR_DENIED:Cou
 			}
 		}
 		else {					/* Dynamic table */
-			if ((ofs / SS(fs) & (fs->csize - 1)) == 0) {		/* Cluster changed? */
+			if ((ofs / SS(fs) & (fs->csize - 1u)) == 0) {		/* Cluster changed? */
 				clst = get_fat(&dp->obj, dp->clust);			/* Get next cluster */
 				if (clst <= 1) return FR_INT_ERR;				/* Internal error */
 				if (clst == 0xFFFFFFFF) return FR_DISK_ERR;		/* Disk error */
@@ -1619,7 +1621,7 @@ int cmp_lfn (				/* 1:matched, 0:not matched */
 
 	if (ld_word(dir + LDIR_FstClusLO) != 0) return 0;	/* Check LDIR_FstClusLO */
 
-	i = ((dir[LDIR_Ord] & 0x3F) - 1) * 13;	/* Offset in the LFN buffer */
+	i = ((dir[LDIR_Ord] & 0x3Fu) - 1u) * 13u;	/* Offset in the LFN buffer */
 
 	for (wc = 1, s = 0; s < 13; s++) {		/* Process all characters in the entry */
 		uc = ld_word(dir + LfnOfs[s]);		/* Pick an LFN character */
@@ -1656,7 +1658,7 @@ int pick_lfn (			/* 1:succeeded, 0:buffer overflow or invalid LFN entry */
 
 	if (ld_word(dir + LDIR_FstClusLO) != 0) return 0;	/* Check LDIR_FstClusLO */
 
-	i = ((dir[LDIR_Ord] & 0x3F) - 1) * 13;	/* Offset in the LFN buffer */
+	i = ((dir[LDIR_Ord] & 0x3Fu) - 1u) * 13u;	/* Offset in the LFN buffer */
 
 	for (wc = 1, s = 0; s < 13; s++) {		/* Process all characters in the entry */
 		uc = ld_word(dir + LfnOfs[s]);		/* Pick an LFN character */
@@ -1698,7 +1700,7 @@ void put_lfn (
 	dir[LDIR_Type] = 0;
 	st_word(dir + LDIR_FstClusLO, 0);
 
-	i = (ord - 1) * 13;				/* Get offset in the LFN working buffer */
+	i = (ord - 1u) * 13u;				/* Get offset in the LFN working buffer */
 	s = wc = 0;
 	do {
 		if (wc != 0xFFFF) wc = lfn[i++];	/* Get an effective character */
@@ -2827,7 +2829,7 @@ int get_ldnumber (		/* Returns logical drive number (-1:invalid drive) */
 		for (tt = *path; (UINT)*tt >= (_USE_LFN ? ' ' : '!') && *tt != ':'; tt++) ;	/* Find ':' in the path */
 		if (*tt == ':') {	/* If a ':' is exist in the path name */
 			tp = *path;
-			i = *tp++ - '0';
+			i = (UINT)(*tp++ - '0');
 			if (i < 10 && tp == tt) {	/* Is there a numeric drive id? */
 				if (i < _VOLUMES) {	/* If a drive id is found, get the value and strip it */
 					vol = (int)i;
@@ -3393,7 +3395,7 @@ FRESULT f_read (
 	for ( ;  btr;								/* Repeat until all data read */
 		rbuff += rcnt, fp->fptr += rcnt, *br += rcnt, btr -= rcnt) {
 		if ((fp->fptr % SS(fs)) == 0) {			/* On the sector boundary? */
-			csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1));	/* Sector offset in the cluster */
+			csect = (UINT)(fp->fptr / SS(fs) & (fs->csize - 1u));	/* Sector offset in the cluster */
 			if (csect == 0) {					/* On the cluster boundary? */
 				if (fp->fptr == 0) {			/* On the top of the file? */
 					clst = fp->obj.sclust;		/* Follow cluster chain from the origin */
@@ -3504,7 +3506,7 @@ FRESULT f_write (
 	for ( ;  btw;							/* Repeat until all data written */
 		wbuff += wcnt, fp->fptr += wcnt, fp->obj.objsize = (fp->fptr > fp->obj.objsize) ? fp->fptr : fp->obj.objsize, *bw += wcnt, btw -= wcnt) {
 		if ((fp->fptr % SS(fs)) == 0) {		/* On the sector boundary? */
-			csect = (UINT)(fp->fptr / SS(fs)) & (fs->csize - 1);	/* Sector offset in the cluster */
+			csect = (UINT)(fp->fptr / SS(fs)) & (fs->csize - 1u);	/* Sector offset in the cluster */
 			if (csect == 0) {				/* On the cluster boundary? */
 				if (fp->fptr == 0) {		/* On the top of the file? */
 					clst = fp->obj.sclust;	/* Follow from the origin */
