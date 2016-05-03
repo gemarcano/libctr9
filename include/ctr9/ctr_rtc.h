@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-typedef struct 
+typedef struct
 {
 	uint8_t seconds, minutes, hours, pad_, day, month, year;
 } ctr_rtc_data;

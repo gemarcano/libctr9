@@ -11,7 +11,7 @@
 #include <ctr9/io/ctr_sdmmc_implementation.h>
 #include <string.h>
 
-static const ctr_io_interface sd_base = 
+static const ctr_io_interface sd_base =
 {
 	ctr_sd_interface_read,
 	ctr_sd_interface_write,

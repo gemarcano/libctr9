@@ -8,9 +8,9 @@ void sha_init(uint32_t mode)
 }
 
 void sha_update(const void* src, uint32_t size)
-{    
+{
     const uint32_t* src32 = (const uint32_t*)src;
-    
+
     while(size >= 0x40) {
         while(*REG_SHACNT & 1);
         for(uint32_t i = 0; i < 4; i++) {

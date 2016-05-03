@@ -13,8 +13,8 @@
 inline int ctr_sdmmc_implementation_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read)
 {
 	int res = 0;
-	if (count && buffer_size) 
-	{   
+	if (count && buffer_size)
+	{
 		size_t total_readable = count < buffer_size ? count : buffer_size;
 		
 		uint8_t *dest = buffer;
@@ -45,7 +45,7 @@ inline int ctr_sdmmc_implementation_read(void *ctx, void *buffer, size_t buffer_
 		size_t mid_sectors = section_readable / 0x200;
 		
 		if (mid_sectors)
-		{   
+		{
 			res |= read(base_sector + sectors_read, mid_sectors, dest + bytes_read);
 			if (res) return res;
 			sectors_read += mid_sectors;
@@ -55,7 +55,7 @@ inline int ctr_sdmmc_implementation_read(void *ctx, void *buffer, size_t buffer_
 		//Section 3: read last sector to extract the right number of bytes from it
 		section_readable = total_readable - bytes_read;
 		if (!res && section_readable)
-		{   
+		{
 			res |= read(base_sector + sectors_read, 1, buf);
 			if (res) return res;
 			memcpy(dest + bytes_read, buf, section_readable);

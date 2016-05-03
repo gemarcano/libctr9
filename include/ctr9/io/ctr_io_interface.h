@@ -6,7 +6,7 @@
  *
  ******************************************************************************/
 
-/** @file */ 
+/** @file */
 
 #ifndef CTR_IO_INTERFACE_H_
 #define CTR_IO_INTERFACE_H_
@@ -21,7 +21,7 @@ extern "C" {
 /**	@brief Pointer to an io interface function used to read.
  *
  *	@param[in,out] io The io interface to use for reading.
- *	@param[out] buffer Pointer to the buffer. 
+ *	@param[out] buffer Pointer to the buffer.
  *	@param[in] buffer_size The size of the buffer in bytes.
  *	@param[in] position Position/address in the io interface to read from.
  *	@param[in] count The number of bytes to read.
@@ -48,7 +48,7 @@ typedef int (*ctr_io_interface_write)(void *io, const void *buffer, size_t buffe
  *	ctr_io_sector_size as a way to poll how many bytes constitute a sector.
  *
  *	@param[in,out] io The io interface to use for reading.
- *	@param[out] buffer Pointer to the buffer. 
+ *	@param[out] buffer Pointer to the buffer.
  *	@param[in] buffer_size The size of the buffer in bytes.
  *	@param[in] sector Sector position in the io interface to read from.
  *	@param[in] count The number of sectors to read.
@@ -102,7 +102,7 @@ typedef struct
  *	correct function to handle the read request.
  *
  *	@param[in,out] io The io interface to use for reading.
- *	@param[out] buffer Pointer to the buffer. 
+ *	@param[out] buffer Pointer to the buffer.
  *	@param[in] buffer_size The size of the buffer in bytes.
  *	@param[in] position Position/address in the io interface to read from.
  *	@param[in] count The number of bytes to read.
@@ -135,7 +135,7 @@ int ctr_io_write(void *io, const void *buffer, size_t buffer_size, size_t positi
  *	ctr_io_sector_size as a way to poll how many bytes constitute a sector.
  *
  *	@param[in,out] io The io interface to use for reading.
- *	@param[out] buffer Pointer to the buffer. 
+ *	@param[out] buffer Pointer to the buffer.
  *	@param[in] buffer_size The size of the buffer in bytes.
  *	@param[in] sector Sector position in the io interface to read from.
  *	@param[in] count The number of sectors to read.

@@ -27,8 +27,9 @@
 #define DISK3	7
 #define DISK4	8
 #define DISK5	9
+#define CTR_DISK_COUNT 10
 
-static ctr_fatfs_disk ctr_fatfs_disks[10] = {0};
+static ctr_fatfs_disk ctr_fatfs_disks[CTR_DISK_COUNT] = {0};
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
@@ -38,7 +39,9 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive number to identify the drive */
 )
 {
-	return ctr_fatfs_disks[pdrv].status;
+	if (pdrv < CTR_DISK_COUNT)
+		return ctr_fatfs_disks[pdrv].status;
+	return STA_NOINIT;
 }
 
 
@@ -51,10 +54,13 @@ DSTATUS disk_initialize (
 )
 {
 	DSTATUS stat = STA_NOINIT;
-	ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
+	if (pdrv < CTR_DISK_COUNT)
+	{
+		ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
 
-	stat = (disk->io && disk->sectors) ?
-		disk->status = 0 : (disk->status |= STA_NOINIT);
+		stat = (disk->io && disk->sectors) ?
+			disk->status = 0 : (disk->status |= STA_NOINIT);
+	}
 
 	return stat;
 }
@@ -72,14 +78,17 @@ DRESULT disk_read (
 )
 {
 	DRESULT res = RES_PARERR;
-	int result;
-
-	ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
-
-	if (!(disk->status & STA_NOINIT))
+	if (pdrv < CTR_DISK_COUNT)
 	{
-		result = ctr_io_read_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset, count);
-		res = result ? RES_ERROR : RES_OK;
+		int result;
+
+		ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
+
+		if (!(disk->status & STA_NOINIT))
+		{
+			result = ctr_io_read_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset, count);
+			res = result ? RES_ERROR : RES_OK;
+		}
 	}
 
 	return res;
@@ -98,24 +107,21 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	DRESULT res;
-	int result;
+	DRESULT res = RES_PARERR;
+	if (pdrv < CTR_DISK_COUNT)
+	{
+		int result;
 
-	switch (pdrv) {
-	case CTRNAND :
-		// translate the arguments here
+		ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
 
-		//result = ATA_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-	case TWL :
-	case TWLP :
-	default:
-		break;
+		if (!(disk->status & STA_NOINIT))
+		{
+			result = ctr_io_write_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset);
+			res = result ? RES_ERROR : RES_OK;
+		}
 	}
 
-	return RES_PARERR;
+	return res;
 }
 
 
@@ -131,40 +137,43 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res = RES_PARERR;
-
-	ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
-	switch (cmd)
+	if (pdrv < CTR_DISK_COUNT)
 	{
-	case GET_SECTOR_COUNT:
-		if (!(disk->status & STA_NOINIT))
+		ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
+		switch (cmd)
 		{
-			*(DWORD*)buff = disk->sectors;
+		case GET_SECTOR_COUNT:
+			if (!(disk->status & STA_NOINIT))
+			{
+				*(DWORD*)buff = disk->sectors;
+				return RES_OK;
+			}
+			return RES_NOTRDY;
+			
+		case GET_SECTOR_SIZE:
+			if (!(disk->status & STA_NOINIT))
+			{
+				*(WORD*)buff = ctr_io_sector_size(disk->io);
+				return RES_OK;
+			}
+			return RES_NOTRDY;
+		case GET_BLOCK_SIZE:
+			*(DWORD*)buff = 1; //Not sure what the block size for SD is...
+		case CTRL_TRIM:
+		case CTRL_SYNC:
 			return RES_OK;
+		case CTR_SETUP_DISK:
+			{
+				ctr_setup_disk_parameters *params = (ctr_setup_disk_parameters*)buff;
+				ctr_fatfs_disk_initialize(disk, params->io, params->sector_offset, params->sectors);
+			}
+			return RES_OK;
+		default:
+			return RES_PARERR;
 		}
 		return RES_NOTRDY;
-		
-	case GET_SECTOR_SIZE:
-		if (!(disk->status & STA_NOINIT))
-		{
-			*(WORD*)buff = ctr_io_sector_size(disk->io);
-			return RES_OK;
-		}
-		return RES_NOTRDY;
-	case GET_BLOCK_SIZE:
-		*(DWORD*)buff = 1; //Not sure what the block size for SD is...
-	case CTRL_TRIM:
-	case CTRL_SYNC:
-		return RES_OK;
-	case CTR_SETUP_DISK:
-		{
-			ctr_setup_disk_parameters *params = (ctr_setup_disk_parameters*)buff;
-			ctr_fatfs_disk_initialize(disk, params->io, params->sector_offset, params->sectors);
-		}
-		return RES_OK;
-	default:
-		return RES_PARERR;
 	}
-	return RES_NOTRDY;
+
+	return RES_PARERR;
 }
 

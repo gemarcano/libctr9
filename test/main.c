@@ -348,6 +348,31 @@ static bool sd_test3(void *ctx)
 	return false;
 }
 
+static bool sd_test4(void *ctx)
+{
+	FATFS fs = { 0 };
+	FIL test_file = { 0 };
+
+	sd_test_data *data = ctx;
+	ctr_setup_disk_parameters params = {&data->io, 0, ctr_io_disk_size(&data->io)};
+	disk_ioctl(3, CTR_SETUP_DISK, &params);
+
+	const char * string = "HELLO WORLD!!!";
+
+	int res2 = 0;
+	if ((res2 = f_mount(&fs, "SD:", 1)) == FR_OK &&
+	(res2 = f_open(&test_file, "SD:/test_data.txt", FA_WRITE | FA_READ  | FA_OPEN_ALWAYS)) == FR_OK)
+	{
+		UINT written;
+		f_write(&test_file, string, strlen(string), &written);
+		size_t size = f_size(&test_file);
+		f_close(&test_file);
+		return size == strlen(string);
+	}
+	return false;
+
+}
+
 #include <ctr9/aes.h>
 #include <stdalign.h>
 
@@ -396,7 +421,7 @@ static bool twl_test2(void *ctx)
 	char *buffer = data->buffer;
 	size_t buffer_size = data->buffer_size;
 
-	ctr_setup_disk_parameters params = { &data->io, 0x00012E00/0x200, 0x08FB5200/0x200 }; 
+	ctr_setup_disk_parameters params = { &data->io, 0x00012E00/0x200, 0x08FB5200/0x200 };
 	disk_ioctl(1, CTR_SETUP_DISK, &params);
 	bool test1 = false, test2 = false;
 	int res2 = 0;
@@ -437,6 +462,7 @@ static bool twl_test3(void *ctx)
 {
 	FATFS fs = { 0 }, fs2 = { 0 };
 	FIL test_file = { 0 };
+	FIL test_file2 = { 0 };
 	
 	nand_crypto_test_data *data = ctx;
 	char *buffer = data->buffer;
@@ -444,16 +470,17 @@ static bool twl_test3(void *ctx)
 
 	ctr_io_read_sector(&data->io, buffer, buffer_size, 0x00012E00/0x200 + 1, 1);
 
-	ctr_setup_disk_parameters params = { &data->io, 0, ctr_io_disk_size(&data->io)/0x200 };
-	disk_ioctl(4, CTR_SETUP_DISK, &params);
-
+	
 	bool test1 = false;
 	int res2 = 0;
 	if ((res2 = f_mount(&fs, "TWL:", 1)) == FR_OK &&
-	(res2 |= f_open(&test_file, "TWL:/shared2/0000", FA_READ)) == FR_OK)
+	(res2 |= f_open(&test_file, "TWL:/shared2/0000", FA_READ | FA_WRITE)) == FR_OK)
 	{
 		ctr_fatfs_interface io;
 		ctr_fatfs_interface_initialize(&io, &test_file);
+		
+		ctr_setup_disk_parameters params = { &io, 0, ctr_io_disk_size(&data->io)/0x200 };
+		disk_ioctl(4, CTR_SETUP_DISK, &params);
 
 		ctr_io_read(&io, buffer, buffer_size, 0, 513);
 		for (size_t i = 0; i < 513; ++i)
@@ -464,6 +491,14 @@ static bool twl_test3(void *ctx)
 			printf("%02X ", ((char*)buffer)[i]);
 		}
 		test1 = FR_OK == f_mount(&fs2, "EMU1:", 1);
+
+		int res3 = f_open(&test_file2, "EMU1:/foobar.txt", FA_WRITE | FA_OPEN_ALWAYS);
+		printf("Did it open: %d\n", res3);
+		UINT written;
+		int res4 = f_write(&test_file2, "FOOBAR\nhello world!!!", sizeof("FOOBAR\nhello world!!!")-1,&written);
+		printf("this much got written: %d\n, status: %d\n", written, res4);
+		f_close(&test_file2);
+
 	}
 
 	return !res2 && test1;
@@ -507,12 +542,13 @@ int main()
 	ctr_unit_tests_add_test(&nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_write", &nand_crypto_ctx, nand_ctrnand_test5 });
 	ctr_unit_tests_add_test(&nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_write_sector", &nand_crypto_ctx, nand_ctrnand_test6 });
 
-	ctr_unit_test sd_tests_f[3];
+	ctr_unit_test sd_tests_f[4];
 	ctr_unit_tests sd_tests;
-	ctr_unit_tests_initialize(&sd_tests, "SD tests", sd_tests_f, 3);
+	ctr_unit_tests_initialize(&sd_tests, "SD tests", sd_tests_f, 4);
 	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_initialize", &sd_ctx, sd_test1});
 	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_read* compare", &sd_ctx, sd_test2});
 	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_interface FATFS read", &sd_ctx, sd_test3});
+	ctr_unit_tests_add_test(&sd_tests, (ctr_unit_test){ "ctr_sd_interface FATFS write", &sd_ctx, sd_test4});
 
 	ctr_unit_test twl_crypto_tests_f[3];
 	ctr_unit_tests twl_crypto_tests;

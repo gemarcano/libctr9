@@ -456,7 +456,7 @@ int Nand_Init()
 	sdmmc_send_command(&handelNAND,0x10410,0x200);
 	if((handelNAND.error & 0x4))return -1;
 	
-	handelNAND.clk |= 0x200; 
+	handelNAND.clk |= 0x200;
 	
 	inittarget(&handelSD);
 	

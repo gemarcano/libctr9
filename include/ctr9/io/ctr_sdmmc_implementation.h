@@ -22,7 +22,7 @@ typedef int (*sdmmc_writesectors)(uint32_t sector_no, uint32_t numsectors, const
 /** @brief Reads bytes from the given io interface.
  *
  *  @param[in,out] io The io interface to use for reading.
- *  @param[out] buffer Pointer to the buffer. 
+ *  @param[out] buffer Pointer to the buffer.
  *  @param[in] buffer_size The size of the buffer in bytes.
  *  @param[in] position Position/address in the io interface to read from.
  *  @param[in] count The number of bytes to read.
@@ -48,7 +48,7 @@ inline int ctr_sdmmc_implementation_write(void *ctx, const void *buffer, size_t 
  *  SD card access uses 512 byte sectors.
  *
  *  @param[in,out] io The io interface to use for reading.
- *  @param[out] buffer Pointer to the buffer. 
+ *  @param[out] buffer Pointer to the buffer.
  *  @param[in] buffer_size The size of the buffer in bytes.
  *  @param[in] sector Sector position in the io interface to read from.
  *  @param[in] count The number of sectors to read.

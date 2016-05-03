@@ -45,7 +45,7 @@ bool InitNandCrypto(void)
     // STEP #1: Get NAND CID, set up TWL/CTR counter
     u32 NandCid[4];
     u8 shasum[32];
-    
+
     sdmmc_get_cid( 1, NandCid);
     sha_init(SHA256_MODE);
     sha_update((u8*)NandCid, 16);
@@ -56,13 +56,13 @@ bool InitNandCrypto(void)
     sha_get(shasum);
     for(u32 i = 0; i < 16; i++) // little endian and reversed order
         TwlNandCtr[i] = shasum[15-i];
-    
+
     // part #2: TWL KEY
     // see: https://www.3dbrew.org/wiki/Memory_layout#ARM9_ITCM
     u32* TwlCustId = (u32*) (0x01FFB808);
     u32 TwlKeyX[4];
     u8 TwlKeyY[16];
-    
+
     // thanks b1l1s & Normmatt
     // see source from https://gbatemp.net/threads/release-twltool-dsi-downgrading-save-injection-etc-multitool.393488/
     const char* nintendo = "NINTENDO";
@@ -70,23 +70,23 @@ bool InitNandCrypto(void)
     TwlKeyXW[0] = (TwlCustId[0] ^ 0xB358A6AF) | 0x80000000;
     TwlKeyXW[3] = TwlCustId[1] ^ 0x08C267B7;
     memcpy(TwlKeyX + 1, nintendo, 8);
-    
+
     // see: https://www.3dbrew.org/wiki/Memory_layout#ARM9_ITCM
     u32 TwlKeyYW3 = 0xE1A00005;
     memcpy(TwlKeyY, (u8*) 0x01FFD3C8, 12);
     memcpy(TwlKeyY + 12, &TwlKeyYW3, 4);
-    
+
     setup_aeskeyX(0x03, (u8*)TwlKeyX);
     setup_aeskeyY(0x03, TwlKeyY);
     use_aeskey(0x03);
-    
+
     // part #3: CTRNAND N3DS KEY
     if (FileGetData("0:/slot0x05KeyY.bin", slot0x05KeyY, 16, 0)) {
         setup_aeskeyY(0x05, slot0x05KeyY);
         use_aeskey(0x05);
     }
-    
-    
+
+
     return true;
 }
 
@@ -99,9 +99,9 @@ bool CheckSlot0x05Crypto(void)
     sha_get(shasum);
     if (memcmp(shasum, slot0x05KeyY_sha256, 32) == 0)
         return true;
-    
+
     // step #2 - check actual CTRNAND magic
-    const u8 magic[8] = {0xE9, 0x00, 0x00, 0x43, 0x54, 0x52, 0x20, 0x20}; 
+    const u8 magic[8] = {0xE9, 0x00, 0x00, 0x43, 0x54, 0x52, 0x20, 0x20};
     const u32 sector = 0x05CAD7;
     u8 buffer[0x200];
     for (u32 nand = 0; nand < 2; nand++) {
@@ -109,7 +109,7 @@ bool CheckSlot0x05Crypto(void)
         if (memcmp(buffer, magic, 8) == 0)
             return true;
     }
-    
+
     // failed if we arrive here
     return false;
 }
@@ -118,11 +118,11 @@ void CryptNand(u8* buffer, u32 sector, u32 count, u32 keyslot)
 {
     u32 mode = (sector >= (0x0B100000 / 0x200)) ? AES_CNT_CTRNAND_MODE : AES_CNT_TWLNAND_MODE;
     u8 ctr[16] __attribute__((aligned(32)));
-    
+
     // copy NAND CTR and increment it
     memcpy(ctr, (sector >= (0x0B100000 / 0x200)) ? CtrNandCtr : TwlNandCtr, 16);
     add_ctr(ctr, sector * (0x200/0x10));
-    
+
     // decrypt the data
     use_aeskey(keyslot);
     for (u32 s = 0; s < count; s++) {
@@ -148,10 +148,10 @@ u32 ReadNandSectors(u8* buffer, u32 sector, u32 count, u32 keyslot, bool read_em
         if (errorcode) return errorcode;
     } else {
         u32 errorcode = sdmmc_nand_readsectors(sector, count, buffer);
-        if (errorcode) return errorcode;   
+        if (errorcode) return errorcode;
     }
     if (keyslot < 0x40) CryptNand(buffer, sector, count, keyslot);
-    
+
     return 0;
 }
 
@@ -173,10 +173,10 @@ u32 WriteNandSectors(const u8* buffer, u32 sector, u32 count, u32 keyslot, bool 
             if (errorcode) return errorcode;
         } else {
             u32 errorcode = sdmmc_nand_writesectors(sector + s, pcount, NAND_BUFFER);
-            if (errorcode) return errorcode;   
+            if (errorcode) return errorcode;
         }
     }
-    
+
     return 0;
 }
 
@@ -189,7 +189,7 @@ u8 CheckNandType(bool check_emunand)
     } else if (memcmp(NAND_BUFFER + 0x100, nand_magic_o3ds, 0x60) == 0) {
         return (GetUnitPlatform() == PLATFORM_3DS) ? NAND_TYPE_O3DS : NAND_TYPE_NO3DS;
     }
-    
+
     return NAND_TYPE_UNK;
 }
 
@@ -209,11 +209,11 @@ bool InitEmuNandBase(void)
     emunand_base_sector = 0x000000; // GW type EmuNAND
     if (CheckNandType(true) != NAND_TYPE_UNK)
         return true;
-    
+
     emunand_base_sector = 0x000001; // RedNAND type EmuNAND
     if (CheckNandType(true) != NAND_TYPE_UNK)
         return true;
-    
+
     if (GetPartitionOffsetSector("0:") > getMMCDevice(0)->total_size)
         emunand_base_sector = 0x000000; // keep unknown EmuNAND as RedNAND only if space is low
     return false;

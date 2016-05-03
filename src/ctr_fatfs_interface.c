@@ -62,6 +62,7 @@ int ctr_fatfs_interface_write(void *ctx, const void *buffer, size_t buffer_size,
 		ctr_fatfs_interface* io = ctx;
 		UINT written;
 		result = f_lseek(io->file, position);
+		
 		if (result == FR_OK)
 		{
 			result = f_write(io->file, buffer, buffer_size, &written);
@@ -97,6 +98,7 @@ int ctr_fatfs_interface_write_sector(void *ctx, const void *buffer, size_t buffe
 		ctr_fatfs_interface* io = ctx;
 		UINT written;
 		result = f_lseek(io->file, sector * 512);
+		
 		if (result == FR_OK)
 		{
 			size_t writeable = buffer_size - buffer_size % 512;

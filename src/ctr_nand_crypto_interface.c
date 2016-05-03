@@ -79,7 +79,7 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *io, uint8_t* buffer, ui
 	if (count)
 	{
 		//FIXME perhaps let mode be set at construction time?
-		uint32_t mode = io->mode; 
+		uint32_t mode = io->mode;
 
 		alignas(32) uint8_t ctr[16];
 
@@ -93,14 +93,14 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *io, uint8_t* buffer, ui
 			process_aes_ctr_block(buffer + (block * 0x10), ctr, mode);
 		}
 	}
-} 
+}
 
 static void applyAESCTR(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t location, uint32_t count)
 {
 	if (count)
 	{
 		//FIXME Maybe move mode out?
-		uint32_t mode = io->mode; 
+		uint32_t mode = io->mode;
 		alignas(32) uint8_t ctr[16];
 		alignas(32) uint8_t block_buffer[16];
 		uint32_t amount_read = 0;
