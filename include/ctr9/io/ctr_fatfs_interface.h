@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-/**	@brief io interface object for accessing NAND.
+/**	@brief io interface object for accessing a fatfs file as a disk.
  */
 typedef struct
 {
@@ -28,22 +28,29 @@ typedef struct
 	FIL *file;
 } ctr_fatfs_interface;
 
-//FIXME is it safe to call this function multiple times? as in, if we have multiple NAND objects, is it safe?
-/**	@brief Initialize the given NAND io interface object.
+//FIXME is it safe to call this function multiple times?
+/**	@brief Initialize the given fatfs io interface object.
  *
- *	@param[out] io NAND io interface to initialize.
+ *	Note that any size file greater or equal than a single sector will be
+ *	accepted by the constructor, but the io operations will ignore the trailing
+ *	data on the file if the file size isn't divisible by the sector size. In
+ *	other words, the effective size of the disk is f_size(file)/0x200, using
+ *	integer arithmetic. In order for reads to work the file must have been
+ *	opened using FA_READ, and for writes to work both FA_READ and FA_WRITE.
  *
- *	@returns 0 on success, anything else on a failure. Unless something has gone
- *		horribly wrong with the NAND subsystem, this function shouldn't fail.
+ *	@param[out] io fatfs io interface to initialize.
+ *	@param[in,out] file File to set up as a disk.
+ *
+ *	@returns 0 on success, anything else on a failure.
  */
 int ctr_fatfs_interface_initialize(ctr_fatfs_interface *io, FIL *file);
 
-/**	@brief Destroys the given NAND io interface object.
+/**	@brief Destroys the given fatfs io interface object.
  *
- *	@param[in,out] io NAND io interface to deinitialize.
+ *	@param[in,out] io fatfs io interface to deinitialize.
  *
  *	@post The io interface has been destroyed and cannot be used for accessing
- *		NAND without being re-initialized.
+ *		the fatfs file as a disk without being re-initialized.
  */
 void ctr_fatfs_interface_destroy(ctr_fatfs_interface *io);
 
@@ -73,7 +80,7 @@ int ctr_fatfs_interface_write(void *io, const void *buffer, size_t buffer_size, 
 
 /** @brief Reads sectors from the given io interface.
  *
- *  NAND uses 512 byte sectors.
+ *  fatfs is configured to only use 512 byte sectors.
  *
  *  @param[in,out] io The io interface to use for reading.
  *  @param[out] buffer Pointer to the buffer.
@@ -87,7 +94,7 @@ int ctr_fatfs_interface_read_sector(void *io, void *buffer, size_t buffer_size, 
 
 /** @brief Writes sectors from the given io interface.
  *
- *	NAND uses 512 byte sectors.
+ *	fatfs is configured to only use 512 byte sectors.
  *
  *  @param[in,out] io The io interface to use for writing.
  *  @param[in] buffer Pointer to the buffer.
@@ -103,12 +110,13 @@ int ctr_fatfs_interface_write_sector(void *io, const void *buffer, size_t buffer
 
 /** @brief Returns the size of the underlying disk for the given io interface.
  *
- *  @returns The size of the NAND as reported by it.
+ *  @returns The size of the file used as the backing for the given io
+ *  	interface.
  */
 size_t ctr_fatfs_interface_disk_size(void *io);
 
 /** @brief Returns the size of the sectors used by the io interface, which is
- *		512 bytes for NAND.
+ *		512 bytes for fatfs due to how it is configured.
  *
  *  @returns 512 bytes as the sector size for NAND.
  */

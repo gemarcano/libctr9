@@ -33,32 +33,32 @@ void ctr_sd_interface_destroy(ctr_sd_interface *io)
 	*io = (ctr_sd_interface){0};	
 }
 
-int ctr_sd_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_sd_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
-	return ctr_sdmmc_implementation_read(ctx, buffer, buffer_size, position, count, sdmmc_sdcard_readsectors);
+	return ctr_sdmmc_implementation_read(buffer, buffer_size, position, count, sdmmc_sdcard_readsectors);
 }
 
-int ctr_sd_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position)
+int ctr_sd_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)
 {
-	return ctr_sdmmc_implementation_write(ctx, buffer, buffer_size, position, sdmmc_sdcard_readsectors, sdmmc_sdcard_writesectors);
+	return ctr_sdmmc_implementation_write(buffer, buffer_size, position, sdmmc_sdcard_readsectors, sdmmc_sdcard_writesectors);
 }
 
-int ctr_sd_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_sd_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
-	return ctr_sdmmc_implementation_read_sector(ctx, buffer, buffer_size, sector, count, sdmmc_sdcard_readsectors);
+	return ctr_sdmmc_implementation_read_sector(buffer, buffer_size, sector, count, sdmmc_sdcard_readsectors);
 }
 
-int ctr_sd_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
+int ctr_sd_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector)
 {
-	return ctr_sdmmc_implementation_write_sector(ctx, buffer, buffer_size, sector, sdmmc_sdcard_writesectors);
+	return ctr_sdmmc_implementation_write_sector(buffer, buffer_size, sector, sdmmc_sdcard_writesectors);
 }
 
-size_t ctr_sd_interface_disk_size(void *ctx)
+size_t ctr_sd_interface_disk_size(void *io)
 {
 	return getMMCDevice(1)->total_size * 512u;
 }
 
-size_t ctr_sd_interface_sector_size(void *ctx)
+size_t ctr_sd_interface_sector_size(void *io)
 {
 	return 512u;
 }

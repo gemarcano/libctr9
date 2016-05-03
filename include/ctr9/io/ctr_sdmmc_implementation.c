@@ -10,7 +10,7 @@
 #include "sdmmc/sdmmc.h"
 #include <string.h>
 
-inline int ctr_sdmmc_implementation_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read)
+inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read)
 {
 	int res = 0;
 	if (count && buffer_size)
@@ -64,7 +64,7 @@ inline int ctr_sdmmc_implementation_read(void *ctx, void *buffer, size_t buffer_
 	return res;
 }
 
-inline int ctr_sdmmc_implementation_write(void *ctx, const void *buffer, size_t buffer_size, size_t position, sdmmc_readsectors read, sdmmc_writesectors write)
+inline int ctr_sdmmc_implementation_write(const void *buffer, size_t buffer_size, size_t position, sdmmc_readsectors read, sdmmc_writesectors write)
 {
     int res = 0;
     if (buffer_size)
@@ -110,7 +110,7 @@ inline int ctr_sdmmc_implementation_write(void *ctx, const void *buffer, size_t 
     return res;
 }
 
-inline int ctr_sdmmc_implementation_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count, sdmmc_readsectors read)
+inline int ctr_sdmmc_implementation_read_sector(void *buffer, size_t buffer_size, size_t sector, size_t count, sdmmc_readsectors read)
 {
     int res = 0;
     size_t read_size = (buffer_size / 512) < count ? buffer_size / 512 : count;
@@ -122,7 +122,7 @@ inline int ctr_sdmmc_implementation_read_sector(void *ctx, void *buffer, size_t 
     return res;
 }
 
-inline int ctr_sdmmc_implementation_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector, sdmmc_writesectors write)
+inline int ctr_sdmmc_implementation_write_sector(const void *buffer, size_t buffer_size, size_t sector, sdmmc_writesectors write)
 {
     size_t write_size = (buffer_size / 512);
     int res;

@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR9_CTR_RTC_H_
-#define CTR9_CTR_RTC_H_
+#ifndef CTR_RTC_H_
+#define CTR_RTC_H_
 
 #include <stdint.h>
 
@@ -35,5 +35,5 @@ void ctr_rtc_init(void);
  */
 ctr_rtc_data ctr_rtc_gettime(void);
 
-#endif//CTR9_CTR_RTC_H_
+#endif//CTR_RTC_H_
 

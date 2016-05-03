@@ -36,88 +36,87 @@ void ctr_fatfs_interface_destroy(ctr_fatfs_interface *io)
 	*io = (ctr_fatfs_interface){0};
 }
 
-int ctr_fatfs_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_fatfs_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
 	FRESULT result = FR_OK;
 	if (count)
 	{
-		ctr_fatfs_interface* io = ctx;
+		ctr_fatfs_interface *fatfs_io = io;
 		size_t readable = count < buffer_size ? count : buffer_size;
 		UINT read;
-		result = f_lseek(io->file, position);
+		result = f_lseek(fatfs_io->file, position);
 		if (result == FR_OK)
 		{
-			result = f_read(io->file, buffer, readable, &read);
+			result = f_read(fatfs_io->file, buffer, readable, &read);
 		}
 	}
 	
 	return result != FR_OK;
 }
 
-int ctr_fatfs_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position)
+int ctr_fatfs_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)
 {
 	FRESULT result = FR_OK;
 	if (buffer_size)
 	{
-		ctr_fatfs_interface* io = ctx;
+		ctr_fatfs_interface *fatfs_io = io;
 		UINT written;
-		result = f_lseek(io->file, position);
+		result = f_lseek(fatfs_io->file, position);
 		
 		if (result == FR_OK)
 		{
-			result = f_write(io->file, buffer, buffer_size, &written);
+			result = f_write(fatfs_io->file, buffer, buffer_size, &written);
 		}
 	}
 	
 	return result != FR_OK;
 }
 
-int ctr_fatfs_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_fatfs_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
 	FRESULT result = FR_OK;
 	if (count)
 	{
-		ctr_fatfs_interface* io = ctx;
+		ctr_fatfs_interface *fatfs_io = io;
 		size_t readable = count < buffer_size/512 ? count : buffer_size/512;
 		UINT read;
-		result = f_lseek(io->file, sector * 512);
+		result = f_lseek(fatfs_io->file, sector * 512);
 		if (result == FR_OK)
 		{
-			result = f_read(io->file, buffer, readable * 512, &read);
+			result = f_read(fatfs_io->file, buffer, readable * 512, &read);
 		}
 	}
 	
 	return result != FR_OK;
 }
 
-int ctr_fatfs_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
+int ctr_fatfs_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector)
 {
 	FRESULT result = FR_OK;
 	if (buffer_size/512)
 	{
-		ctr_fatfs_interface* io = ctx;
+		ctr_fatfs_interface *fatfs_io = io;
 		UINT written;
-		result = f_lseek(io->file, sector * 512);
+		result = f_lseek(fatfs_io->file, sector * 512);
 		
 		if (result == FR_OK)
 		{
 			size_t writeable = buffer_size - buffer_size % 512;
-			result = f_write(io->file, buffer, writeable , &written);
+			result = f_write(fatfs_io->file, buffer, writeable , &written);
 		}
 	}
 	
 	return result != FR_OK;
 }
 
-size_t ctr_fatfs_interface_disk_size(void *ctx)
+size_t ctr_fatfs_interface_disk_size(void *io)
 {
-	ctr_fatfs_interface *io = ctx;
-	return f_size(io->file);
+	ctr_fatfs_interface *fatfs_io = io;
+	return f_size(fatfs_io->file);
 }
 
-size_t ctr_fatfs_interface_sector_size(void *ctx)
+size_t ctr_fatfs_interface_sector_size(void *io)
 {
-	ctr_fatfs_interface *io = ctx;
 	return 512;
 }
 

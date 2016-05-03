@@ -25,5 +25,5 @@ typedef enum
  */
 ctr_system_type ctr_get_system_type(void);
 
-#endif// CTR_SYSTEM_H_
+#endif//CTR_SYSTEM_H_
 

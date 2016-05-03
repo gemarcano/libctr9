@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR_NAND_INTRFACE_H_
-#define CTR_NAND_INTRFACE_H_
+#ifndef CTR_NAND_INTERFACE_H_
+#define CTR_NAND_INTERFACE_H_
 
 #include "ctr_io_interface.h"
 #include "sdmmc/sdmmc.h"
@@ -115,5 +115,5 @@ size_t ctr_nand_interface_sector_size(void *io);
 }
 #endif
 
-#endif//CTR_NAND_INTRFACE_H_
+#endif//CTR_NAND_INTERFACE_H_
 

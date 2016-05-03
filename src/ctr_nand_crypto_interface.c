@@ -33,12 +33,12 @@ static inline void process_aes_ctr_block(void *buffer, uint8_t *ctr, uint32_t mo
 	add_ctr(ctr, 0x1);		
 }
 
-int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
+int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
 {
-	io->base = nand_crypto_base;
-	io->lower_io = lower_io;
-	io->keySlot = keySlot;
-	io->mode = AES_CNT_CTRNAND_MODE;
+	crypto_io->base = nand_crypto_base;
+	crypto_io->lower_io = lower_io;
+	crypto_io->keySlot = keySlot;
+	crypto_io->mode = AES_CNT_CTRNAND_MODE;
 
 	//Get the nonces for CTRNAND and TWL decryption
 	uint32_t NandCid[4];
@@ -52,8 +52,8 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t 
 			sha_init(SHA256_MODE);
 			sha_update((uint8_t*)NandCid, 16);
 			sha_get(shasum);
-			memcpy(io->ctr, shasum, 16);
-			io->mode = AES_CNT_CTRNAND_MODE;
+			memcpy(crypto_io->ctr, shasum, 16);
+			crypto_io->mode = AES_CNT_CTRNAND_MODE;
 			break;
 
 		case NAND_TWL:
@@ -62,9 +62,9 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t 
 			sha_get(shasum);
 			for(uint32_t i = 0; i < 16u; i++) // little endian and reversed order
 			{
-				io->ctr[i] = shasum[15-i];
+				crypto_io->ctr[i] = shasum[15-i];
 			}
-			io->mode = AES_CNT_TWLNAND_MODE;
+			crypto_io->mode = AES_CNT_TWLNAND_MODE;
 			break;
 
 		default:
@@ -74,20 +74,20 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *io, uint8_t 
 }
 
 
-static void applyAESCTRSector(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t sector, uint32_t count)
+static void applyAESCTRSector(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, uint32_t sector, uint32_t count)
 {
 	if (count)
 	{
 		//FIXME perhaps let mode be set at construction time?
-		uint32_t mode = io->mode;
+		uint32_t mode = crypto_io->mode;
 
 		alignas(32) uint8_t ctr[16];
 
-		memcpy(ctr, io->ctr, 16);
+		memcpy(ctr, crypto_io->ctr, 16);
 		add_ctr(ctr, sector * (0x200 / 0x10));
 		
 		//apply AES CTR to the data
-		use_aeskey(io->keySlot);
+		use_aeskey(crypto_io->keySlot);
 		for (uint32_t block = 0; block < (count * 0x200 / 0x10); ++block)
 		{
 			process_aes_ctr_block(buffer + (block * 0x10), ctr, mode);
@@ -95,19 +95,19 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *io, uint8_t* buffer, ui
 	}
 }
 
-static void applyAESCTR(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t location, uint32_t count)
+static void applyAESCTR(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, uint32_t location, uint32_t count)
 {
 	if (count)
 	{
 		//FIXME Maybe move mode out?
-		uint32_t mode = io->mode;
+		uint32_t mode = crypto_io->mode;
 		alignas(32) uint8_t ctr[16];
 		alignas(32) uint8_t block_buffer[16];
 		uint32_t amount_read = 0;
 
-		use_aeskey(io->keySlot);
+		use_aeskey(crypto_io->keySlot);
 		
-		memcpy(ctr, io->ctr, 16);
+		memcpy(ctr, crypto_io->ctr, 16);
 		add_ctr(ctr, location / 0x10);
 
 		//Section 1: First block always exists, may or may not be aligned to block boundaries.
@@ -149,18 +149,18 @@ static void applyAESCTR(ctr_nand_crypto_interface *io, uint8_t* buffer, uint32_t
 	}
 }
 
-void ctr_nand_crypto_interface_destroy(ctr_nand_crypto_interface *io)
+void ctr_nand_crypto_interface_destroy(ctr_nand_crypto_interface *crypto_io)
 {
-	*io = (ctr_nand_crypto_interface){0};
+	*crypto_io = (ctr_nand_crypto_interface){0};
 }
 
-int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_nand_crypto_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)
 {
 	int res = 0;
 	if (count)
 	{
-		ctr_nand_crypto_interface* io = ctx;
-		res = io->lower_io->read(ctx, buffer, buffer_size, position, count);
+		ctr_nand_crypto_interface *crypto_io = io;
+		res = crypto_io->lower_io->read(io, buffer, buffer_size, position, count);
 		
 		//we now have raw data, apply crypto
 		applyAESCTR(io, (uint8_t*)buffer, position, count < buffer_size ? count : buffer_size);
@@ -169,9 +169,9 @@ int ctr_nand_crypto_interface_read(void *ctx, void *buffer, size_t buffer_size, 
 	return res;
 }
 
-int ctr_nand_crypto_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position)
+int ctr_nand_crypto_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)
 {
-	ctr_nand_crypto_interface* io = ctx;
+	ctr_nand_crypto_interface *crypto_io = io;
 	alignas(32) uint8_t buf[0x200*4];
 	int res = 0;
 	for (size_t i = 0; i < buffer_size && !res; i += sizeof(buf))
@@ -180,32 +180,32 @@ int ctr_nand_crypto_interface_write(void *ctx, const void *buffer, size_t buffer
 		memcpy(buf, buffer, write_size);
 
 		applyAESCTR(io, buf, position + i, write_size);
-		res |= io->lower_io->write(ctx, buf, write_size, position + i);
+		res |= crypto_io->lower_io->write(io, buf, write_size, position + i);
 	}
 
 	return res;
 }
 
-int ctr_nand_crypto_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_nand_crypto_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)
 {
 	int res = 0;
 	if (count)
 	{
-		ctr_nand_crypto_interface* io = ctx;
-		res = io->lower_io->read_sector(ctx, buffer, buffer_size, sector, count);
+		ctr_nand_crypto_interface *crypto_io = io;
+		res = crypto_io->lower_io->read_sector(io, buffer, buffer_size, sector, count);
 		applyAESCTRSector(io, (uint8_t*)buffer, sector, count < buffer_size/0x200 ? count : buffer_size/0x200 );
 	}
 	return res;
 }
 
-int ctr_nand_crypto_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t sector)
+int ctr_nand_crypto_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector)
 {
 	int res = 0;
 	size_t number_of_sectors = buffer_size / 0x200;
 
 	if (number_of_sectors)
 	{
-		ctr_nand_crypto_interface* io = ctx;
+		ctr_nand_crypto_interface *crypto_io = io;
 		uint8_t buf[0x200*4];
 		for (size_t i = 0; i < number_of_sectors && !res; i += sizeof(buf) / 0x200)
 		{
@@ -214,21 +214,21 @@ int ctr_nand_crypto_interface_write_sector(void *ctx, const void *buffer, size_t
 			memcpy(buf, buffer, write_sectors * 0x200);
 
 			applyAESCTRSector(io, buf, sector + i, write_sectors);
-			res |= io->lower_io->write_sector(ctx, buf, write_sectors * 0x200, sector + i);
+			res |= crypto_io->lower_io->write_sector(io, buf, write_sectors * 0x200, sector + i);
 		}
 	}
 	return res;
 }
 
-size_t ctr_nand_crypto_interface_disk_size(void *ctx)
+size_t ctr_nand_crypto_interface_disk_size(void *io)
 {
-	ctr_nand_crypto_interface *io = ctx;
-	return io->lower_io->disk_size(ctx);
+	ctr_nand_crypto_interface *crypto_io = io;
+	return crypto_io->lower_io->disk_size(io);
 }
 
-size_t ctr_nand_crypto_interface_sector_size(void *ctx)
+size_t ctr_nand_crypto_interface_sector_size(void *io)
 {
-	ctr_nand_crypto_interface *io = ctx;
-	return io->lower_io->sector_size(ctx);
+	ctr_nand_crypto_interface *crypto_io = io;
+	return crypto_io->lower_io->sector_size(io);
 }
 

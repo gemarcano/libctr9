@@ -8,8 +8,8 @@
 
 /** @file */
 
-#ifndef CTR_SD_INTRFACE_H_
-#define CTR_SD_INTRFACE_H_
+#ifndef CTR_SD_INTERFACE_H_
+#define CTR_SD_INTERFACE_H_
 
 #include "ctr_io_interface.h"
 #include "sdmmc/sdmmc.h"
@@ -54,7 +54,7 @@ void ctr_sd_interface_destroy(ctr_sd_interface *io);
  *
  *  @returns 0 upon success, anything else means an error.
  */
-int ctr_sd_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count);
+int ctr_sd_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count);
 
 /** @brief Writes bytes to the given io interface.
  *
@@ -66,7 +66,7 @@ int ctr_sd_interface_read(void *ctx, void *buffer, size_t buffer_size, size_t po
  *
  *  @returns 0 upon success, anything else means an error.
  */
-int ctr_sd_interface_write(void *ctx, const void *buffer, size_t buffer_size, size_t position);
+int ctr_sd_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position);
 
 /** @brief Reads sectors from the given io interface.
  *
@@ -80,7 +80,7 @@ int ctr_sd_interface_write(void *ctx, const void *buffer, size_t buffer_size, si
  *
  *  @returns 0 upon success, anything else means an error.
  */
-int ctr_sd_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, size_t position, size_t count);
+int ctr_sd_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t position, size_t count);
 
 /** @brief Writes sectors from the given io interface.
  *
@@ -96,24 +96,24 @@ int ctr_sd_interface_read_sector(void *ctx, void *buffer, size_t buffer_size, si
  *
  *  @returns 0 upon success, anything else means an error.
  */
-int ctr_sd_interface_write_sector(void *ctx, const void *buffer, size_t buffer_size, size_t position);
+int ctr_sd_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t position);
 
 /** @brief Returns the size of the underlying disk for the given io interface.
  *
  *  @returns The size of the NAND as reported by it.
  */
-size_t ctr_sd_interface_disk_size(void *ctx);
+size_t ctr_sd_interface_disk_size(void *io);
 
 /** @brief Returns the size of the sectors used by the io interface, which is
  *      512 bytes for SD cards.
  *
  *  @returns 512 bytes as the sector size for SD cards.
  */
-size_t ctr_sd_interface_sector_size(void *ctx);
+size_t ctr_sd_interface_sector_size(void *io);
 
 #ifdef __clusplus
 }
 #endif
 
-#endif//CTR_SD_INTRFACE_H_
+#endif//CTR_SD_INTERFACE_H_
 
