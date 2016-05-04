@@ -1,0 +1,151 @@
+________________________________________________________________________________
+
+(Working title) libctr9
+
+Copyright 2016, Gabriel Marcano
+________________________________________________________________________________
+
+
+--------------------------------------------------------------------------------
+Licensing
+--------------------------------------------------------------------------------
+
+This project is licensed under the GPL 2 or later licenses, at your choice.
+Refer to COPYING for more licensing information.
+
+
+--------------------------------------------------------------------------------
+About
+--------------------------------------------------------------------------------
+
+This library is meant to be a collection of useful routines for ARM9 3DS
+development. The plan is for it to eventually grow to something like libnds.
+Currently the main contribution to this library is a generic disk IO framework
+that has been designed for ease of use and extensibility.
+
+The library is linked using LTO, meaning that if one's program also uses LTO,
+the linker when linking the final executable will be able to throw out parts of
+the library that are not in use, reducing executable size.
+
+Note this library is still in active development and the API is not considered
+stable. Breaking changes will be mentioned in commits at the very least.
+
+--------------------------------------------------------------------------------
+Installation
+--------------------------------------------------------------------------------
+
+TBD. This library is built using Autotools, so it supports the 'make install'
+and 'make uninstall' targets. Be sure to set --prefix when calling configure 
+if either of the preceeding targets will be used.
+
+
+--------------------------------------------------------------------------------
+Usage
+--------------------------------------------------------------------------------
+
+Depending on where the library is installed, one may need to use -L in one's
+projects to point the compiler to find the library, then use -lctr9 to cause
+the linker to link in the static library.
+
+
+--------------------------------------------------------------------------------
+Documentation
+--------------------------------------------------------------------------------
+
+This project uses Doxygen markup in order to facilitate the generation of
+documentation, which should be found when generated in the doc/ folder. Each
+header in the include/ directory should also be well documented and can be used
+as reference for programming.
+
+
+--------------------------------------------------------------------------------
+Design: IO subsystem/framework
+--------------------------------------------------------------------------------
+
+The IO framework is based on the idea of IO interfaces that can be layered. The
+implementation of each IO interface layer depends on a function table that is
+embedded into the IO interface context object. It is via this function table
+that the generic IO interface functions determine what function to call, acting
+as a virtual table for the IO interface functionality. Refer to
+ctr_io_interface.h for the definition of this function table.
+
+One of the advantages of the framework is that it lends itself well to layering
+IO interfaces. For example, after implementing a NAND IO interface, it is
+possible to develop an IO interface layer that takes as an input at
+initialization a NAND IO interface and transforms the input/output of the NAND
+IO interface layer as necessary. An example of this is the crypto IO interface
+layer included in this library, which takes as an input any IO interface layer
+(most likely NAND) and then applies crypto to the input/output to/from the
+NAND IO layer, based on the initialization parameters of the crypto layer. This
+allows for the encrypted NAND to be read and written transparently, for example.
+
+The IO subsystem was designed with extensibility in mind. In order to create a
+new IO interface layer, all one needs to do is implement six functions and
+load a function table at the beginning of the new IO interface object with those
+functions. Instead of calling the function pointers directly, use the ctr_io_*
+functions supplied by the framework. These will make sure to call the right
+functions.
+
+For examples of how IO interfaces are implemented refer to the source code for
+this library. Some example IO interfaces are ctr_nand_interface (the actual
+implementation for this one was abstracted to ctr_sdmmc_implementation),
+ctr_nand_crypto_interface, and ctr_fatfs_interface. It is feasible to make a
+ctr_xorpad_interface to generate xorpads, for example, taking two IO interface
+layers, one providing the raw encrypted ouput and another the plaintext.
+
+
+--------------------------------------------------------------------------------
+Testing
+--------------------------------------------------------------------------------
+
+This project does include a homegrown unit testing framework and some unit tests
+for this library. See the test/ directory for more information. Note that the
+unit testing payload WILL write to NAND (in theory writes to areas that are
+unused) as a part of unit testing.
+
+
+--------------------------------------------------------------------------------
+Issues/Bugs
+--------------------------------------------------------------------------------
+
+Please report these to the issue tracker at the repository, and these will be
+addressed as soon as possible, if not at least acknowledged. The more detailed
+the reports, the more likely they are to be addressed quickly. In particular,
+the following information can be quite useful when debugging bugs:
+
+ - Type of 2/3DS system
+ - Operating system being used to compile
+ - Release/commit of library in use
+ - Steps to reproduce issue
+ - Expected behavior
+ - Actual behavior
+ - ARM9 entry point
+ - Any modifications to the library, or extensions
+
+
+--------------------------------------------------------------------------------
+Contributing
+--------------------------------------------------------------------------------
+
+Pull requests are welcome. All requests will be looked at in detail, and must be
+documented in a similar fashion as the rest of the code for this project. In
+particular, it is unlikely (but not impossible) that code that emmits warnings
+with the warnings in use by this library would be merged without first fixing/
+addressing what is causing the warnings to be emitted.
+
+
+--------------------------------------------------------------------------------
+Credits
+--------------------------------------------------------------------------------
+
+ - #3dshacks @ Rizon for starting me on my path to 3DS homebrew development
+ - #Cakey @ Freenode for the continued development support
+ - d0k3 for some code use in this library and for suggestions
+ - dark_samus for helping to develop A9LH stuff in Cakey, which drove for the
+    development of this library
+ - Delebile for publishing the public arm9loaderhax implementation, making using
+    and testing this library possible (or less of a pain).
+ - Aurora, et. al for for general development help and brainstorming.
+ - Normmatt for yelling at me for screwing up his sdmmc code :) Also a lot of
+    other general 3DS development stuff.
+
