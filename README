@@ -2,7 +2,7 @@ ________________________________________________________________________________
 
 (Working title) libctr9
 
-Copyright 2016, Gabriel Marcano
+Copyright 2016 Gabriel Marcano
 ________________________________________________________________________________
 
 
@@ -11,7 +11,8 @@ Licensing
 --------------------------------------------------------------------------------
 
 This project is licensed under the GPL 2 or later licenses, at your choice.
-Refer to COPYING for more licensing information.
+Refer to COPYING for more licensing informationi and for the licensing for the
+code borrowed from other sources.
 
 
 --------------------------------------------------------------------------------
@@ -29,6 +30,7 @@ the library that are not in use, reducing executable size.
 
 Note this library is still in active development and the API is not considered
 stable. Breaking changes will be mentioned in commits at the very least.
+
 
 --------------------------------------------------------------------------------
 Installation
@@ -140,12 +142,16 @@ Credits
 
  - #3dshacks @ Rizon for starting me on my path to 3DS homebrew development
  - #Cakey @ Freenode for the continued development support
+ - #3dsdev @ EFNet for the occasional help answering questions
  - d0k3 for some code use in this library and for suggestions
  - dark_samus for helping to develop A9LH stuff in Cakey, which drove for the
     development of this library
  - Delebile for publishing the public arm9loaderhax implementation, making using
-    and testing this library possible (or less of a pain).
- - Aurora, et. al for for general development help and brainstorming.
+    and testing this library possible (or less of a pain)
+ - Aurora, et. al (you know who you are, I hope) for for general development
+ -	help and brainstorming
  - Normmatt for yelling at me for screwing up his sdmmc code :) Also a lot of
-    other general 3DS development stuff.
+    other general 3DS development stuff
+
+ - See COPYING for details about code usage from other sources
 
