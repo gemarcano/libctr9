@@ -1,6 +1,6 @@
 ________________________________________________________________________________
 
-(Working title) libctr9
+(Working title) libctr9_io
 
 Copyright 2016 Gabriel Marcano
 ________________________________________________________________________________
@@ -48,10 +48,17 @@ Compiling
 
 The Autotools setup assumes that devkitarm is already in the PATH.
 
- - autoreconf -if
- - ./configure ./configure --host arm-none-eabi \
-     --prefix=[anywhere to install the lib]
- - make
+ # this is if the 3ds compiler isn't in the path
+ export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin 
+ autoreconf -if
+ ./configure ./configure --host arm-none-eabi --prefix=[lib install path]
+ make
+
+Example:
+  export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
+  ./configure --host arm-none-eabi --prefix="$HOME/.local/usr/arm-none-eabi-9/"
+  make -j10
+
 
 --------------------------------------------------------------------------------
 Installation
@@ -59,7 +66,13 @@ Installation
 
 TBD. This library is built using Autotools, so it supports the 'make install'
 and 'make uninstall' targets. Be sure to set --prefix when calling configure 
-if either of the preceeding targets will be used.
+if either of the preceeding targets will be used, else by default the generated
+Makefile will install to /usr/local/ !
+
+Example (after having compiled):
+  #this will install to the directory specified in prefix, or /usr/local/ if
+  #prefix isn't defined!
+  make install 
 
 
 --------------------------------------------------------------------------------
@@ -69,6 +82,10 @@ Usage
 Depending on where the library is installed, one may need to use -L in one's
 projects to point the compiler to find the library, then use -lctr9 to cause
 the linker to link in the static library.
+
+Example:
+  arm-none-eabi-gcc -I$HOME/.local/usr/arm-none-eabi-9/include \
+    -L$HOME/.local/usr/arm-none-eabi-9/lib -Os -Wall -Wextra -Wpedantic hello.c
 
 
 --------------------------------------------------------------------------------
@@ -170,7 +187,7 @@ Credits
  - Delebile for publishing the public arm9loaderhax implementation, making using
     and testing this library possible (or less of a pain)
  - Aurora, et. al (you know who you are, I hope) for for general development
- -	help and brainstorming
+    help and brainstorming
  - Normmatt for yelling at me for screwing up his sdmmc code :) Also a lot of
     other general 3DS development stuff
 
