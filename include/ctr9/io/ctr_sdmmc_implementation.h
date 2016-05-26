@@ -56,7 +56,7 @@ typedef int (*sdmmc_writesectors)(uint32_t sector_no, uint32_t numsectors, const
  */
 static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read);
 
-/** @brief General implementation for writing bytes using sdmmc functions..
+/** @brief General implementation for writing bytes using sdmmc functions.
  *
  *  @param[in] buffer Pointer to the buffer.
  *  @param[in] buffer_size The size of the buffer, and the number of bytes to

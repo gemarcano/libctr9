@@ -73,13 +73,15 @@ DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
 #define ATA_GET_SN			22	/* Get serial number */
 
 /* Custom IOCTLs */
-#define CTR_SETUP_DISK		23
+#define CTR_SETUP_DISK		23	//Set up fatfs disk with the io interface
 
+/**	@brief Structure used for CTR_SETUP_DISK ioctl
+ */
 typedef struct
 {
-	void *io;
-	size_t sector_offset;
-	size_t sectors;
+	void *io;				//io interface to load into fatfs
+	size_t sector_offset;	//offset in sectors from beginning of partition
+	size_t sectors;			//Size in sectors of partition
 } ctr_setup_disk_parameters;
 
 #ifdef __cplusplus
