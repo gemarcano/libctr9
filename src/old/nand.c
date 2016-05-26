@@ -16,16 +16,16 @@ int nand_read(size_t location, size_t size, uint8_t *dest)
 		uint8_t buffer[0x200u];
 		const size_t base_sector = location / 0x200u;
 		const size_t start_location = location % 0x200u;
-		
+
 		size_t bytes_read = 0;
 		size_t sectors_read = 0;
-		
+
 		//read first sector to extract the right number of bytes from it
 		sdmmc_nand_readsectors(base_sector, ++sectors_read, buffer);
-		
+
 		const size_t readable = 0x200u - start_location;
 		bytes_read += readable < size ? readable : size;
-		
+
 		memcpy(dest, &buffer[start_location], bytes_read);
 
 		//read all sectors until the last one
@@ -54,19 +54,19 @@ int nand_write(size_t location, size_t size, const uint8_t *source)
 		uint8_t buffer[0x200u];
 		const size_t base_sector = location / 0x200u;
 		const size_t start_location = location % 0x200u;
-		
+
 		size_t bytes_written = 0;
 		size_t sectors_written = 0;
 
 		//read first sector to extract the right number of bytes from it
 		sdmmc_nand_readsectors(base_sector, ++sectors_written, buffer);
-	
+
 		const size_t writeable = 0x200u - start_location;
 		bytes_written += writeable < size ? writeable : size;
 
 		memcpy(buffer + start_location, source, bytes_written);
 		sdmmc_nand_writesectors(base_sector, sectors_written, buffer);
-	
+
 		const size_t mid_sectors = (size-bytes_written)/0x200u;
 		//read all sectors until the last one
 		if (mid_sectors)

@@ -1,3 +1,3 @@
-SUBDIRS = src test
+SUBDIRS = src test examples
 
 EXTRA_DIST = Doxyfile

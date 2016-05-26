@@ -4,7 +4,8 @@ lib_LIBRARIES = libctr9.a
 libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	ctr_io_interface.c ctr_nand_interface.c sdmmc/delay.s sdmmc/sdmmc.c i2c.c \
 	ctr_rtc.c fatfs/diskio.c fatfs/ff.c fatfs/option/unicode.c ctr_system.c \
-	ctr_fatfs_interface.c fatfs/ctr_fatfs_disk.c
+	ctr_fatfs_interface.c fatfs/ctr_fatfs_disk.c ctr_disks.c fatfs/ctr_fatfs_disk.c \
+	ctr_fatfs.c
 
 EXTRA_libctr9_a_SOURCES = fatfs/option/cc932.c fatfs/option/cc936.c \
 	fatfs/option/cc949.c fatfs/option/cc950.c fatfs/option/ccsbcs.c \
@@ -28,12 +29,13 @@ ctrioinclude_HEADERS = $(includedirectory)/ctr9/io/ctr_fatfs_interface.h \
 	$(includedirectory)/ctr9/io/ctr_nand_interface.h \
 	$(includedirectory)/ctr9/io/ctr_sd_interface.h \
 	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.h \
-	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.c
+	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.c \
+	$(includedirectory)/ctr9/io/ctr_disks.h
 
 ctrfatfsinclude_HEADERS = $(includedirectory)/ctr9/io/fatfs/ff.h \
 	$(includedirectory)/ctr9/io/fatfs/ctr_fatfs_disk.h \
 	$(includedirectory)/ctr9/io/fatfs/diskio.h \
 	$(includedirectory)/ctr9/io/fatfs/ffconf.h \
-	$(includedirectory)/ctr9/io/fatfs/integer.h
+	$(includedirectory)/ctr9/io/fatfs/integer.h 
 
 ctrsdmmcinclude_HEADERS = $(includedirectory)/ctr9/io/sdmmc/sdmmc.h

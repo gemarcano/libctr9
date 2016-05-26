@@ -30,7 +30,7 @@ static inline void process_aes_ctr_block(void *buffer, uint8_t *ctr, uint32_t mo
 {
 	set_ctr(ctr);
 	aes_decrypt(buffer, buffer, 1, mode);
-	add_ctr(ctr, 0x1);		
+	add_ctr(ctr, 0x1);
 }
 
 int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
@@ -45,7 +45,7 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 	alignas(32) uint8_t shasum[32];
 
 	sdmmc_get_cid(true, NandCid);
-	
+
 	switch (crypto_type)
 	{
 		case NAND_CTR:
@@ -85,7 +85,7 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *crypto_io, uint8_t* buf
 
 		memcpy(ctr, crypto_io->ctr, 16);
 		add_ctr(ctr, sector * (0x200 / 0x10));
-		
+
 		//apply AES CTR to the data
 		use_aeskey(crypto_io->keySlot);
 		for (uint32_t block = 0; block < (count * 0x200 / 0x10); ++block)
@@ -106,7 +106,7 @@ static void applyAESCTR(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, u
 		uint32_t amount_read = 0;
 
 		use_aeskey(crypto_io->keySlot);
-		
+
 		memcpy(ctr, crypto_io->ctr, 16);
 		add_ctr(ctr, location / 0x10);
 
@@ -161,11 +161,11 @@ int ctr_nand_crypto_interface_read(void *io, void *buffer, size_t buffer_size, s
 	{
 		ctr_nand_crypto_interface *crypto_io = io;
 		res = crypto_io->lower_io->read(io, buffer, buffer_size, position, count);
-		
+
 		//we now have raw data, apply crypto
 		applyAESCTR(io, (uint8_t*)buffer, position, count < buffer_size ? count : buffer_size);
 	}
-	
+
 	return res;
 }
 
@@ -210,7 +210,7 @@ int ctr_nand_crypto_interface_write_sector(void *io, const void *buffer, size_t 
 		for (size_t i = 0; i < number_of_sectors && !res; i += sizeof(buf) / 0x200)
 		{
 			size_t write_sectors = ((number_of_sectors - i) >= (sizeof(buf) / 0x200) ? sizeof(buf) / 0x200 : buffer_size/0x200 - i);
-			
+
 			memcpy(buf, buffer, write_sectors * 0x200);
 
 			applyAESCTRSector(io, buf, sector + i, write_sectors);

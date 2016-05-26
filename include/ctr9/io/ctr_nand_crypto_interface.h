@@ -31,7 +31,7 @@ typedef struct
 {
 	ctr_io_interface base;
 	ctr_io_interface *lower_io;
-	
+
 	uint8_t keySlot;
 	uint8_t ctr[16];
 	uint32_t mode;

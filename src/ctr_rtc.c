@@ -15,7 +15,7 @@
 typedef struct
 {
 	time_t time;
-	
+
 } ctr_rtc;
 
 static inline uint8_t bcd_to_number(uint8_t bcd)

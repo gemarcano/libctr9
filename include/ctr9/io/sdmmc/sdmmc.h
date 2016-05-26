@@ -32,7 +32,7 @@
 #define REG_SDIRMASK0			0x20
 #define REG_SDIRMASK1			0x22
 #define REG_SDCLKCTL			0x24
-		
+
 #define REG_SDBLKLEN			0x26
 #define REG_SDOPT				0x28
 #define REG_SDFIFO				0x30
@@ -99,20 +99,20 @@ extern "C" {
 		uint32_t total_size; //size in sectors of the device
 		uint32_t res;
 	} mmcdevice;
-	
+
 	int sdmmc_sdcard_init();
 	int sdmmc_sdcard_readsector(uint32_t sector_no, uint8_t *out);
 	int sdmmc_sdcard_readsectors(uint32_t sector_no, uint32_t numsectors, uint8_t *out);
 	int sdmmc_sdcard_writesector(uint32_t sector_no, const uint8_t *in);
 	int sdmmc_sdcard_writesectors(uint32_t sector_no, uint32_t numsectors, const uint8_t *in);
-	
+
 	int sdmmc_nand_readsectors(uint32_t sector_no, uint32_t numsectors, uint8_t *out);
 	int sdmmc_nand_writesectors(uint32_t sector_no, uint32_t numsectors, const uint8_t *in);
 
 	int sdmmc_get_cid(bool isNand, uint32_t *info);
-	
+
 	mmcdevice *getMMCDevice(int drive);
-	
+
 	void InitSD();
 	int Nand_Init();
 	int SD_Init();

@@ -50,7 +50,7 @@ int ctr_fatfs_interface_read(void *io, void *buffer, size_t buffer_size, size_t 
 			result = f_read(fatfs_io->file, buffer, readable, &read);
 		}
 	}
-	
+
 	return result != FR_OK;
 }
 
@@ -62,13 +62,13 @@ int ctr_fatfs_interface_write(void *io, const void *buffer, size_t buffer_size, 
 		ctr_fatfs_interface *fatfs_io = io;
 		UINT written;
 		result = f_lseek(fatfs_io->file, position);
-		
+
 		if (result == FR_OK)
 		{
 			result = f_write(fatfs_io->file, buffer, buffer_size, &written);
 		}
 	}
-	
+
 	return result != FR_OK;
 }
 
@@ -86,7 +86,7 @@ int ctr_fatfs_interface_read_sector(void *io, void *buffer, size_t buffer_size, 
 			result = f_read(fatfs_io->file, buffer, readable * 512, &read);
 		}
 	}
-	
+
 	return result != FR_OK;
 }
 
@@ -98,14 +98,14 @@ int ctr_fatfs_interface_write_sector(void *io, const void *buffer, size_t buffer
 		ctr_fatfs_interface *fatfs_io = io;
 		UINT written;
 		result = f_lseek(fatfs_io->file, sector * 512);
-		
+
 		if (result == FR_OK)
 		{
 			size_t writeable = buffer_size - buffer_size % 512;
 			result = f_write(fatfs_io->file, buffer, writeable , &written);
 		}
 	}
-	
+
 	return result != FR_OK;
 }
 

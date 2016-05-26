@@ -1,0 +1,13 @@
+#include <ctr9/io/fatfs/ctr_fatfs_disk.h>
+#include <ctr9/io/ctr_nand_interface.h>
+#include <ctr9/io/ctr_nand_crypto_interface.h>
+#include <ctr9/io/ctr_sd_interface.h>
+#include <ctr9/io/ctr_disks.h>
+
+int ctr_fatfs_initialize(ctr_nand_interface *nand_io, ctr_nand_crypto_interface *ctr_io, ctr_nand_crypto_interface *twl_io, ctr_sd_interface *sd_io)
+{
+	int result = ctr_disks_initialize(nand_io, ctr_io, twl_io, sd_io);
+	ctr_fatfs_default_setup(ctr_io, twl_io, sd_io);
+	return result;
+}
+

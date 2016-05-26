@@ -378,7 +378,7 @@ static bool sd_test4(void *ctx)
 
 static bool twl_test1(void *ctx)
 {
-	
+
 	nand_crypto_test_data *data = ctx;
 	char *buffer = data->buffer;
 	size_t buffer_size = data->buffer_size;
@@ -388,7 +388,7 @@ static bool twl_test1(void *ctx)
 		uint32_t* TwlCustId = (uint32_t*) (0x01FFB808);
 		alignas(32) uint8_t TwlKeyX[16];
 		alignas(32) uint8_t TwlKeyY[16];
-		
+
 		// thanks b1l1s & Normmatt
 		// see source from https://gbatemp.net/threads/release-twltool-dsi-downgrading-save-injection-etc-multitool.393488/
 		const char* nintendo = "NINTENDO";
@@ -396,12 +396,12 @@ static bool twl_test1(void *ctx)
 		TwlKeyXW[0] = (TwlCustId[0] ^ 0xB358A6AF) | 0x80000000;
 		TwlKeyXW[3] = TwlCustId[1] ^ 0x08C267B7;
 		memcpy(TwlKeyX + 4, nintendo, 8);
-		
+
 		// see: https://www.3dbrew.org/wiki/Memory_layout#ARM9_ITCM
 		uint32_t TwlKeyYW3 = 0xE1A00005;
 		memcpy(TwlKeyY, (uint8_t*) 0x01FFD3C8, 12);
 		memcpy(TwlKeyY + 12, &TwlKeyYW3, 4);
-		
+
 		setup_aeskeyX(0x03, TwlKeyX);
 		setup_aeskeyY(0x03, TwlKeyY);
 		use_aeskey(0x03);
@@ -416,7 +416,7 @@ static bool twl_test2(void *ctx)
 {
 	FATFS fs = { 0 };
 	FIL test_file = { 0 };
-	
+
 	nand_crypto_test_data *data = ctx;
 	char *buffer = data->buffer;
 	size_t buffer_size = data->buffer_size;
@@ -463,14 +463,14 @@ static bool twl_test3(void *ctx)
 	FATFS fs = { 0 }, fs2 = { 0 };
 	FIL test_file = { 0 };
 	FIL test_file2 = { 0 };
-	
+
 	nand_crypto_test_data *data = ctx;
 	char *buffer = data->buffer;
 	size_t buffer_size = data->buffer_size;
 
 	ctr_io_read_sector(&data->io, buffer, buffer_size, 0x00012E00/0x200 + 1, 1);
 
-	
+
 	bool test1 = false;
 	int res2 = 0;
 	if ((res2 = f_mount(&fs, "TWL:", 1)) == FR_OK &&
@@ -478,7 +478,7 @@ static bool twl_test3(void *ctx)
 	{
 		ctr_fatfs_interface io;
 		ctr_fatfs_interface_initialize(&io, &test_file);
-		
+
 		ctr_setup_disk_parameters params = { &io, 0, ctr_io_disk_size(&data->io)/0x200 };
 		disk_ioctl(4, CTR_SETUP_DISK, &params);
 
@@ -589,7 +589,7 @@ int main()
 
 	printf("Press any key to continue...\n");
 	input_wait();
-	
+
 	printf("I'm alive, I swear!\n");
 	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
 	return 0;

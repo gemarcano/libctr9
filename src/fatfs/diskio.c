@@ -149,7 +149,7 @@ DRESULT disk_ioctl (
 				return RES_OK;
 			}
 			return RES_NOTRDY;
-			
+
 		case GET_SECTOR_SIZE:
 			if (!(disk->status & STA_NOINIT))
 			{

@@ -30,7 +30,7 @@ int ctr_sd_interface_initialize(ctr_sd_interface *io)
 
 void ctr_sd_interface_destroy(ctr_sd_interface *io)
 {
-	*io = (ctr_sd_interface){0};	
+	*io = (ctr_sd_interface){0};
 }
 
 int ctr_sd_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)

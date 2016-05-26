@@ -14,6 +14,8 @@
 #include "io/ctr_nand_crypto_interface.h"
 #include "io/ctr_sd_interface.h"
 #include "io/ctr_fatfs_interface.h"
+#include "io/ctr_disks.h"
+#include "io/fatfs/ctr_fatfs_disk.h"
 
 #endif//CTR_IO_H_
 

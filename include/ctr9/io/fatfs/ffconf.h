@@ -153,7 +153,7 @@
 
 
 #define _STR_VOLUME_ID	1
-#define _VOLUME_STRS	"CTRNAND","TWL","TWLP","SD","EMU1","EMU2","EMU3"
+#define _VOLUME_STRS	"CTRNAND","TWLN","TWLP","SD","DISK1","DISK2","DISK3"
 /* _STR_VOLUME_ID switches string support of volume ID.
 /  When _STR_VOLUME_ID is set to 1, also pre-defined strings can be used as drive
 /  number in the path name. _VOLUME_STRS defines the drive ID strings for each
@@ -217,7 +217,7 @@
 
 
 #define _FS_NORTC	1
-#define _NORTC_MON	4	
+#define _NORTC_MON	4
 #define _NORTC_MDAY	22
 #define _NORTC_YEAR	2016
 /* The option _FS_NORTC switches timestamp functiton. If the system does not have
