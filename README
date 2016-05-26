@@ -143,6 +143,9 @@ for this library. See the test/ directory for more information. Note that the
 unit testing payload WILL write to NAND (in theory writes to areas that are
 unused) as a part of unit testing.
 
+To compile it, change directory to test/, then execute `make test`. The
+generated test.bin is an A9LH compatible binary.
+
 
 --------------------------------------------------------------------------------
 Issues/Bugs
