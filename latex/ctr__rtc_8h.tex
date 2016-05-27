@@ -1,0 +1,49 @@
+\hypertarget{ctr__rtc_8h}{}\section{include/ctr9/ctr\+\_\+rtc.h File Reference}
+\label{ctr__rtc_8h}\index{include/ctr9/ctr\+\_\+rtc.\+h@{include/ctr9/ctr\+\_\+rtc.\+h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structctr__rtc__data}{ctr\+\_\+rtc\+\_\+data}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{ctr__rtc_8h_afa2dcc3715fb0150a172fc4208620d55}{ctr\+\_\+rtc\+\_\+init} (void)
+\begin{DoxyCompactList}\small\item\em Initializes the data used for R\+TC access. \end{DoxyCompactList}\item 
+\hyperlink{structctr__rtc__data}{ctr\+\_\+rtc\+\_\+data} \hyperlink{ctr__rtc_8h_a4bc3b12a3d4866776d1e465584bb23ac}{ctr\+\_\+rtc\+\_\+gettime} (void)
+\begin{DoxyCompactList}\small\item\em Returns the data read from the R\+TC. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{ctr\+\_\+rtc.\+h@{ctr\+\_\+rtc.\+h}!ctr\+\_\+rtc\+\_\+gettime@{ctr\+\_\+rtc\+\_\+gettime}}
+\index{ctr\+\_\+rtc\+\_\+gettime@{ctr\+\_\+rtc\+\_\+gettime}!ctr\+\_\+rtc.\+h@{ctr\+\_\+rtc.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+rtc\+\_\+gettime(void)}{ctr_rtc_gettime(void)}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf ctr\+\_\+rtc\+\_\+data} ctr\+\_\+rtc\+\_\+gettime (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__rtc_8h_a4bc3b12a3d4866776d1e465584bb23ac}{}\label{ctr__rtc_8h_a4bc3b12a3d4866776d1e465584bb23ac}
+
+
+Returns the data read from the R\+TC. 
+
+The underlying R\+TC returns data in B\+CD format, but this function converts the B\+CD to binary.
+
+\begin{DoxyPrecond}{Precondition}
+ctr\+\_\+rtc\+\_\+init has been called at least once. 
+\end{DoxyPrecond}
+\begin{DoxyReturn}{Returns}
+The binary representation of the R\+TC B\+CD data. 
+\end{DoxyReturn}
+\index{ctr\+\_\+rtc.\+h@{ctr\+\_\+rtc.\+h}!ctr\+\_\+rtc\+\_\+init@{ctr\+\_\+rtc\+\_\+init}}
+\index{ctr\+\_\+rtc\+\_\+init@{ctr\+\_\+rtc\+\_\+init}!ctr\+\_\+rtc.\+h@{ctr\+\_\+rtc.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+rtc\+\_\+init(void)}{ctr_rtc_init(void)}}]{\setlength{\rightskip}{0pt plus 5cm}void ctr\+\_\+rtc\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__rtc_8h_afa2dcc3715fb0150a172fc4208620d55}{}\label{ctr__rtc_8h_afa2dcc3715fb0150a172fc4208620d55}
+
+
+Initializes the data used for R\+TC access. 
+
+Call this function at least once before trying to get the R\+TC time. It is safe to call this function multiple times. 

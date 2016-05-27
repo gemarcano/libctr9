@@ -1,0 +1,219 @@
+\hypertarget{ctr__nand__interface_8h}{}\section{include/ctr9/io/ctr\+\_\+nand\+\_\+interface.h File Reference}
+\label{ctr__nand__interface_8h}\index{include/ctr9/io/ctr\+\_\+nand\+\_\+interface.\+h@{include/ctr9/io/ctr\+\_\+nand\+\_\+interface.\+h}}
+{\ttfamily \#include \char`\"{}ctr\+\_\+io\+\_\+interface.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sdmmc/sdmmc.\+h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structctr__nand__interface}{ctr\+\_\+nand\+\_\+interface}
+\begin{DoxyCompactList}\small\item\em io interface object for accessing N\+A\+ND. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{ctr__nand__interface_8h_a0351ef845f67441a24d96e82c29cf479}{ctr\+\_\+nand\+\_\+interface\+\_\+initialize} (\hyperlink{structctr__nand__interface}{ctr\+\_\+nand\+\_\+interface} $\ast$io)
+\begin{DoxyCompactList}\small\item\em Initialize the given N\+A\+ND io interface object. \end{DoxyCompactList}\item 
+void \hyperlink{ctr__nand__interface_8h_a5aa05fdb2043459013aa2fd4ea54ad6b}{ctr\+\_\+nand\+\_\+interface\+\_\+destroy} (\hyperlink{structctr__nand__interface}{ctr\+\_\+nand\+\_\+interface} $\ast$io)
+\begin{DoxyCompactList}\small\item\em Destroys the given N\+A\+ND io interface object. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__nand__interface_8h_a4826fcc07f81f7ae5bbfdda08f0aecbe}{ctr\+\_\+nand\+\_\+interface\+\_\+read} (void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)
+\begin{DoxyCompactList}\small\item\em Reads bytes from the given io interface. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__nand__interface_8h_aef66c68dfb0262b16036546f88a4087b}{ctr\+\_\+nand\+\_\+interface\+\_\+write} (void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)
+\begin{DoxyCompactList}\small\item\em Writes bytes to the given io interface. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__nand__interface_8h_a97d9e1480c3744d590ff0c3b80c2140b}{ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector} (void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)
+\begin{DoxyCompactList}\small\item\em Reads sectors from the given io interface. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__nand__interface_8h_ae9521385e63bdd19fc98816098902a79}{ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector} (void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)
+\begin{DoxyCompactList}\small\item\em Writes sectors from the given io interface. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{ctr__nand__interface_8h_a9160a69cd50ff749ead38d1f9e6c23a5}{ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size} (void $\ast$io)
+\begin{DoxyCompactList}\small\item\em Returns the size of the underlying disk for the given io interface. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{ctr__nand__interface_8h_a573043922702f30c76d97ee3bd1d7bc9}{ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size} (void $\ast$io)
+\begin{DoxyCompactList}\small\item\em Returns the size of the sectors used by the io interface, which is 512 bytes for N\+A\+ND. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+destroy@{ctr\+\_\+nand\+\_\+interface\+\_\+destroy}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+destroy@{ctr\+\_\+nand\+\_\+interface\+\_\+destroy}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+destroy(ctr\+\_\+nand\+\_\+interface $\ast$io)}{ctr_nand_interface_destroy(ctr_nand_interface *io)}}]{\setlength{\rightskip}{0pt plus 5cm}void ctr\+\_\+nand\+\_\+interface\+\_\+destroy (
+\begin{DoxyParamCaption}
+\item[{{\bf ctr\+\_\+nand\+\_\+interface} $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_a5aa05fdb2043459013aa2fd4ea54ad6b}{}\label{ctr__nand__interface_8h_a5aa05fdb2043459013aa2fd4ea54ad6b}
+
+
+Destroys the given N\+A\+ND io interface object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & N\+A\+ND io interface to deinitialize.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPostcond}{Postcondition}
+The io interface has been destroyed and cannot be used for accessing N\+A\+ND without being re-\/initialized. 
+\end{DoxyPostcond}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size@{ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size@{ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size(void $\ast$io)}{ctr_nand_interface_disk_size(void *io)}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t ctr\+\_\+nand\+\_\+interface\+\_\+disk\+\_\+size (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_a9160a69cd50ff749ead38d1f9e6c23a5}{}\label{ctr__nand__interface_8h_a9160a69cd50ff749ead38d1f9e6c23a5}
+
+
+Returns the size of the underlying disk for the given io interface. 
+
+\begin{DoxyReturn}{Returns}
+The size of the N\+A\+ND as reported by it. 
+\end{DoxyReturn}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+initialize@{ctr\+\_\+nand\+\_\+interface\+\_\+initialize}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+initialize@{ctr\+\_\+nand\+\_\+interface\+\_\+initialize}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+initialize(ctr\+\_\+nand\+\_\+interface $\ast$io)}{ctr_nand_interface_initialize(ctr_nand_interface *io)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+nand\+\_\+interface\+\_\+initialize (
+\begin{DoxyParamCaption}
+\item[{{\bf ctr\+\_\+nand\+\_\+interface} $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_a0351ef845f67441a24d96e82c29cf479}{}\label{ctr__nand__interface_8h_a0351ef845f67441a24d96e82c29cf479}
+
+
+Initialize the given N\+A\+ND io interface object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em io} & N\+A\+ND io interface to initialize.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, anything else on a failure. Unless something has gone horribly wrong with the N\+A\+ND subsystem, this function shouldn\textquotesingle{}t fail. 
+\end{DoxyReturn}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+read@{ctr\+\_\+nand\+\_\+interface\+\_\+read}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+read@{ctr\+\_\+nand\+\_\+interface\+\_\+read}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+read(void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)}{ctr_nand_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+nand\+\_\+interface\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_a4826fcc07f81f7ae5bbfdda08f0aecbe}{}\label{ctr__nand__interface_8h_a4826fcc07f81f7ae5bbfdda08f0aecbe}
+
+
+Reads bytes from the given io interface. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for reading. \\
+\hline
+\mbox{\tt out}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer in bytes. \\
+\hline
+\mbox{\tt in}  & {\em position} & Position/address in the io interface to read from. \\
+\hline
+\mbox{\tt in}  & {\em count} & The number of bytes to read.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector@{ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector@{ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector(void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)}{ctr_nand_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+nand\+\_\+interface\+\_\+read\+\_\+sector (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_a97d9e1480c3744d590ff0c3b80c2140b}{}\label{ctr__nand__interface_8h_a97d9e1480c3744d590ff0c3b80c2140b}
+
+
+Reads sectors from the given io interface. 
+
+N\+A\+ND uses 512 byte sectors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for reading. \\
+\hline
+\mbox{\tt out}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer in bytes. \\
+\hline
+\mbox{\tt in}  & {\em sector} & Sector position in the io interface to read from. \\
+\hline
+\mbox{\tt in}  & {\em count} & The number of sectors to read.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size@{ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size@{ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size(void $\ast$io)}{ctr_nand_interface_sector_size(void *io)}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t ctr\+\_\+nand\+\_\+interface\+\_\+sector\+\_\+size (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_a573043922702f30c76d97ee3bd1d7bc9}{}\label{ctr__nand__interface_8h_a573043922702f30c76d97ee3bd1d7bc9}
+
+
+Returns the size of the sectors used by the io interface, which is 512 bytes for N\+A\+ND. 
+
+\begin{DoxyReturn}{Returns}
+512 bytes as the sector size for N\+A\+ND. 
+\end{DoxyReturn}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+write@{ctr\+\_\+nand\+\_\+interface\+\_\+write}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+write@{ctr\+\_\+nand\+\_\+interface\+\_\+write}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+write(void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)}{ctr_nand_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+nand\+\_\+interface\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{const void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_aef66c68dfb0262b16036546f88a4087b}{}\label{ctr__nand__interface_8h_aef66c68dfb0262b16036546f88a4087b}
+
+
+Writes bytes to the given io interface. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for writing. \\
+\hline
+\mbox{\tt in}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer, and the number of bytes to write. \\
+\hline
+\mbox{\tt in}  & {\em position} & Position/address in the io interface to write to.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
+\index{ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}!ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector@{ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector}}
+\index{ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector@{ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector}!ctr\+\_\+nand\+\_\+interface.\+h@{ctr\+\_\+nand\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector(void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)}{ctr_nand_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t position)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+nand\+\_\+interface\+\_\+write\+\_\+sector (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{const void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__nand__interface_8h_ae9521385e63bdd19fc98816098902a79}{}\label{ctr__nand__interface_8h_ae9521385e63bdd19fc98816098902a79}
+
+
+Writes sectors from the given io interface. 
+
+N\+A\+ND uses 512 byte sectors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for writing. \\
+\hline
+\mbox{\tt in}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer, and the number of bytes to write. If the number is not a multiple of the sector size, this function will only write all the full sectors it can, ignoring the end of the buffer that doesn\textquotesingle{}t fit a sector. \\
+\hline
+\mbox{\tt in}  & {\em sector} & Sector Position in the io interface to write to.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}

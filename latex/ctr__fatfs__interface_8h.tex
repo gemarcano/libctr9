@@ -1,0 +1,225 @@
+\hypertarget{ctr__fatfs__interface_8h}{}\section{include/ctr9/io/ctr\+\_\+fatfs\+\_\+interface.h File Reference}
+\label{ctr__fatfs__interface_8h}\index{include/ctr9/io/ctr\+\_\+fatfs\+\_\+interface.\+h@{include/ctr9/io/ctr\+\_\+fatfs\+\_\+interface.\+h}}
+{\ttfamily \#include \char`\"{}ctr\+\_\+io\+\_\+interface.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sdmmc/sdmmc.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}fatfs/ff.\+h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structctr__fatfs__interface}{ctr\+\_\+fatfs\+\_\+interface}
+\begin{DoxyCompactList}\small\item\em io interface object for accessing a fatfs file as a disk. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{ctr__fatfs__interface_8h_a249a1f49336920491b4d449b2153fa04}{ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize} (\hyperlink{structctr__fatfs__interface}{ctr\+\_\+fatfs\+\_\+interface} $\ast$io, \hyperlink{struct_f_i_l}{F\+IL} $\ast$file)
+\begin{DoxyCompactList}\small\item\em Initialize the given fatfs io interface object. \end{DoxyCompactList}\item 
+void \hyperlink{ctr__fatfs__interface_8h_a154cf97cb27d30da18376f81cbcb989f}{ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy} (\hyperlink{structctr__fatfs__interface}{ctr\+\_\+fatfs\+\_\+interface} $\ast$io)
+\begin{DoxyCompactList}\small\item\em Destroys the given fatfs io interface object. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__fatfs__interface_8h_a506079db2395309d67009fc8d54da868}{ctr\+\_\+fatfs\+\_\+interface\+\_\+read} (void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)
+\begin{DoxyCompactList}\small\item\em Reads bytes from the given io interface. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__fatfs__interface_8h_acb663f84c82bb0feb9532dfd784eb611}{ctr\+\_\+fatfs\+\_\+interface\+\_\+write} (void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)
+\begin{DoxyCompactList}\small\item\em Writes bytes to the given io interface. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__fatfs__interface_8h_acb75f2c8423da1684342c13591060adf}{ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector} (void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)
+\begin{DoxyCompactList}\small\item\em Reads sectors from the given io interface. \end{DoxyCompactList}\item 
+int \hyperlink{ctr__fatfs__interface_8h_a652cb2a2eda61ac3da605a6bab7f04a3}{ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector} (void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)
+\begin{DoxyCompactList}\small\item\em Writes sectors from the given io interface. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{ctr__fatfs__interface_8h_ae4e8fe3bced6006309e0de185043628c}{ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size} (void $\ast$io)
+\begin{DoxyCompactList}\small\item\em Returns the size of the underlying disk for the given io interface. \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{ctr__fatfs__interface_8h_a413e16700593e584aff1343e96b34581}{ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size} (void $\ast$io)
+\begin{DoxyCompactList}\small\item\em Returns the size of the sectors used by the io interface, which is 512 bytes for fatfs due to how it is configured. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy@{ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy@{ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy(ctr\+\_\+fatfs\+\_\+interface $\ast$io)}{ctr_fatfs_interface_destroy(ctr_fatfs_interface *io)}}]{\setlength{\rightskip}{0pt plus 5cm}void ctr\+\_\+fatfs\+\_\+interface\+\_\+destroy (
+\begin{DoxyParamCaption}
+\item[{{\bf ctr\+\_\+fatfs\+\_\+interface} $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_a154cf97cb27d30da18376f81cbcb989f}{}\label{ctr__fatfs__interface_8h_a154cf97cb27d30da18376f81cbcb989f}
+
+
+Destroys the given fatfs io interface object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & fatfs io interface to deinitialize.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPostcond}{Postcondition}
+The io interface has been destroyed and cannot be used for accessing the fatfs file as a disk without being re-\/initialized. 
+\end{DoxyPostcond}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size@{ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size@{ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size(void $\ast$io)}{ctr_fatfs_interface_disk_size(void *io)}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t ctr\+\_\+fatfs\+\_\+interface\+\_\+disk\+\_\+size (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_ae4e8fe3bced6006309e0de185043628c}{}\label{ctr__fatfs__interface_8h_ae4e8fe3bced6006309e0de185043628c}
+
+
+Returns the size of the underlying disk for the given io interface. 
+
+\begin{DoxyReturn}{Returns}
+The size of the file used as the backing for the given io interface. 
+\end{DoxyReturn}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize@{ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize@{ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize(ctr\+\_\+fatfs\+\_\+interface $\ast$io, F\+I\+L $\ast$file)}{ctr_fatfs_interface_initialize(ctr_fatfs_interface *io, FIL *file)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+fatfs\+\_\+interface\+\_\+initialize (
+\begin{DoxyParamCaption}
+\item[{{\bf ctr\+\_\+fatfs\+\_\+interface} $\ast$}]{io, }
+\item[{{\bf F\+IL} $\ast$}]{file}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_a249a1f49336920491b4d449b2153fa04}{}\label{ctr__fatfs__interface_8h_a249a1f49336920491b4d449b2153fa04}
+
+
+Initialize the given fatfs io interface object. 
+
+Note that any size file greater or equal than a single sector will be accepted by the constructor, but the io operations will ignore the trailing data on the file if the file size isn\textquotesingle{}t divisible by the sector size. In other words, the effective size of the disk is f\+\_\+size(file)/0x200, using integer arithmetic. In order for reads to work the file must have been opened using F\+A\+\_\+\+R\+E\+AD, and for writes to work both F\+A\+\_\+\+R\+E\+AD and F\+A\+\_\+\+W\+R\+I\+TE.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em io} & fatfs io interface to initialize. \\
+\hline
+\mbox{\tt in,out}  & {\em file} & File to set up as a disk.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, anything else on a failure. 
+\end{DoxyReturn}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+read@{ctr\+\_\+fatfs\+\_\+interface\+\_\+read}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+read@{ctr\+\_\+fatfs\+\_\+interface\+\_\+read}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+read(void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)}{ctr_fatfs_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+fatfs\+\_\+interface\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_a506079db2395309d67009fc8d54da868}{}\label{ctr__fatfs__interface_8h_a506079db2395309d67009fc8d54da868}
+
+
+Reads bytes from the given io interface. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for reading. \\
+\hline
+\mbox{\tt out}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer in bytes. \\
+\hline
+\mbox{\tt in}  & {\em position} & Position/address in the io interface to read from. \\
+\hline
+\mbox{\tt in}  & {\em count} & The number of bytes to read.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector@{ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector@{ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector(void $\ast$io, void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position, size\+\_\+t count)}{ctr_fatfs_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+fatfs\+\_\+interface\+\_\+read\+\_\+sector (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_acb75f2c8423da1684342c13591060adf}{}\label{ctr__fatfs__interface_8h_acb75f2c8423da1684342c13591060adf}
+
+
+Reads sectors from the given io interface. 
+
+fatfs is configured to only use 512 byte sectors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for reading. \\
+\hline
+\mbox{\tt out}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer in bytes. \\
+\hline
+\mbox{\tt in}  & {\em sector} & Sector position in the io interface to read from. \\
+\hline
+\mbox{\tt in}  & {\em count} & The number of sectors to read.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size@{ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size@{ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size(void $\ast$io)}{ctr_fatfs_interface_sector_size(void *io)}}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t ctr\+\_\+fatfs\+\_\+interface\+\_\+sector\+\_\+size (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_a413e16700593e584aff1343e96b34581}{}\label{ctr__fatfs__interface_8h_a413e16700593e584aff1343e96b34581}
+
+
+Returns the size of the sectors used by the io interface, which is 512 bytes for fatfs due to how it is configured. 
+
+\begin{DoxyReturn}{Returns}
+512 bytes as the sector size for N\+A\+ND. 
+\end{DoxyReturn}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+write@{ctr\+\_\+fatfs\+\_\+interface\+\_\+write}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+write@{ctr\+\_\+fatfs\+\_\+interface\+\_\+write}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+write(void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)}{ctr_fatfs_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+fatfs\+\_\+interface\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{const void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_acb663f84c82bb0feb9532dfd784eb611}{}\label{ctr__fatfs__interface_8h_acb663f84c82bb0feb9532dfd784eb611}
+
+
+Writes bytes to the given io interface. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for writing. \\
+\hline
+\mbox{\tt in}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer, and the number of bytes to write. \\
+\hline
+\mbox{\tt in}  & {\em position} & Position/address in the io interface to write to.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
+\index{ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}!ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector@{ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector}}
+\index{ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector@{ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector}!ctr\+\_\+fatfs\+\_\+interface.\+h@{ctr\+\_\+fatfs\+\_\+interface.\+h}}
+\subsubsection[{\texorpdfstring{ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector(void $\ast$io, const void $\ast$buffer, size\+\_\+t buffer\+\_\+size, size\+\_\+t position)}{ctr_fatfs_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t position)}}]{\setlength{\rightskip}{0pt plus 5cm}int ctr\+\_\+fatfs\+\_\+interface\+\_\+write\+\_\+sector (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{io, }
+\item[{const void $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{buffer\+\_\+size, }
+\item[{size\+\_\+t}]{position}
+\end{DoxyParamCaption}
+)}\hypertarget{ctr__fatfs__interface_8h_a652cb2a2eda61ac3da605a6bab7f04a3}{}\label{ctr__fatfs__interface_8h_a652cb2a2eda61ac3da605a6bab7f04a3}
+
+
+Writes sectors from the given io interface. 
+
+fatfs is configured to only use 512 byte sectors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em io} & The io interface to use for writing. \\
+\hline
+\mbox{\tt in}  & {\em buffer} & Pointer to the buffer. \\
+\hline
+\mbox{\tt in}  & {\em buffer\+\_\+size} & The size of the buffer, and the number of bytes to write. If the number is not a multiple of the sector size, this function will only write all the full sectors it can, ignoring the end of the buffer that doesn\textquotesingle{}t fit a sector. \\
+\hline
+\mbox{\tt in}  & {\em sector} & Sector Position in the io interface to write to.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 upon success, anything else means an error. 
+\end{DoxyReturn}
