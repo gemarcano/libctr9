@@ -13,7 +13,6 @@ FORCE:
 $(top_builddir)/src/libctr9.a: FORCE
 	(cd $(top_builddir)/src && $(MAKE) $(AM_MAKEFLAGS) libctr9.a )
 
-all-local: test.bin
 clean-local:
 	rm -f test
 	rm -f test.bin

@@ -6,7 +6,7 @@ void ctr_fatfs_default_setup(ctr_nand_crypto_interface *ctr_io, ctr_nand_crypto_
 	if (ctr_io)
 	{
 		params = (ctr_setup_disk_parameters){ctr_io, 0x0B930000/0x200, 0x2F5D0000/0x200};
-	    disk_ioctl(0, CTR_SETUP_DISK, &params);
+		disk_ioctl(0, CTR_SETUP_DISK, &params);
 	}
 
 	if (twl_io)

@@ -1,3 +1,4 @@
+#include <ctr9/io/ctr_fatfs.h>
 #include <ctr9/io/fatfs/ctr_fatfs_disk.h>
 #include <ctr9/io/ctr_nand_interface.h>
 #include <ctr9/io/ctr_nand_crypto_interface.h>

@@ -11,8 +11,7 @@
 #include <ctr9/i2c.h>
 #include <ctr9/io/fatfs/ff.h>
 #include <ctr9/io/fatfs/diskio.h>
-
-#define SD 3
+#include <ctr9/ctr_system.h>
 
 #include "test.h"
 
@@ -383,30 +382,8 @@ static bool twl_test1(void *ctx)
 	char *buffer = data->buffer;
 	size_t buffer_size = data->buffer_size;
 
-
-	if ((*(volatile uint32_t*) 0x101401C0) == 0) { // only for a9lh
-		uint32_t* TwlCustId = (uint32_t*) (0x01FFB808);
-		alignas(32) uint8_t TwlKeyX[16];
-		alignas(32) uint8_t TwlKeyY[16];
-
-		// thanks b1l1s & Normmatt
-		// see source from https://gbatemp.net/threads/release-twltool-dsi-downgrading-save-injection-etc-multitool.393488/
-		const char* nintendo = "NINTENDO";
-		uint32_t* TwlKeyXW = (uint32_t*) TwlKeyX;
-		TwlKeyXW[0] = (TwlCustId[0] ^ 0xB358A6AF) | 0x80000000;
-		TwlKeyXW[3] = TwlCustId[1] ^ 0x08C267B7;
-		memcpy(TwlKeyX + 4, nintendo, 8);
-
-		// see: https://www.3dbrew.org/wiki/Memory_layout#ARM9_ITCM
-		uint32_t TwlKeyYW3 = 0xE1A00005;
-		memcpy(TwlKeyY, (uint8_t*) 0x01FFD3C8, 12);
-		memcpy(TwlKeyY + 12, &TwlKeyYW3, 4);
-
-		setup_aeskeyX(0x03, TwlKeyX);
-		setup_aeskeyY(0x03, TwlKeyY);
-		use_aeskey(0x03);
-	}
-
+	ctr_twl_keyslot_setup();
+	
 	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x03, NAND_TWL, &data->lower_io->base);
 
 	return !res;
@@ -425,14 +402,14 @@ static bool twl_test2(void *ctx)
 	disk_ioctl(1, CTR_SETUP_DISK, &params);
 	bool test1 = false, test2 = false;
 	int res2 = 0;
-	if ((res2 = f_mount(&fs, "TWL:", 1)) == FR_OK &&
-	(res2 |= f_open(&test_file, "TWL:/sys/TWLFontTable.dat", FA_READ)) == FR_OK)
+	if ((res2 = f_mount(&fs, "TWLN:", 1)) == FR_OK &&
+	(res2 |= f_open(&test_file, "TWLN:/sys/TWLFontTable.dat", FA_READ)) == FR_OK)
 	{
 		size_t size = f_size(&test_file);
 		f_close(&test_file);
 		test1 = size == 863296;
 		ctr_fatfs_interface io;
-		f_open(&test_file, "TWL:/shared2/0000", FA_READ | FA_WRITE);
+		f_open(&test_file, "TWLN:/shared2/0000", FA_READ | FA_WRITE);
 		ctr_fatfs_interface_initialize(&io, &test_file);
 
 		ctr_io_read(&io, buffer, buffer_size, 0, 513);
@@ -473,8 +450,8 @@ static bool twl_test3(void *ctx)
 
 	bool test1 = false;
 	int res2 = 0;
-	if ((res2 = f_mount(&fs, "TWL:", 1)) == FR_OK &&
-	(res2 |= f_open(&test_file, "TWL:/shared2/0000", FA_READ | FA_WRITE)) == FR_OK)
+	if ((res2 = f_mount(&fs, "TWLN:", 1)) == FR_OK &&
+	(res2 |= f_open(&test_file, "TWLN:/shared2/0000", FA_READ | FA_WRITE)) == FR_OK)
 	{
 		ctr_fatfs_interface io;
 		ctr_fatfs_interface_initialize(&io, &test_file);
@@ -490,9 +467,9 @@ static bool twl_test3(void *ctx)
 
 			printf("%02X ", ((char*)buffer)[i]);
 		}
-		test1 = FR_OK == f_mount(&fs2, "EMU1:", 1);
+		test1 = FR_OK == f_mount(&fs2, "DISK1:", 1);
 
-		int res3 = f_open(&test_file2, "EMU1:/foobar.txt", FA_WRITE | FA_OPEN_ALWAYS);
+		int res3 = f_open(&test_file2, "DISK1:/foobar.txt", FA_WRITE | FA_OPEN_ALWAYS);
 		printf("Did it open: %d\n", res3);
 		UINT written;
 		int res4 = f_write(&test_file2, "FOOBAR\nhello world!!!", sizeof("FOOBAR\nhello world!!!")-1,&written);

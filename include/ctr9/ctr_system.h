@@ -11,6 +11,8 @@
 #ifndef CTR_SYSTEM_H_
 #define CTR_SYSTEM_H_
 
+#include <stdbool.h>
+
 /** @brief Enumeration describing the running system.
  */
 typedef enum
@@ -18,6 +20,21 @@ typedef enum
     SYSTEM_O3DS,
     SYSTEM_N3DS,
 } ctr_system_type;
+
+/**	@brief Returns whether the arm9 entry was a9lh or not.
+ *
+ *	@returns True if the arm9 entrypoint was a9lh, false otherwise.
+ */
+bool ctr_detect_a9lh_entry(void);
+
+/**	@brief Sets up the TWL keyslot.
+ *
+ *	This only really matters if arm9 execution is obtained via a9lh, or prior to
+ *	a FIRM load. Nothing happens if FIRM had been launched previously.
+ *
+ *	@post The TWL keyslot is setup properly.
+ */
+void ctr_twl_keyslot_setup(void);
 
 /**	@brief Returns the enumeration corresponding to the running system.
  *
