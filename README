@@ -51,7 +51,7 @@ The Autotools setup assumes that devkitarm is already in the PATH.
  # this is if the 3ds compiler isn't in the path
  export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin 
  autoreconf -if
- ./configure ./configure --host arm-none-eabi --prefix=[lib install path]
+ ./configure --host arm-none-eabi --prefix=[lib install path]
  make
 
 Example:
