@@ -42,5 +42,8 @@ void ctr_twl_keyslot_setup(void);
  */
 ctr_system_type ctr_get_system_type(void);
 
+
+void ctr_flush_cache(void);
+
 #endif//CTR_SYSTEM_H_
 

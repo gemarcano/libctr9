@@ -483,6 +483,7 @@ static bool twl_test3(void *ctx)
 
 int main()
 {
+	ctr_flush_cache();
 	draw_init((draw_s*)0x23FFFE00);
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0xAAAAAA);
