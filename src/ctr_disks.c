@@ -20,7 +20,7 @@ int ctr_disks_initialize(
 			if (ctr_io)
 			{
 				uint64_t encryption_type = 0;
-				result |= ctr_io_read(&nand_io, &encryption_type, sizeof(encryption_type), 0x118, sizeof(encryption_type));
+				result |= ctr_io_read(nand_io, &encryption_type, sizeof(encryption_type), 0x118, sizeof(encryption_type));
 				uint8_t keyslot;
 				switch (encryption_type)
 				{
@@ -47,7 +47,9 @@ int ctr_disks_initialize(
 	}
 
 	if (sd_io)
+	{
 		result |= ctr_sd_interface_initialize(sd_io);
+	}
 
 	return result;
 }

@@ -5,7 +5,9 @@ libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	ctr_io_interface.c ctr_nand_interface.c sdmmc/delay.s sdmmc/sdmmc.c i2c.c \
 	ctr_rtc.c fatfs/diskio.c fatfs/ff.c fatfs/option/unicode.c ctr_system.c \
 	ctr_fatfs_interface.c fatfs/ctr_fatfs_disk.c ctr_disks.c fatfs/ctr_fatfs_disk.c \
-	ctr_fatfs.c
+	ctr_fatfs.c ctr_interrupt.c
+
+ctr_interrupt.o : AM_CFLAGS += -marm #Force ARM mode for ctr_interrupt
 
 EXTRA_libctr9_a_SOURCES = fatfs/option/cc932.c fatfs/option/cc936.c \
 	fatfs/option/cc949.c fatfs/option/cc950.c fatfs/option/ccsbcs.c \
@@ -21,7 +23,7 @@ ctrsdmmcincludedir = $(includedir)/ctr9/io/sdmmc
 ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
 	$(includedirectory)/ctr9/ctr_rtc.h $(includedirectory)/ctr9/ctr_system.h \
 	$(includedirectory)/ctr9/i2c.h $(includedirectory)/ctr9/io.h \
-	$(includedirectory)/ctr9/sha.h
+	$(includedirectory)/ctr9/sha.h $(includedirectory)/ctr9/ctr_interrupt.h
 
 ctrioinclude_HEADERS = $(includedirectory)/ctr9/io/ctr_fatfs_interface.h \
 	$(includedirectory)/ctr9/io/ctr_io_interface.h \

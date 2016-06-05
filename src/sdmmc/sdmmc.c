@@ -467,10 +467,10 @@ int SD_Init()
 {
 	inittarget(&handelSD);
 
-	waitcycles(1u << 19); //Card needs a little bit of time to be detected, it seems FIXME test again to see what a good number is for the delay
+	waitcycles(1u << 22); //Card needs a little bit of time to be detected, it seems FIXME test again to see what a good number is for the delay
 
 	//If not inserted
-	if (!(*((volatile uint16_t*)(SDMMC_BASE + REG_SDSTATUS0)) & TMIO_STAT0_SIGSTATE)) return -1;
+	if (!(*((volatile uint16_t*)(SDMMC_BASE + REG_SDSTATUS0)) & TMIO_STAT0_SIGSTATE)) return 5;
 
 	sdmmc_send_command(&handelSD,0,0);
 	sdmmc_send_command(&handelSD,0x10408,0x1AA);
@@ -497,31 +497,31 @@ int SD_Init()
 	if((handelSD.error & 0x4)) return -1;
 
 	sdmmc_send_command(&handelSD,0x10403,0);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -2;
 	handelSD.initarg = handelSD.ret[0] >> 0x10;
 
 	sdmmc_send_command(&handelSD,0x10609,handelSD.initarg << 0x10);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -3;
 
 	handelSD.total_size = calcSDSize((uint8_t*)&handelSD.ret[0],-1);
 	handelSD.clk = 1;
 	setckl(1);
 
 	sdmmc_send_command(&handelSD,0x10507,handelSD.initarg << 0x10);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -4;
 
 	sdmmc_send_command(&handelSD,0x10437,handelSD.initarg << 0x10);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -5;
 
 	handelSD.SDOPT = 1;
 	sdmmc_send_command(&handelSD,0x10446,0x2);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -6;
 
 	sdmmc_send_command(&handelSD,0x1040D,handelSD.initarg << 0x10);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -7;
 
 	sdmmc_send_command(&handelSD,0x10410,0x200);
-	if((handelSD.error & 0x4)) return -1;
+	if((handelSD.error & 0x4)) return -8;
 	handelSD.clk |= 0x200;
 
 	return 0;
