@@ -327,27 +327,6 @@ static uint32_t calcSDSize(uint8_t* csd, int type)
 
 void InitSD()
 {
-	static int init = 0;
-	if (init) return;
-
-	init = 1;
-
-	//NAND
-	handelNAND.isSDHC = 0;
-	handelNAND.SDOPT = 0;
-	handelNAND.res = 0;
-	handelNAND.initarg = 1;
-	handelNAND.clk = 0x80;
-	handelNAND.devicenumber = 1;
-
-	//SD
-	handelSD.isSDHC = 0;
-	handelSD.SDOPT = 0;
-	handelSD.res = 0;
-	handelSD.initarg = 0;
-	handelSD.clk = 0x80;
-	handelSD.devicenumber = 0;
-
 	//sdmmc_mask16(0x100,0x800,0);
 	//sdmmc_mask16(0x100,0x1000,0);
 	//sdmmc_mask16(0x100,0x0,0x402);
@@ -406,12 +385,18 @@ void InitSD()
 	*(volatile uint16_t*)0x10006002 &= 0xFFFCu; ////SDPORTSEL
 	*(volatile uint16_t*)0x10006026 = 512; //SDBLKLEN
 	*(volatile uint16_t*)0x10006008 = 0; //SDSTOP
-
-	inittarget(&handelSD);
 }
 
 int Nand_Init()
 {
+	//NAND
+	handelNAND.isSDHC = 0;
+	handelNAND.SDOPT = 0;
+	handelNAND.res = 0;
+	handelNAND.initarg = 1;
+	handelNAND.clk = 0x80;
+	handelNAND.devicenumber = 1;
+
 	inittarget(&handelNAND);
 	waitcycles(0xF000);
 
@@ -465,6 +450,14 @@ int Nand_Init()
 
 int SD_Init()
 {
+	//SD
+	handelSD.isSDHC = 0;
+	handelSD.SDOPT = 0;
+	handelSD.res = 0;
+	handelSD.initarg = 0;
+	handelSD.clk = 0x80;
+	handelSD.devicenumber = 0;
+
 	inittarget(&handelSD);
 
 	waitcycles(1u << 22); //Card needs a little bit of time to be detected, it seems FIXME test again to see what a good number is for the delay

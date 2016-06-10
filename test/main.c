@@ -481,6 +481,8 @@ static bool twl_test3(void *ctx)
 	return !res2 && test1;
 }
 
+#include <ctr9/io/ctr_fatfs.h>
+
 int main()
 {
 	ctr_flush_cache();
@@ -560,6 +562,9 @@ int main()
 	{
 		printf("Size: %d\n", f_size(&test_file));
 	}
+
+	int res3 = ctr_fatfs_initialize(&(nand_ctx.nand_io), NULL, NULL, &(sd_ctx.io));
+	printf("ctr_fatfs_initialize result: %X\n", res3);
 
 	ctr_sd_interface_destroy(&sd_ctx.io);
 	ctr_nand_crypto_interface_destroy(&nand_crypto_ctx.io);
