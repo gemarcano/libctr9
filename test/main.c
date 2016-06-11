@@ -574,7 +574,7 @@ int main()
 	input_wait();
 
 	printf("I'm alive, I swear!\n");
-	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
+	ctr_system_poweroff();
 	return 0;
 }
 

@@ -36,6 +36,23 @@ bool ctr_detect_a9lh_entry(void);
  */
 void ctr_twl_keyslot_setup(void);
 
+/**	@brief Powers off the 3DS.
+ *
+ *	This function does not return. It powers off the 3DS via an i2c call to the
+ *	MPU.
+ *
+ *	@post 3DS has powered off.
+ */
+void ctr_system_poweroff(void);
+
+/**	@brief Resets the 3DS.
+ *
+ *	This function does not return. It resets the 3DS via an i2c call to the MPU.
+ *
+ *	@post 3DS has restarted.
+ */
+void ctr_system_reset(void);
+
 /**	@brief Returns the enumeration corresponding to the running system.
  *
  *	@returns The type of system this is called in.
