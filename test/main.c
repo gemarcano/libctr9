@@ -15,6 +15,8 @@
 
 #include "test.h"
 
+void scribble_screen(void);
+
 typedef struct
 {
 	char *buffer;
@@ -487,6 +489,7 @@ int main()
 {
 	ctr_flush_cache();
 	draw_init((draw_s*)0x23FFFE00);
+	asm volatile("blx scribble_screen \n\t");
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0xAAAAAA);
 	printf("UNIT TESTING\n");

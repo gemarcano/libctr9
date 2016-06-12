@@ -1,9 +1,25 @@
-.section .text.start, "x"
+#.section .text.start, "x"
 .align 4
 
-.global _entry
+.global _entry, scribble_screen
+
+scribble_screen:
+	push {r0, r1, r2}
+	ldr r0, =0x18300000
+	ldr r1, =0xFFFFFFFF
+	add r2, r0, #0x2000
+
+	draw_screen_loop:
+	str r1, [r0], #4
+	cmp r0, r2
+	bls draw_screen_loop
+	pop {r0, r1, r2}
+	blx lr
+
+.section .text.start, "x"
+
 _entry:
-    @ Disable IRQ
+	@ Disable IRQ
     mrs r0, cpsr
     orr r0, r0, #0x80
     msr cpsr_c, r0
@@ -11,16 +27,37 @@ _entry:
     @ Change the stack pointer
     ldr sp, =0x27F00000
 
+	@ initialize GOT
+	sub r3, pc, #24
+	ldr r0, =__got_start
+	ldr r1, =__got_end
+
+	add r0, r0, r3
+	add r1, r1, r3
+
+	got_init:
+	cmp r0, r1
+	beq gotinit_done
+	ldr r2, [r0]
+	add r2, r2, r3
+	str r2, [r0], #4
+	b got_init
+	gotinit_done:
+
 	@clear bss
 	ldr r0, =__bss_start
 	mov r1, #0
-	ldr r3, =__bss_end
-	subs r2, r3, r0
+	ldr r4, =__bss_end
+	add r0, r0, r3
+	add r4, r4, r3
+	subs r2, r4, r0
 	clear_bss_loop:
 		strb r1, [r0], #1
 		subs r2, r2, #1
 		bne clear_bss_loop
 
+	push {r3}
+	
     @ Give read/write access to all the memory regions
     ldr r0, =0x33333333
     mcr p15, 0, r0, c5, c0, 2 @ write data access
@@ -69,5 +106,9 @@ _entry:
     mov r1, #0x340
     str r1, [r0]
 
-    blx main
+	pop {r3}
+	ldr r0, =main
+	add r0, r0, r3
+
+    blx r0
 	bx lr
