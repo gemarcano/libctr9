@@ -1,7 +1,7 @@
 INCPATHS=-I$(top_srcdir)/include 
 C9FLAGS=-mcpu=arm946e-s -march=armv5te -mlittle-endian -mword-relocations
 
-THUMBFLAGS=-mthumb -mthumb-interwork
+THUMBFLAGS=-mthumb #-mthumb-interwork
 #SIZE_OPTIMIZATION = -flto
 #SIZE_OPTIMIZATION = -Wl,--gc-sections -ffunction-sections
 AM_CFLAGS= -std=gnu11 -O2 -g -fPIC -fomit-frame-pointer -ffast-math \

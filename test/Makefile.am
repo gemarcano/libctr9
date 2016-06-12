@@ -1,10 +1,10 @@
 include $(top_srcdir)/common.mk
 
 EXTRA_PROGRAMS = test
-test_CFLAGS=$(AM_CFLAGS) -T$(srcdir)/arm9loaderhax.ld -nostartfiles
-test_LDFLAGS=$(AM_LDFLAGS) -lctr
+test_CFLAGS=$(AM_CFLAGS) -T$(srcdir)/arm9loaderhax.ld -nostartfiles -nostdlib -L${CTRARM9}/arm-none-eabi/lib
+test_LDFLAGS=$(AM_LDFLAGS) -lctr -lc -lgcc
 test_SOURCES = main.c start.s test.c test.h
-test_LDADD = $(top_builddir)/src/libctr9.a
+test_LDADD = $(top_builddir)/src/libctr9.a ${CTRARM9}/arm-none-eabi/lib/thumb/libc.a ${DEVKITARM}/lib/gcc/arm-none-eabi/5.3.0/thumb/libgcc.a 
 
 EXTRA_DIST = arm9loaderhax.ld
 
