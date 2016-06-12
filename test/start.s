@@ -44,17 +44,50 @@ _entry:
 	b got_init
 	gotinit_done:
 
+	@ data.rel.ro
+	ldr r0, =__data_rel_ro_start
+	ldr r1, =__data_rel_ro_end
+
+	add r0, r0, r3
+	add r1, r1, r3
+
+	data_rel_ro_init:
+	cmp r0, r1
+	beq data_rel_ro_done
+	ldr r2, [r0]
+	add r2, r2, r3
+	str r2, [r0], #4
+	b data_rel_ro_init
+	data_rel_ro_done:
+	
+	@ data.rel.ro.local
+	ldr r0, =__data_rel_ro_local_start
+	ldr r1, =__data_rel_ro_local_end
+
+	add r0, r0, r3
+	add r1, r1, r3
+
+	data_rel_ro_local_init:
+	cmp r0, r1
+	beq data_rel_ro_local_done
+	ldr r2, [r0]
+	add r2, r2, r3
+	str r2, [r0], #4
+	b data_rel_ro_local_init
+	data_rel_ro_local_done:
+
 	@clear bss
 	ldr r0, =__bss_start
-	mov r1, #0
-	ldr r4, =__bss_end
+	ldr r1, =__bss_end
 	add r0, r0, r3
-	add r4, r4, r3
-	subs r2, r4, r0
+	add r1, r1, r3
+	mov r2, #0
 	clear_bss_loop:
-		strb r1, [r0], #1
-		subs r2, r2, #1
-		bne clear_bss_loop
+		cmp r0, r1
+		beq clear_bss_loop_done
+		str r2, [r0], #4
+		b clear_bss_loop
+	clear_bss_loop_done:
 
 	push {r3}
 	
