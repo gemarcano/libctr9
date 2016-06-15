@@ -12,6 +12,7 @@
 #include <ctr9/io/fatfs/ff.h>
 #include <ctr9/io/fatfs/diskio.h>
 #include <ctr9/ctr_system.h>
+#include <ctr9/ctr_interrupt.h>
 
 #include "test.h"
 
@@ -485,11 +486,12 @@ static bool twl_test3(void *ctx)
 
 #include <ctr9/io/ctr_fatfs.h>
 
+void abort_interrupt();
+
 int main()
 {
 	ctr_flush_cache();
 	draw_init((draw_s*)0x23FFFE00);
-	asm volatile("blx scribble_screen \n\t");
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0xAAAAAA);
 	printf("UNIT TESTING\n");
@@ -575,6 +577,30 @@ int main()
 
 	printf("Press any key to continue...\n");
 	input_wait();
+
+
+	printf("Preparing interrupts\n");
+	ctr_interrupt_prepare();
+
+	int status = 0;
+	asm volatile( "mrc p15, 0, %0, c1, c0, 0" : "=r"(status));
+	printf("STATUS: %08X\n", status);
+	input_wait();
+
+	printf("Setting abort\n");
+	ctr_interrupt_set(CTR_INTERRUPT_RESET, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_SWI, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_IRQ, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_FIQ, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, abort_interrupt);
+	printf("testing abort\n");
+
+	ctr_system_reset();
+
+	//Cause a data abort :P
+	*(volatile u32*)0xFFFFFFF0;
 
 	printf("I'm alive, I swear!\n");
 	ctr_system_poweroff();
