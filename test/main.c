@@ -493,7 +493,7 @@ int main()
 	ctr_flush_cache();
 	draw_init((draw_s*)0x23FFFE00);
 	console_init(0xFFFFFF, 0);
-	draw_clear_screen(SCREEN_TOP, 0xAAAAAA);
+	draw_clear_screen(SCREEN_TOP, 0x111111);
 	printf("UNIT TESTING\n");
 
 	char buffer[0x1000] = {0};
@@ -581,23 +581,8 @@ int main()
 
 	printf("Preparing interrupts\n");
 	ctr_interrupt_prepare();
-
-	int status = 0;
-	asm volatile( "mrc p15, 0, %0, c1, c0, 0" : "=r"(status));
-	printf("STATUS: %08X\n", status);
-	input_wait();
-
-	printf("Setting abort\n");
-	ctr_interrupt_set(CTR_INTERRUPT_RESET, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_SWI, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_IRQ, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_FIQ, abort_interrupt);
 	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, abort_interrupt);
 	printf("testing abort\n");
-
-	ctr_system_reset();
 
 	//Cause a data abort :P
 	*(volatile u32*)0xFFFFFFF0;

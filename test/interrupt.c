@@ -10,8 +10,15 @@
 __attribute__((interrupt("IRQ")))
 void abort_interrupt()
 {
-	//printf("We hit an abort interrupt!\n");
-	//printf("press any key to reset");
-	//input_wait();
-	ctr_system_poweroff();
+	uint32_t lr = 0;
+	asm volatile (
+		"mov %0, lr \n\t"
+		: "=r"(lr)
+	);
+	lr -= 4;
+
+	printf("\n\nDATA ABORT:\n");
+	printf("\n\nAddress: 0x%08X\n\n", lr);
+	input_wait();
+	//ctr_system_poweroff();
 }

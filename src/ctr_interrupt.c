@@ -72,7 +72,7 @@ void ctr_interrupt_prepare(void)
 	ACCESS_FUNCTION_PTR(0x01FF803C) = (interrupt_function)0xEAFFFFFE;
 	ACCESS_FUNCTION_PTR(0x01FF8044) = (interrupt_function)0xEAFFFFFE;
 	ACCESS_FUNCTION_PTR(0x01FF804C) = (interrupt_function)0xEAFFFFFE;
-	ACCESS_FUNCTION_PTR(0x01FF8050) = (interrupt_function)0xEAFFFFFE;
+	ACCESS_FUNCTION_PTR(0x01FF8054) = (interrupt_function)0xEAFFFFFE;
 
 	ACCESS_FUNCTION_PTR(0x01FF8000) = (interrupt_function)0xEA000006u;
 	ACCESS_FUNCTION_PTR(0x01FF8004) = (interrupt_function)0xEA000007u;

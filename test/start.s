@@ -19,17 +19,44 @@ scribble_screen:
 .section .text.start, "x"
 
 _entry:
+	@ initialize offset register
+	sub r9, pc, #8
+
+	mrs r0, cpsr
+	bic r0, r0, #0x1F
+
+	@system mode
+	orr r1, r0, #0x1F
+	msr cpsr_c, r1
+	ldr sp, =0x8000
+
+	@abort mode
+	orr r1, r0, #0x17
+	msr cpsr_c, r1
+	ldr sp, =0x8000
+
+	@IRQ mode
+	orr r1, r0, #0x12
+	msr cpsr_c, r1
+	ldr sp, =0x8000
+
+	@FIQ mode
+	orr r1, r0, #0x11
+	msr cpsr_c, r1
+	ldr sp, =0x8000
+
+	@supervisor mode
+	orr r1, r0, #0x13
+	msr cpsr_c, r1
+
 	@ Disable IRQ
 	mrs r0, cpsr
 	orr r0, r0, #0x80
 	msr cpsr_c, r0
-	
+
 	@ Change the stack pointer
 	ldr sp, =0x27F00000
 
-	@ initialize GOT
-	sub r9, pc, #24
-	
 	@ make sure ITCM is accessible
 	mrc p15, 0, r0, c1, c0, 0
 	orr r0, r0, #(1<<18)
@@ -111,7 +138,7 @@ _entry:
 	mcr p15, 0, r0, c2, c0, 0  @ data cacheable
 	mcr p15, 0, r0, c2, c0, 1  @ instruction cacheable
 	mcr p15, 0, r0, c3, c0, 0  @ data bufferable
-	
+
 	@ Enable caches and MPU
 	ldr r0, =enable_mpu_and_caching
 	add r0, r0, r9
