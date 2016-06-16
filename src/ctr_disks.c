@@ -34,7 +34,7 @@ int ctr_disks_initialize(
 				}
 				result |= ctr_nand_crypto_interface_initialize(ctr_io, keyslot, NAND_CTR, (ctr_io_interface*)nand_io);
 			}
-			
+
 			if (twl_io)
 			{
 				result |= ctr_nand_crypto_interface_initialize(twl_io, 0x03, NAND_TWL, (ctr_io_interface*)nand_io);
