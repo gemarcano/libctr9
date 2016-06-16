@@ -19,8 +19,8 @@ int ctr_disks_initialize(
 			//FIXME read required keyslot from NAND
 			if (ctr_io)
 			{
-				uint64_t encryption_type = 0;
-				result |= ctr_io_read(nand_io, &encryption_type, sizeof(encryption_type), 0x118, sizeof(encryption_type));
+				uint8_t encryption_type = 0;
+				result |= ctr_io_read(nand_io, &encryption_type, sizeof(encryption_type), 0x118 + 0x4, sizeof(encryption_type));
 				uint8_t keyslot;
 				switch (encryption_type)
 				{
