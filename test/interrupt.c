@@ -4,21 +4,23 @@
 #include <ctr/hid.h>
 
 #ifdef __thumb__
-#error
+//#error
 #endif
 
-__attribute__((interrupt("IRQ")))
-void abort_interrupt()
+void abort_interrupt(const uint32_t *registers)
 {
-	uint32_t lr = 0;
-	asm volatile (
-		"mov %0, lr \n\t"
-		: "=r"(lr)
-	);
-	lr -= 4;
+	uint32_t cpsr = registers[0];
+	uint32_t lr = registers[14];
+	const uint32_t *r = registers+1;
 
 	printf("\n\nDATA ABORT:\n");
-	printf("\n\nAddress: 0x%08X\n\n", lr);
+
+	printf("CPSR: 0x%08X\n", cpsr);
+	printf("Abort address: 0x%08X\n", lr - 8);
+	for (size_t i = 0; i < 13; ++i)
+	{
+		printf("r%d: 0x%08X\n", i, r[i]);
+	}
 	input_wait();
-	//ctr_system_poweroff();
+	ctr_system_poweroff();
 }

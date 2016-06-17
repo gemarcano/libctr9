@@ -486,7 +486,8 @@ static bool twl_test3(void *ctx)
 
 #include <ctr9/io/ctr_fatfs.h>
 
-void abort_interrupt();
+extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
+void abort_interrupt(const uint32_t*);
 
 int main()
 {
@@ -582,6 +583,17 @@ int main()
 	printf("Preparing interrupts\n");
 	ctr_interrupt_prepare();
 	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
+	printf("abort handler: %X\n", ctr_interrupt_handlers[4]);
+	
+	uint32_t tmp = 0;
+	uint32_t handler_tmp = ctr_interrupt_handlers;
+
+	asm volatile(
+	"ldr %0, [%1, #0x10] \n\t"
+	:"=r"(tmp): "r"(handler_tmp)
+	);
+
+	printf("abort handler: %X\n", tmp);
 	printf("testing abort\n");
 
 	//Cause a data abort :P

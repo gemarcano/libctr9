@@ -9,10 +9,10 @@ scribble_screen:
 	ldr r1, =0xFFFFFFFF
 	add r2, r0, #0x2000
 
-	draw_screen_loop:
+	0:
 	str r1, [r0], #4
 	cmp r0, r2
-	bls draw_screen_loop
+	bls 0b
 	pop {r0, r1, r2}
 	blx lr
 

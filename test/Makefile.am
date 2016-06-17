@@ -6,7 +6,7 @@ test_LDFLAGS=$(AM_LDFLAGS) -lctr -lc -lgcc
 test_SOURCES = main.c start.s test.c test.h interrupt.c
 test_LDADD = $(top_builddir)/src/libctr9.a ${CTRARM9}/arm-none-eabi/lib/thumb/libc.a ${DEVKITARM}/lib/gcc/arm-none-eabi/5.3.0/thumb/libgcc.a 
 
-test-interrupt.${OBJEXT} : AM_CFLAGS += -marm
+#test-interrupt.${OBJEXT} : AM_CFLAGS += -marm
 
 EXTRA_DIST = arm9loaderhax.ld
 
