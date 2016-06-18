@@ -1,6 +1,13 @@
 var searchData=
 [
+  ['ctr_5fdetect_5fa9lh_5fentry',['ctr_detect_a9lh_entry',['../ctr__system_8h.html#ab36c68a4c16b777a16eb7dbd5c9afc6e',1,'ctr_system.h']]],
+  ['ctr_5ffatfs_2eh',['ctr_fatfs.h',['../ctr__fatfs_8h.html',1,'']]],
+  ['ctr_5ffatfs_5fdefault_5fsetup',['ctr_fatfs_default_setup',['../ctr__fatfs__disk_8h.html#a3207f9bea98adb2ac2a3e8ad4765abb4',1,'ctr_fatfs_disk.h']]],
   ['ctr_5ffatfs_5fdisk',['ctr_fatfs_disk',['../structctr__fatfs__disk.html',1,'']]],
+  ['ctr_5ffatfs_5fdisk_2eh',['ctr_fatfs_disk.h',['../ctr__fatfs__disk_8h.html',1,'']]],
+  ['ctr_5ffatfs_5fdisk_5fdestroy',['ctr_fatfs_disk_destroy',['../ctr__fatfs__disk_8h.html#aed72dc232ccf822ad7e2c6aeaa87f4ef',1,'ctr_fatfs_disk.h']]],
+  ['ctr_5ffatfs_5fdisk_5finitialize',['ctr_fatfs_disk_initialize',['../ctr__fatfs__disk_8h.html#a347402b597def51478af6587cbc260c0',1,'ctr_fatfs_disk.h']]],
+  ['ctr_5ffatfs_5finitialize',['ctr_fatfs_initialize',['../ctr__fatfs_8h.html#a5ab0a8f095360c149bde1bf7cba5c2ea',1,'ctr_fatfs.h']]],
   ['ctr_5ffatfs_5finterface',['ctr_fatfs_interface',['../structctr__fatfs__interface.html',1,'']]],
   ['ctr_5ffatfs_5finterface_2eh',['ctr_fatfs_interface.h',['../ctr__fatfs__interface_8h.html',1,'']]],
   ['ctr_5ffatfs_5finterface_5fdestroy',['ctr_fatfs_interface_destroy',['../ctr__fatfs__interface_8h.html#a154cf97cb27d30da18376f81cbcb989f',1,'ctr_fatfs_interface.h']]],
@@ -11,7 +18,14 @@ var searchData=
   ['ctr_5ffatfs_5finterface_5fsector_5fsize',['ctr_fatfs_interface_sector_size',['../ctr__fatfs__interface_8h.html#a413e16700593e584aff1343e96b34581',1,'ctr_fatfs_interface.h']]],
   ['ctr_5ffatfs_5finterface_5fwrite',['ctr_fatfs_interface_write',['../ctr__fatfs__interface_8h.html#acb663f84c82bb0feb9532dfd784eb611',1,'ctr_fatfs_interface.h']]],
   ['ctr_5ffatfs_5finterface_5fwrite_5fsector',['ctr_fatfs_interface_write_sector',['../ctr__fatfs__interface_8h.html#a652cb2a2eda61ac3da605a6bab7f04a3',1,'ctr_fatfs_interface.h']]],
+  ['ctr_5fflush_5fcache',['ctr_flush_cache',['../ctr__system_8h.html#a0aae8c24e84e3bc8cd06d4d215f59c61',1,'ctr_system.h']]],
   ['ctr_5fget_5fsystem_5ftype',['ctr_get_system_type',['../ctr__system_8h.html#a80a3bf2d55352059fcdc5e127c801511',1,'ctr_system.h']]],
+  ['ctr_5finterrupt_2eh',['ctr_interrupt.h',['../ctr__interrupt_8h.html',1,'']]],
+  ['ctr_5finterrupt_5fenum',['ctr_interrupt_enum',['../ctr__interrupt_8h.html#a9dac5917bfe08169bc49f52d59423b9e',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fglobal_5fdisable',['ctr_interrupt_global_disable',['../ctr__interrupt_8h.html#af7a1f898800b6f7c0cb62f00af6cdb48',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fglobal_5fenable',['ctr_interrupt_global_enable',['../ctr__interrupt_8h.html#a2c5c1213bba944634a86632067b44082',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fprepare',['ctr_interrupt_prepare',['../ctr__interrupt_8h.html#af3bb67c1f7281071d99d3770c1908151',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fset',['ctr_interrupt_set',['../ctr__interrupt_8h.html#af0c528a04d8d7ceb1935b1d8e53517fe',1,'ctr_interrupt.h']]],
   ['ctr_5fio_5fdisk_5fsize',['ctr_io_disk_size',['../ctr__io__interface_8h.html#ac79d6c6c171a5329416c875c69661670',1,'ctr_io_interface.h']]],
   ['ctr_5fio_5finterface',['ctr_io_interface',['../structctr__io__interface.html',1,'']]],
   ['ctr_5fio_5finterface_2eh',['ctr_io_interface.h',['../ctr__io__interface_8h.html',1,'']]],
@@ -63,5 +77,8 @@ var searchData=
   ['ctr_5fsdmmc_5fimplementation_2eh',['ctr_sdmmc_implementation.h',['../ctr__sdmmc__implementation_8h.html',1,'']]],
   ['ctr_5fsetup_5fdisk_5fparameters',['ctr_setup_disk_parameters',['../structctr__setup__disk__parameters.html',1,'']]],
   ['ctr_5fsystem_2eh',['ctr_system.h',['../ctr__system_8h.html',1,'']]],
-  ['ctr_5fsystem_5ftype',['ctr_system_type',['../ctr__system_8h.html#aebe5a3669fd7710a11be92edf6e68023',1,'ctr_system.h']]]
+  ['ctr_5fsystem_5fpoweroff',['ctr_system_poweroff',['../ctr__system_8h.html#a0c87a5d13e304c7967a055e14cf9f34d',1,'ctr_system.h']]],
+  ['ctr_5fsystem_5freset',['ctr_system_reset',['../ctr__system_8h.html#ab9353f50a57b333a375d51403690d1d8',1,'ctr_system.h']]],
+  ['ctr_5fsystem_5ftype',['ctr_system_type',['../ctr__system_8h.html#aebe5a3669fd7710a11be92edf6e68023',1,'ctr_system.h']]],
+  ['ctr_5ftwl_5fkeyslot_5fsetup',['ctr_twl_keyslot_setup',['../ctr__system_8h.html#a2477086373a67c57270d6507246db7c8',1,'ctr_system.h']]]
 ];

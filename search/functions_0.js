@@ -1,5 +1,10 @@
 var searchData=
 [
+  ['ctr_5fdetect_5fa9lh_5fentry',['ctr_detect_a9lh_entry',['../ctr__system_8h.html#ab36c68a4c16b777a16eb7dbd5c9afc6e',1,'ctr_system.h']]],
+  ['ctr_5ffatfs_5fdefault_5fsetup',['ctr_fatfs_default_setup',['../ctr__fatfs__disk_8h.html#a3207f9bea98adb2ac2a3e8ad4765abb4',1,'ctr_fatfs_disk.h']]],
+  ['ctr_5ffatfs_5fdisk_5fdestroy',['ctr_fatfs_disk_destroy',['../ctr__fatfs__disk_8h.html#aed72dc232ccf822ad7e2c6aeaa87f4ef',1,'ctr_fatfs_disk.h']]],
+  ['ctr_5ffatfs_5fdisk_5finitialize',['ctr_fatfs_disk_initialize',['../ctr__fatfs__disk_8h.html#a347402b597def51478af6587cbc260c0',1,'ctr_fatfs_disk.h']]],
+  ['ctr_5ffatfs_5finitialize',['ctr_fatfs_initialize',['../ctr__fatfs_8h.html#a5ab0a8f095360c149bde1bf7cba5c2ea',1,'ctr_fatfs.h']]],
   ['ctr_5ffatfs_5finterface_5fdestroy',['ctr_fatfs_interface_destroy',['../ctr__fatfs__interface_8h.html#a154cf97cb27d30da18376f81cbcb989f',1,'ctr_fatfs_interface.h']]],
   ['ctr_5ffatfs_5finterface_5fdisk_5fsize',['ctr_fatfs_interface_disk_size',['../ctr__fatfs__interface_8h.html#ae4e8fe3bced6006309e0de185043628c',1,'ctr_fatfs_interface.h']]],
   ['ctr_5ffatfs_5finterface_5finitialize',['ctr_fatfs_interface_initialize',['../ctr__fatfs__interface_8h.html#a249a1f49336920491b4d449b2153fa04',1,'ctr_fatfs_interface.h']]],
@@ -8,7 +13,12 @@ var searchData=
   ['ctr_5ffatfs_5finterface_5fsector_5fsize',['ctr_fatfs_interface_sector_size',['../ctr__fatfs__interface_8h.html#a413e16700593e584aff1343e96b34581',1,'ctr_fatfs_interface.h']]],
   ['ctr_5ffatfs_5finterface_5fwrite',['ctr_fatfs_interface_write',['../ctr__fatfs__interface_8h.html#acb663f84c82bb0feb9532dfd784eb611',1,'ctr_fatfs_interface.h']]],
   ['ctr_5ffatfs_5finterface_5fwrite_5fsector',['ctr_fatfs_interface_write_sector',['../ctr__fatfs__interface_8h.html#a652cb2a2eda61ac3da605a6bab7f04a3',1,'ctr_fatfs_interface.h']]],
+  ['ctr_5fflush_5fcache',['ctr_flush_cache',['../ctr__system_8h.html#a0aae8c24e84e3bc8cd06d4d215f59c61',1,'ctr_system.h']]],
   ['ctr_5fget_5fsystem_5ftype',['ctr_get_system_type',['../ctr__system_8h.html#a80a3bf2d55352059fcdc5e127c801511',1,'ctr_system.h']]],
+  ['ctr_5finterrupt_5fglobal_5fdisable',['ctr_interrupt_global_disable',['../ctr__interrupt_8h.html#af7a1f898800b6f7c0cb62f00af6cdb48',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fglobal_5fenable',['ctr_interrupt_global_enable',['../ctr__interrupt_8h.html#a2c5c1213bba944634a86632067b44082',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fprepare',['ctr_interrupt_prepare',['../ctr__interrupt_8h.html#af3bb67c1f7281071d99d3770c1908151',1,'ctr_interrupt.h']]],
+  ['ctr_5finterrupt_5fset',['ctr_interrupt_set',['../ctr__interrupt_8h.html#af0c528a04d8d7ceb1935b1d8e53517fe',1,'ctr_interrupt.h']]],
   ['ctr_5fio_5fdisk_5fsize',['ctr_io_disk_size',['../ctr__io__interface_8h.html#ac79d6c6c171a5329416c875c69661670',1,'ctr_io_interface.h']]],
   ['ctr_5fio_5fread',['ctr_io_read',['../ctr__io__interface_8h.html#acbad47942a09e56adbf08707319b627d',1,'ctr_io_interface.h']]],
   ['ctr_5fio_5fread_5fsector',['ctr_io_read_sector',['../ctr__io__interface_8h.html#a949f2f5c646768e097218a973d613dec',1,'ctr_io_interface.h']]],
@@ -40,5 +50,8 @@ var searchData=
   ['ctr_5fsd_5finterface_5fread_5fsector',['ctr_sd_interface_read_sector',['../ctr__sd__interface_8h.html#a99c218f69dc4406a4813713014cf79c9',1,'ctr_sd_interface.h']]],
   ['ctr_5fsd_5finterface_5fsector_5fsize',['ctr_sd_interface_sector_size',['../ctr__sd__interface_8h.html#af93f0d29f42cda3cfe5b35e12c2ea81f',1,'ctr_sd_interface.h']]],
   ['ctr_5fsd_5finterface_5fwrite',['ctr_sd_interface_write',['../ctr__sd__interface_8h.html#a82862bf46fafd91f74d4e02236d32aa1',1,'ctr_sd_interface.h']]],
-  ['ctr_5fsd_5finterface_5fwrite_5fsector',['ctr_sd_interface_write_sector',['../ctr__sd__interface_8h.html#a98fd0fcf91518f7379ecea7b408cc770',1,'ctr_sd_interface.h']]]
+  ['ctr_5fsd_5finterface_5fwrite_5fsector',['ctr_sd_interface_write_sector',['../ctr__sd__interface_8h.html#a98fd0fcf91518f7379ecea7b408cc770',1,'ctr_sd_interface.h']]],
+  ['ctr_5fsystem_5fpoweroff',['ctr_system_poweroff',['../ctr__system_8h.html#a0c87a5d13e304c7967a055e14cf9f34d',1,'ctr_system.h']]],
+  ['ctr_5fsystem_5freset',['ctr_system_reset',['../ctr__system_8h.html#ab9353f50a57b333a375d51403690d1d8',1,'ctr_system.h']]],
+  ['ctr_5ftwl_5fkeyslot_5fsetup',['ctr_twl_keyslot_setup',['../ctr__system_8h.html#a2477086373a67c57270d6507246db7c8',1,'ctr_system.h']]]
 ];

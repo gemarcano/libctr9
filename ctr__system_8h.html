@@ -110,7 +110,8 @@ $(document).ready(function(){initNavTree('ctr__system_8h.html','');});
 <div class="title">ctr_system.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;stdbool.h&gt;</code><br />
+</div>
 <p><a href="ctr__system_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -123,11 +124,64 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ab36c68a4c16b777a16eb7dbd5c9afc6e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__system_8h.html#ab36c68a4c16b777a16eb7dbd5c9afc6e">ctr_detect_a9lh_entry</a> (void)</td></tr>
+<tr class="memdesc:ab36c68a4c16b777a16eb7dbd5c9afc6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the arm9 entry was a9lh or not.  <a href="#ab36c68a4c16b777a16eb7dbd5c9afc6e">More...</a><br /></td></tr>
+<tr class="separator:ab36c68a4c16b777a16eb7dbd5c9afc6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2477086373a67c57270d6507246db7c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__system_8h.html#a2477086373a67c57270d6507246db7c8">ctr_twl_keyslot_setup</a> (void)</td></tr>
+<tr class="memdesc:a2477086373a67c57270d6507246db7c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the TWL keyslot.  <a href="#a2477086373a67c57270d6507246db7c8">More...</a><br /></td></tr>
+<tr class="separator:a2477086373a67c57270d6507246db7c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c87a5d13e304c7967a055e14cf9f34d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__system_8h.html#a0c87a5d13e304c7967a055e14cf9f34d">ctr_system_poweroff</a> (void)</td></tr>
+<tr class="memdesc:a0c87a5d13e304c7967a055e14cf9f34d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Powers off the 3DS.  <a href="#a0c87a5d13e304c7967a055e14cf9f34d">More...</a><br /></td></tr>
+<tr class="separator:a0c87a5d13e304c7967a055e14cf9f34d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9353f50a57b333a375d51403690d1d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__system_8h.html#ab9353f50a57b333a375d51403690d1d8">ctr_system_reset</a> (void)</td></tr>
+<tr class="memdesc:ab9353f50a57b333a375d51403690d1d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the 3DS.  <a href="#ab9353f50a57b333a375d51403690d1d8">More...</a><br /></td></tr>
+<tr class="separator:ab9353f50a57b333a375d51403690d1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80a3bf2d55352059fcdc5e127c801511"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ctr__system_8h.html#aebe5a3669fd7710a11be92edf6e68023">ctr_system_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__system_8h.html#a80a3bf2d55352059fcdc5e127c801511">ctr_get_system_type</a> (void)</td></tr>
 <tr class="memdesc:a80a3bf2d55352059fcdc5e127c801511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the enumeration corresponding to the running system.  <a href="#a80a3bf2d55352059fcdc5e127c801511">More...</a><br /></td></tr>
 <tr class="separator:a80a3bf2d55352059fcdc5e127c801511"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aae8c24e84e3bc8cd06d4d215f59c61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__system_8h.html#a0aae8c24e84e3bc8cd06d4d215f59c61">ctr_flush_cache</a> (void)</td></tr>
+<tr class="memdesc:a0aae8c24e84e3bc8cd06d4d215f59c61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flushes all of the ARM9 CPU caches, and drains the write buffer.  <a href="#a0aae8c24e84e3bc8cd06d4d215f59c61">More...</a><br /></td></tr>
+<tr class="separator:a0aae8c24e84e3bc8cd06d4d215f59c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ab36c68a4c16b777a16eb7dbd5c9afc6e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ctr_detect_a9lh_entry </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns whether the arm9 entry was a9lh or not. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if the arm9 entrypoint was a9lh, false otherwise. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0aae8c24e84e3bc8cd06d4d215f59c61"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ctr_flush_cache </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flushes all of the ARM9 CPU caches, and drains the write buffer. </p>
+<dl class="section post"><dt>Postcondition</dt><dd>All CPU caches (instruction and data) have been flushed, and the write buffer has been drained. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a80a3bf2d55352059fcdc5e127c801511"></a>
 <div class="memitem">
 <div class="memproto">
@@ -144,6 +198,66 @@ Functions</h2></td></tr>
 
 <p>Returns the enumeration corresponding to the running system. </p>
 <dl class="section return"><dt>Returns</dt><dd>The type of system this is called in. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0c87a5d13e304c7967a055e14cf9f34d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ctr_system_poweroff </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Powers off the 3DS. </p>
+<p>This function does not return. It powers off the 3DS via an i2c call to the MPU.</p>
+<dl class="section post"><dt>Postcondition</dt><dd>3DS has powered off. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab9353f50a57b333a375d51403690d1d8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ctr_system_reset </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Resets the 3DS. </p>
+<p>This function does not return. It resets the 3DS via an i2c call to the MPU.</p>
+<dl class="section post"><dt>Postcondition</dt><dd>3DS has restarted. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2477086373a67c57270d6507246db7c8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ctr_twl_keyslot_setup </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets up the TWL keyslot. </p>
+<p>This only really matters if arm9 execution is obtained via a9lh, or prior to a FIRM load. Nothing happens if FIRM had been launched previously.</p>
+<dl class="section post"><dt>Postcondition</dt><dd>The TWL keyslot is setup properly. </dd></dl>
 
 </div>
 </div>
