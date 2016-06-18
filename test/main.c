@@ -416,13 +416,6 @@ static bool twl_test2(void *ctx)
 		ctr_fatfs_interface_initialize(&io, &test_file);
 
 		ctr_io_read(&io, buffer, buffer_size, 0, 513);
-		for (size_t i = 0; i < 513; ++i)
-		{
-			if (i && !(i%8)) printf("\n");
-			if (i && !(i%64)) input_wait();
-
-			printf("%02X ", ((char*)buffer)[i]);
-		}
 	}
 
 	params = (ctr_setup_disk_parameters){&data->io, 0x09011A00/0x200, 0x020B6600/0x200};
@@ -463,13 +456,6 @@ static bool twl_test3(void *ctx)
 		disk_ioctl(4, CTR_SETUP_DISK, &params);
 
 		ctr_io_read(&io, buffer, buffer_size, 0, 513);
-		for (size_t i = 0; i < 513; ++i)
-		{
-			if (i && !(i%8)) printf("\n");
-			if (i && !(i%64)) input_wait();
-
-			printf("%02X ", ((char*)buffer)[i]);
-		}
 		test1 = FR_OK == f_mount(&fs2, "DISK1:", 1);
 
 		int res3 = f_open(&test_file2, "DISK1:/foobar.txt", FA_WRITE | FA_OPEN_ALWAYS);

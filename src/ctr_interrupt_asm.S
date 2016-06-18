@@ -2,47 +2,50 @@
 
 .align 4
 
-.global ctr_interrupt_reset_veneer, ctr_interrupt_undef_veneer, ctr_interrupt_swi_veneer, ctr_interrupt_preabrt_veneer, ctr_interrupt_databrt_veneer, ctr_interrupt_irq_veneer, ctr_interrupt_fiq_veneer
+.global ctr_interrupt_reset_veneer, ctr_interrupt_undef_veneer, \
+	ctr_interrupt_swi_veneer, ctr_interrupt_preabrt_veneer, \
+	ctr_interrupt_databrt_veneer, ctr_interrupt_irq_veneer, \
+	ctr_interrupt_fiq_veneer
 
 .extern ctr_interrupt_handlers
 
-.macro scribble
-	push {r0, r1, r2}
-    ldr r0, =0x18300000
-    ldr r1, =0xFFFFFFFF
-    add r2, r0, #0x2000
-
-    1:
-    str r1, [r0], #4
-    cmp r0, r2
-    bls 1b
-    pop {r0, r1, r2}
-    blx lr
-.endm
-
-ctr_interrupt_handlers_location:
-.word ctr_interrupt_handlers - .
-
 .macro CTR_INTERRUPT_VENEER table_offset=0
-	push {r0-r12, r14}
+	push {r0-r12,r14} @push "normal" registers
+
+	@switch to previous mode to grab stack pointer, then switch back
+	mrs r1, cpsr
 	mrs r0, spsr
-	push {r0}
-	
+	mov r3, r0
+	orr r3, #0xC0
+	bic r3, #0x20
+
+	msr cpsr_c, r3
+	mov r3, r13
+	msr cpsr_c, r1
+
+	@push "special" registers, placing them in the front of the array to be
+	@passed
+	push {r0,r3,r14}
+
 	adr r1, ctr_interrupt_handlers_location
 	ldr r2, [r1]
 	add r1, r1, r2
 	ldr r2, [r1, #\table_offset]
 	mov r0, sp
+
+	@Parameters: r0 - pointer to array on stack:
+	@    cpsr, sp, lr, r0-r12
 	blx r2
 
 	@now determine the mode we were in previously
-	pop {r0}
-	tst r0, #0x40
+	@if Thumb, make sure LR is updated
+	pop {r0,r3,r14}
+	tst r0, #0x20
 	beq 1f
-	ldr r0, [sp, #0x34]
-	orr r0, r0, #1
+	orr r14, r14, #1
 
 	1:
+	str r14, [sp, #0x34]
 	ldmfd sp!, {r0-r12, pc}^
 .endm
 
@@ -67,4 +70,7 @@ ctr_interrupt_irq_veneer:
 
 ctr_interrupt_fiq_veneer:
 	CTR_INTERRUPT_VENEER 24
+
+ctr_interrupt_handlers_location:
+.word ctr_interrupt_handlers - .
 
