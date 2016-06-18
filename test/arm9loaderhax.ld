@@ -2,8 +2,8 @@ OUTPUT_ARCH(arm)
 ENTRY(_entry)
 SECTIONS
 {
-	/* . = 0x23F00000; */
-	. = 0;
+	. = 0x23F00000;
+	/* . = 0; */
 	.text : {
 		*(.text.start)
 		*(.text)
@@ -13,14 +13,14 @@ SECTIONS
 		*(.data)
 				. = ALIGN(4);
 	}
-	
+
 	.data.rel.ro.local : {
 		__data_rel_ro_local_start = .;
 		*(.data.rel.ro)
 		. = ALIGN(4);
 	}
 	__data_rel_ro_local_end = .;
-	
+
 	.data.rel.ro : {
 		__data_rel_ro_start = .;
 		*(.data.rel.ro)

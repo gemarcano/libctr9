@@ -31,7 +31,7 @@ void ctr_interrupt_global_enable(void)
 }
 
 typedef void (*interrupt_function)(void);
-typedef void (*ctr_interrupt_handler)(const uint32_t* register_array);
+typedef void (*ctr_interrupt_handler)(uint32_t* register_array);
 
 ctr_interrupt_handler ctr_interrupt_handlers[7] = {0};
 

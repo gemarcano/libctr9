@@ -17,7 +17,7 @@ typedef enum
 void ctr_interrupt_global_disable(void);
 void ctr_interrupt_global_enable(void);
 void ctr_interrupt_prepare(void);
-void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, void (*interrupt)(const uint32_t*));
+void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, void (*interrupt)(uint32_t*));
 
 #endif//CTR_INTERRUPT_H_
 

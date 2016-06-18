@@ -1,27 +1,11 @@
 #.section .text.start, "x"
 .align 4
 
-.global _entry, scribble_screen
-
-scribble_screen:
-	push {r0, r1, r2}
-	ldr r0, =0x18300000
-	ldr r1, =0xFFFFFFFF
-	add r2, r0, #0x2000
-
-	0:
-	str r1, [r0], #4
-	cmp r0, r2
-	bls 0b
-	pop {r0, r1, r2}
-	blx lr
+.global _entry
 
 .section .text.start, "x"
 
 _entry:
-	@ initialize offset register
-	sub r9, pc, #8
-
 	mrs r0, cpsr
 	bic r0, r0, #0x1F
 
@@ -63,46 +47,73 @@ _entry:
 	mcr p15, 0, r0, c1, c0, 0
 
 	@ Disable caches and MPU
-	ldr r0, =disable_mpu_and_caching
-	add r0, r0, r9
-	blx r0
+	adr r1, disable_mpu_and_caching_offset
+	ldr r2, [r1]
+	add r1, r2, r1
+	blx r1
 
 	@ Flush caches
-	ldr r0, =flush_all_caches
-	add r0, r0, r9
+	adr r0, flush_all_caches_offset
+	ldr r1, [r0]
+	add r0, r1, r0
 	blx r0
 
-	ldr r0, =__got_start
-	ldr r1, =__got_end
-	mov r2, r9
+	adr r0, __got_start_offset
+	ldr r1, [r0]
+	add r0, r1, r0
 
-	ldr r3, =relocate_section
-	add r3, r3, r9
+	@ check if relocation is needed
+	ldr r1, =__got_start
+	cmp r0, r1
+	beq reloc_end
+
+	adr r1, __got_end_offset
+	ldr r2, [r1]
+	add r1, r2, r1
+
+	adr r3, relocate_section_offset
+	ldr r4, [r3]
+	add r3, r3, r4
 	blx r3
 
 	@ data.rel.ro
-	ldr r0, =__data_rel_ro_start
-	ldr r1, =__data_rel_ro_end
-	mov r2, r9
+	adr r0, __data_rel_ro_start_offset
+	ldr r1, [r0]
+	add r0, r1, r0
 
-	ldr r3, =relocate_section
-	add r3, r3, r9
+	adr r1, __data_rel_ro_end_offset
+	ldr r2, [r1]
+	add r1, r2, r1
+
+	adr r3, relocate_section_offset
+	ldr r4, [r3]
+	add r3, r3, r4
 	blx r3
 
 	@ data.rel.ro.local
-	ldr r0, =__data_rel_ro_local_start
-	ldr r1, =__data_rel_ro_local_end
-	mov r2, r9
+	adr r0, __data_rel_ro_local_start_offset
+	ldr r1, [r0]
+	add r0, r1, r0
 
-	ldr r3, =relocate_section
-	add r3, r3, r9
+	adr r1, __data_rel_ro_local_end_offset
+	ldr r2, [r1]
+	add r1, r2, r1
+
+	adr r3, relocate_section_offset
+	ldr r4, [r3]
+	add r3, r3, r4
 	blx r3
 
+	reloc_end:
+
 	@clear bss
-	ldr r0, =__bss_start
-	ldr r1, =__bss_end
-	add r0, r0, r3
-	add r1, r1, r3
+	adr r0, __bss_start_offset
+	ldr r1, [r0]
+	add r0, r1, r0
+
+	adr r1, __bss_end_offset
+	ldr r2, [r1]
+	add r1, r2, r1
 	mov r2, #0
 	clear_bss_loop:
 		cmp r0, r1
@@ -140,8 +151,9 @@ _entry:
 	mcr p15, 0, r0, c3, c0, 0  @ data bufferable
 
 	@ Enable caches and MPU
-	ldr r0, =enable_mpu_and_caching
-	add r0, r0, r9
+	adr r0, enable_mpu_and_caching_offset
+	ldr r1, [r0]
+	add r0, r1, r0
 	blx r0
 
 	@ Fix mounting of SDMC
@@ -149,11 +161,52 @@ _entry:
 	mov r1, #0x340
 	str r1, [r0]
 
-
-	ldr r4, =main
-	add r4, r4, r9
-	blx r4
+	mov r0, #0
+	mov r1, #0
+	adr r2, main_offset
+	ldr r3, [r2]
+	add r2, r3, r2
+	blx r2
 	bx lr
+
+__got_start_offset:
+.word __got_start-.
+
+__got_end_offset:
+.word __got_end-.
+
+__bss_start_offset:
+.word __bss_start-.
+
+__bss_end_offset:
+.word __bss_end-.
+
+__data_rel_ro_start_offset:
+.word __data_rel_ro_start-.
+
+__data_rel_ro_end_offset:
+.word __data_rel_ro_end-.
+
+__data_rel_ro_local_start_offset:
+.word __data_rel_ro_local_start-.
+
+__data_rel_ro_local_end_offset:
+.word __data_rel_ro_local_end-.
+
+disable_mpu_and_caching_offset:
+.word disable_mpu_and_caching-.
+
+enable_mpu_and_caching_offset:
+.word enable_mpu_and_caching-.
+
+relocate_section_offset:
+.word relocate_section-.
+
+flush_all_caches_offset:
+.word flush_all_caches-.
+
+main_offset:
+.word main-.
 
 disable_mpu_and_caching:
 	@ Disable caches and MPU
@@ -179,8 +232,10 @@ enable_mpu_and_caching:
 @ r1 - region end
 @ r2 - relocation base (usually starting PC address)
 relocate_section:
-	add r0, r0, r2
-	add r1, r1, r2
+
+	adr r2, relocation_base_offset
+	ldr r3, [r2]
+	add r2, r3, r2
 
 	.Lreloc_init:
 	cmp r0, r1
@@ -192,6 +247,9 @@ relocate_section:
 	.Lrelocinit_done:
 
 	bx lr
+
+relocation_base_offset:
+.word _entry-.
 
 flush_all_caches:
 	push {lr}
