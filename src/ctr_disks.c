@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #include <ctr9/io/ctr_disks.h>
 #include <ctr9/io/ctr_io_interface.h>
 #include <ctr9/io/ctr_nand_interface.h>
@@ -16,7 +26,6 @@ int ctr_disks_initialize(
 		result |= ctr_nand_interface_initialize(nand_io);
 		if (!result)
 		{
-			//FIXME read required keyslot from NAND
 			if (ctr_io)
 			{
 				uint8_t encryption_type = 0;

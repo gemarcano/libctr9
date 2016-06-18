@@ -386,7 +386,7 @@ static bool twl_test1(void *ctx)
 	size_t buffer_size = data->buffer_size;
 
 	ctr_twl_keyslot_setup();
-	
+
 	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x03, NAND_TWL, &data->lower_io->base);
 
 	return !res;
@@ -565,27 +565,16 @@ int main()
 	printf("Press any key to continue...\n");
 	input_wait();
 
-
 	printf("Preparing interrupts\n");
 	ctr_interrupt_prepare();
 	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
 	printf("abort handler: %X\n", ctr_interrupt_handlers[4]);
-	
-	uint32_t tmp = 0;
-	uint32_t handler_tmp = ctr_interrupt_handlers;
-
-	asm volatile(
-	"ldr %0, [%1, #0x10] \n\t"
-	:"=r"(tmp): "r"(handler_tmp)
-	);
-
-	printf("abort handler: %X\n", tmp);
 	printf("testing abort\n");
 
 	//Cause a data abort :P
 	*(volatile u32*)0xFFFFFFF0;
+	printf("Returned from the abort.\n");
 
-	printf("I'm alive, I swear!\n");
 	ctr_system_poweroff();
 	return 0;
 }

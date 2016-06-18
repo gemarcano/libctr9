@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #include <ctr9/ctr_system.h>
 #include <ctr9/aes.h>
 #include <ctr9/i2c.h>
@@ -20,7 +30,7 @@ ctr_system_type ctr_get_system_type(void)
 bool ctr_detect_a9lh_entry(void)
 {
 	//Aurora determined that this register isn't yet set when a9lh launches.
-	return *PDN_SPI_CNT == 0; 
+	return *PDN_SPI_CNT == 0;
 }
 
 void ctr_system_poweroff(void)

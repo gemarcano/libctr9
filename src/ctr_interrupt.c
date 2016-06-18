@@ -1,4 +1,15 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #include <ctr9/ctr_interrupt.h>
+#include <ctr9/ctr_system.h>
 #include <stdint.h>
 
 void ctr_interrupt_reset_veneer(void);
@@ -58,6 +69,7 @@ void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler 
 
 void ctr_interrupt_prepare(void)
 {
+	//Secondary handler. Read payload address from next word
 	ACCESS_FUNCTION_PTR(0x01FF8020) = (interrupt_function)0xE51FF004;
 	ACCESS_FUNCTION_PTR(0x01FF8028) = (interrupt_function)0xE51FF004;
 	ACCESS_FUNCTION_PTR(0x01FF8030) = (interrupt_function)0xE51FF004;
@@ -66,7 +78,8 @@ void ctr_interrupt_prepare(void)
 	ACCESS_FUNCTION_PTR(0x01FF8048) = (interrupt_function)0xE51FF004;
 	ACCESS_FUNCTION_PTR(0x01FF8050) = (interrupt_function)0xE51FF004;
 
-	//Pointers to veneers
+	//Pointers to veneers, which then would load the actual user provide
+	//handlers
 	ACCESS_FUNCTION_PTR(0x01FF8024) = ctr_interrupt_reset_veneer;
 	ACCESS_FUNCTION_PTR(0x01FF802C) = ctr_interrupt_undef_veneer;
 	ACCESS_FUNCTION_PTR(0x01FF8034) = ctr_interrupt_swi_veneer;
@@ -75,6 +88,7 @@ void ctr_interrupt_prepare(void)
 	ACCESS_FUNCTION_PTR(0x01FF804C) = ctr_interrupt_irq_veneer;
 	ACCESS_FUNCTION_PTR(0x01FF8054) = ctr_interrupt_fiq_veneer;
 
+	//Actual exception handling code. Jumps to the secondary handler.
 	ACCESS_FUNCTION_PTR(0x01FF8000) = (interrupt_function)0xEA000006u;
 	ACCESS_FUNCTION_PTR(0x01FF8004) = (interrupt_function)0xEA000007u;
 	ACCESS_FUNCTION_PTR(0x01FF8008) = (interrupt_function)0xEA000008u;
@@ -84,6 +98,9 @@ void ctr_interrupt_prepare(void)
 	ACCESS_FUNCTION_PTR(0x01FF8018) = (interrupt_function)0xEA00000Au;
 	ACCESS_FUNCTION_PTR(0x01FF801C) = (interrupt_function)0xEA00000Bu;
 
+	ctr_flush_cache();
+
+	//switch to low vectors
 	asm volatile (
 		"mrc p15, 0, r0, c1, c0, 0 \n\t"
 		"bic r0, #(1<<13) \n\t"

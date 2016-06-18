@@ -1,11 +1,19 @@
+@*******************************************************************************
+@* Copyright (C) 2016 Gabriel Marcano
+@*
+@* Refer to the COPYING.txt file at the top of the project directory. If that is
+@* missing, this file is licensed under the GPL version 2.0 or later.
+@*
+@******************************************************************************/
+
 .arm
 
 .align 4
 
-.global ctr_interrupt_reset_veneer, ctr_interrupt_undef_veneer, \
-	ctr_interrupt_swi_veneer, ctr_interrupt_preabrt_veneer, \
-	ctr_interrupt_databrt_veneer, ctr_interrupt_irq_veneer, \
-	ctr_interrupt_fiq_veneer
+.global ctr_interrupt_reset_veneer, ctr_interrupt_undef_veneer
+.global ctr_interrupt_swi_veneer, ctr_interrupt_preabrt_veneer
+.global ctr_interrupt_databrt_veneer, ctr_interrupt_irq_veneer
+.global ctr_interrupt_fiq_veneer
 
 .extern ctr_interrupt_handlers
 
