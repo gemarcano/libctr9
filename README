@@ -24,9 +24,11 @@ development. The plan is for it to eventually grow to something like libnds.
 Currently the main contribution to this library is a generic disk IO framework
 that has been designed for ease of use and extensibility.
 
-The library is linked using LTO, meaning that if one's program also uses LTO,
-the linker when linking the final executable will be able to throw out parts of
-the library that are not in use, reducing executable size.
+The library was meant to be linked with LTO, but due to technical limitations of
+devKitARM with GCC 5.3, it is not. Instead, it is compiled with
+-ffunction-section, so if the final executable uses the gc-section option for
+the linker, the linker when linking the final executable will be able to throw
+out parts of the library that are not in use, reducing executable size.
 
 Note this library is still in active development and the API is not considered
 stable. Breaking changes will be mentioned in commits at the very least.
@@ -48,8 +50,8 @@ Compiling
 
 The Autotools setup assumes that devkitarm is already in the PATH.
 
- # this is if the 3ds compiler isn't in the path
- export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin 
+ # this following line is if the 3ds compiler isn't in the path
+ export PATH=${PATH}:${DEVKITPRO}/bin:${DEVKITARM}/bin
  autoreconf -if
  ./configure --host arm-none-eabi --prefix=[lib install path]
  make
@@ -66,14 +68,14 @@ Installation
 --------------------------------------------------------------------------------
 
 TBD. This library is built using Autotools, so it supports the 'make install'
-and 'make uninstall' targets. Be sure to set --prefix when calling configure 
+and 'make uninstall' targets. Be sure to set --prefix when calling configure
 if either of the preceeding targets will be used, else by default the generated
-Makefile will install to /usr/local/ !
+Makefile will install to /usr/local/ (most likely)) !
 
 Example (after having compiled):
   #this will install to the directory specified in prefix, or /usr/local/ if
-  #prefix isn't defined!
-  make install 
+  #prefix isn't defined (most likely)!
+  make install
 
 
 --------------------------------------------------------------------------------
@@ -88,6 +90,11 @@ Example:
   arm-none-eabi-gcc -I$HOME/.local/usr/arm-none-eabi-9/include \
     -L$HOME/.local/usr/arm-none-eabi-9/lib -Os -Wall -Wextra -Wpedantic hello.c
 
+One setup that is recommended is to export a variable such as, CTRARM9, to point
+to the root of the prefix where libctr9_io is installed. This way, it is easier
+to point to the lib and include directories (such as by using $CTRARM9/include
+and $CTRARM9/lib).
+
 
 --------------------------------------------------------------------------------
 Documentation
@@ -97,6 +104,9 @@ This project uses Doxygen markup in order to facilitate the generation of
 documentation, which should be found when generated in the doc/ folder. Each
 header in the include/ directory should also be well documented and can be used
 as reference for programming.
+
+In addition, some documentation is hosted in GitHub pages:
+	https://gemarcano.github.io/libctr9_io/
 
 
 --------------------------------------------------------------------------------
