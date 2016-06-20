@@ -13,6 +13,7 @@
 #include <ctr9/io/fatfs/diskio.h>
 #include <ctr9/ctr_system.h>
 #include <ctr9/ctr_interrupt.h>
+#include <ctr9/ctr_screen.h>
 
 #include "test.h"
 
@@ -477,7 +478,6 @@ void abort_interrupt(const uint32_t*);
 
 int main()
 {
-	ctr_flush_cache();
 	draw_init((draw_s*)0x23FFFE00);
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0x111111);
@@ -574,6 +574,28 @@ int main()
 	//Cause a data abort :P
 	*(volatile u32*)0xFFFFFFF0;
 	printf("Returned from the abort.\n");
+
+	printf("Trying to turn off top screen\n");
+	input_wait();
+	ctr_screen_disable_backlight(CTR_SCREEN_TOP);
+	input_wait();
+	ctr_screen_enable_backlight(CTR_SCREEN_TOP);
+	printf("done: Trying to turn off top screen\n");
+
+	printf("Trying to turn off bottom screen\n");
+	input_wait();
+	ctr_screen_disable_backlight(CTR_SCREEN_BOTTOM);
+	input_wait();
+	ctr_screen_enable_backlight(CTR_SCREEN_BOTTOM);
+	printf("done: Trying to turn off bottom screen\n");
+
+	printf("Trying to turn off both screens\n");
+	input_wait();
+	ctr_screen_disable_backlight(CTR_SCREEN_BOTH);
+	input_wait();
+	ctr_screen_enable_backlight(CTR_SCREEN_BOTTOM | CTR_SCREEN_TOP);
+	printf("Trying to turn off both screens\n");
+	input_wait();
 
 	ctr_system_poweroff();
 	return 0;
