@@ -32,11 +32,11 @@ void ctr_flush_cache(void)
 			uint32_t line_and_segment = line | segment;
 			clean_and_flush(line_and_segment); //effectively the mcr opcode
 
-			//The number of lines depends on the cache size, 0x800 for the
+			//The number of lines depends on the cache size, 0x400 for the
 			//3DS data cache since it has 8KB of cache. Refer to the ARM
 			//documentation for more details.
-			line += 0x800;
-		} while (line != 0x800);
+			line += 0x20;
+		} while (line != 0x400);
 
 		segment += 0x40000000;
 	} while (segment != 0); //It overflows eventually
