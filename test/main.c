@@ -15,6 +15,8 @@
 #include <ctr9/ctr_interrupt.h>
 #include <ctr9/ctr_screen.h>
 
+#include <ctr9/ctr_rtc.h>
+
 #include "test.h"
 
 void scribble_screen(void);
@@ -597,6 +599,30 @@ int main()
 	printf("Trying to turn off both screens\n");
 	input_wait();
 
+	printf("Testing i2c write crap\n");
+
+	ctr_rtc_data rtc = ctr_rtc_gettime();
+	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
+	printf("Testing a single write\n");
+	input_wait();
+	i2cWriteRegister(I2C_DEV_MCU, 0x30, 0x11);
+	rtc = ctr_rtc_gettime();
+	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
+	
+	printf("Testing a single write from buffer\n");
+	input_wait();
+	uint8_t temp_rtc[8] = { 11, 22, 33, 44, 0xBB, 0xAA,  0x99, 0x88};
+	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 1);
+	rtc = ctr_rtc_gettime();
+	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
+
+	printf("Testing a multiple write from buffer\n");
+	input_wait();
+	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 8);
+	rtc = ctr_rtc_gettime();
+	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
+
+	input_wait();
 	ctr_system_poweroff();
 	return 0;
 }
