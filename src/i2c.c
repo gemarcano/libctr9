@@ -98,34 +98,38 @@ uint8_t i2cReadRegister(uint8_t dev_id, uint8_t reg) {
 }
 
 bool i2cReadRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t* buffer, size_t buf_size) {
-    uint8_t bus_id = i2cGetDeviceBusId(dev_id);
-    uint8_t dev_addr = i2cGetDeviceRegAddr(dev_id);
+    
+	if (buf_size)
+	{
+		uint8_t bus_id = i2cGetDeviceBusId(dev_id);
+		uint8_t dev_addr = i2cGetDeviceRegAddr(dev_id);
 
-    size_t j = 0;
-    while (!i2cSelectDevice(bus_id, dev_addr)
-        || !i2cSelectRegister(bus_id, reg)
-        || !i2cSelectDevice(bus_id, dev_addr | 1))
-    {
-        i2cWaitBusy(bus_id);
-        *i2cGetCntReg(bus_id) = 0xC5;
-        i2cWaitBusy(bus_id);
-        if (++j >= 8)
-            return false;
-    }
+		size_t j = 0;
+		while (!i2cSelectDevice(bus_id, dev_addr)
+			|| !i2cSelectRegister(bus_id, reg)
+			|| !i2cSelectDevice(bus_id, dev_addr | 1))
+		{
+			i2cWaitBusy(bus_id);
+			*i2cGetCntReg(bus_id) = 0xC5;
+			i2cWaitBusy(bus_id);
+			if (++j >= 8)
+				return false;
+		}
 
-    if (buf_size != 1) {
-        for (size_t i = 0; i < buf_size - 1; i++) {
-            i2cWaitBusy(bus_id);
-            *i2cGetCntReg(bus_id) = 0xF0;
-            i2cWaitBusy(bus_id);
-            buffer[i] = *i2cGetDataReg(bus_id);
-        }
-    }
+		if (buf_size != 1) {
+			for (size_t i = 0; i < buf_size - 1; i++) {
+				i2cWaitBusy(bus_id);
+				*i2cGetCntReg(bus_id) = 0xF0;
+				i2cWaitBusy(bus_id);
+				buffer[i] = *i2cGetDataReg(bus_id);
+			}
+		}
 
-    i2cWaitBusy(bus_id);
-    *i2cGetCntReg(bus_id) = 0xE1;
-    i2cWaitBusy(bus_id);
-    buffer[buf_size-1] = *i2cGetDataReg(bus_id);
+		i2cWaitBusy(bus_id);
+		*i2cGetCntReg(bus_id) = 0xE1;
+		i2cWaitBusy(bus_id);
+		buffer[buf_size-1] = *i2cGetDataReg(bus_id);
+	}
     return true;
 }
 
@@ -150,33 +154,37 @@ bool i2cWriteRegister(uint8_t dev_id, uint8_t reg, uint8_t data) {
 }
 
 bool i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, const uint8_t *buffer, size_t buf_size) {
-    uint8_t bus_id = i2cGetDeviceBusId(dev_id);
-    uint8_t dev_addr = i2cGetDeviceRegAddr(dev_id);
 
-    size_t j = 0;
-    while (!i2cSelectDevice(bus_id, dev_addr)
-        || !i2cSelectRegister(bus_id, reg))
-    {
-        i2cWaitBusy(bus_id);
-        *i2cGetCntReg(bus_id) = 0xC5;
-        i2cWaitBusy(bus_id);
-        if (++j >= 8)
-            return false;
-    }
+	if (buf_size)
+	{
+		uint8_t bus_id = i2cGetDeviceBusId(dev_id);
+		uint8_t dev_addr = i2cGetDeviceRegAddr(dev_id);
 
-    if (buf_size != 1) {
-        for (size_t i = 0; i < buf_size - 1; i++) {
-            i2cWaitBusy(bus_id);
-            *i2cGetDataReg(bus_id) = buffer[i];
-            *i2cGetCntReg(bus_id) = 0xD0;
-            i2cWaitBusy(bus_id);
-        }
-    }
+		size_t j = 0;
+		while (!i2cSelectDevice(bus_id, dev_addr)
+			|| !i2cSelectRegister(bus_id, reg))
+		{
+			i2cWaitBusy(bus_id);
+			*i2cGetCntReg(bus_id) = 0xC5;
+			i2cWaitBusy(bus_id);
+			if (++j >= 8)
+				return false;
+		}
 
-    i2cWaitBusy(bus_id);
-    *i2cGetDataReg(bus_id) = buffer[buf_size-1];
-    *i2cGetCntReg(bus_id) = 0xC1;
-    i2cWaitBusy(bus_id);
+		if (buf_size != 1) {
+			for (size_t i = 0; i < buf_size - 1; i++) {
+				i2cWaitBusy(bus_id);
+				*i2cGetDataReg(bus_id) = buffer[i];
+				*i2cGetCntReg(bus_id) = 0xD0;
+				i2cWaitBusy(bus_id);
+			}
+		}
+
+		i2cWaitBusy(bus_id);
+		*i2cGetDataReg(bus_id) = buffer[buf_size-1];
+		*i2cGetCntReg(bus_id) = 0xC1;
+		i2cWaitBusy(bus_id);
+	}
     return true;
 }
 
