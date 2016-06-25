@@ -149,7 +149,7 @@ bool i2cWriteRegister(uint8_t dev_id, uint8_t reg, uint8_t data) {
     return false;
 }
 
-bool i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t *buffer, size_t buf_size) {
+bool i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, const uint8_t *buffer, size_t buf_size) {
     uint8_t bus_id = i2cGetDeviceBusId(dev_id);
     uint8_t dev_addr = i2cGetDeviceRegAddr(dev_id);
 

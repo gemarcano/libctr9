@@ -35,5 +35,5 @@ uint8_t i2cReadRegister(uint8_t dev_id, uint8_t reg);
 bool i2cWriteRegister(uint8_t dev_id, uint8_t reg, uint8_t data);
 
 bool i2cReadRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t *buffer, size_t buf_size);
-bool i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t *buffer, size_t buf_size);
+bool i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, const uint8_t *buffer, size_t buf_size);
 
