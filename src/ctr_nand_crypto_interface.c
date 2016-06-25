@@ -154,7 +154,7 @@ void ctr_nand_crypto_interface_destroy(ctr_nand_crypto_interface *crypto_io)
 	*crypto_io = (ctr_nand_crypto_interface){0};
 }
 
-int ctr_nand_crypto_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_nand_crypto_interface_read(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)
 {
 	int res = 0;
 	if (count)
@@ -169,7 +169,7 @@ int ctr_nand_crypto_interface_read(void *io, void *buffer, size_t buffer_size, s
 	return res;
 }
 
-int ctr_nand_crypto_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)
+int ctr_nand_crypto_interface_write(void *io, const void *buffer, size_t buffer_size, uint64_t position)
 {
 	ctr_nand_crypto_interface *crypto_io = io;
 	alignas(32) uint8_t buf[0x200*4];
@@ -220,7 +220,7 @@ int ctr_nand_crypto_interface_write_sector(void *io, const void *buffer, size_t 
 	return res;
 }
 
-size_t ctr_nand_crypto_interface_disk_size(void *io)
+uint64_t ctr_nand_crypto_interface_disk_size(void *io)
 {
 	ctr_nand_crypto_interface *crypto_io = io;
 	return crypto_io->lower_io->disk_size(io);

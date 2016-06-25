@@ -54,7 +54,7 @@ typedef int (*sdmmc_writesectors)(uint32_t sector_no, uint32_t numsectors, const
  *
  *  @returns 0 upon success, anything else means an error.
  */
-static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read);
+static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, uint64_t position, size_t count, sdmmc_readsectors read);
 
 /** @brief General implementation for writing bytes using sdmmc functions.
  *
@@ -67,7 +67,7 @@ static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size
  *
  *  @returns 0 upon success, anything else means an error.
  */
-static inline int ctr_sdmmc_implementation_write(const void *buffer, size_t buffer_size, size_t position, sdmmc_readsectors read, sdmmc_writesectors write);
+static inline int ctr_sdmmc_implementation_write(const void *buffer, size_t buffer_size, uint64_t position, sdmmc_readsectors read, sdmmc_writesectors write);
 
 /** @brief General implementation for reading sectors using an sdmmc function.
  *
@@ -81,7 +81,7 @@ static inline int ctr_sdmmc_implementation_write(const void *buffer, size_t buff
  *
  *  @returns 0 upon success, anything else means an error.
  */
-static inline int ctr_sdmmc_implementation_read_sector(void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read);
+static inline int ctr_sdmmc_implementation_read_sector(void *buffer, size_t buffer_size, size_t sector, size_t count, sdmmc_readsectors read);
 
 /** @brief General implementation for writing sectors using an sdmmc function.
  *
@@ -97,7 +97,7 @@ static inline int ctr_sdmmc_implementation_read_sector(void *buffer, size_t buff
  *
  *  @returns 0 upon success, anything else means an error.
  */
-static inline int ctr_sdmmc_implementation_write_sector(const void *buffer, size_t buffer_size, size_t position, sdmmc_writesectors write);
+static inline int ctr_sdmmc_implementation_write_sector(const void *buffer, size_t buffer_size, size_t sector, sdmmc_writesectors write);
 
 #include "ctr_sdmmc_implementation.c"
 

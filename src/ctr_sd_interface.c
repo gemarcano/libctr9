@@ -33,12 +33,12 @@ void ctr_sd_interface_destroy(ctr_sd_interface *io)
 	*io = (ctr_sd_interface){0};
 }
 
-int ctr_sd_interface_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_sd_interface_read(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)
 {
 	return ctr_sdmmc_implementation_read(buffer, buffer_size, position, count, sdmmc_sdcard_readsectors);
 }
 
-int ctr_sd_interface_write(void *io, const void *buffer, size_t buffer_size, size_t position)
+int ctr_sd_interface_write(void *io, const void *buffer, size_t buffer_size, uint64_t position)
 {
 	return ctr_sdmmc_implementation_write(buffer, buffer_size, position, sdmmc_sdcard_readsectors, sdmmc_sdcard_writesectors);
 }
@@ -53,9 +53,9 @@ int ctr_sd_interface_write_sector(void *io, const void *buffer, size_t buffer_si
 	return ctr_sdmmc_implementation_write_sector(buffer, buffer_size, sector, sdmmc_sdcard_writesectors);
 }
 
-size_t ctr_sd_interface_disk_size(void *io)
+uint64_t ctr_sd_interface_disk_size(void *io)
 {
-	return getMMCDevice(1)->total_size * 512u;
+	return getMMCDevice(1)->total_size * (uint64_t)512u;
 }
 
 size_t ctr_sd_interface_sector_size(void *io)

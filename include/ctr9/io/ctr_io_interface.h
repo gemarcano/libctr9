@@ -28,7 +28,7 @@ extern "C" {
  *
  *	@returns 0 upon success, anything else means an error.
  */
-typedef int (*ctr_io_interface_read)(void *io, void *buffer, size_t buffer_size, size_t position, size_t count);
+typedef int (*ctr_io_interface_read)(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count);
 
 /**	@brief Pointer to an io interface function used to write.
  *
@@ -40,7 +40,7 @@ typedef int (*ctr_io_interface_read)(void *io, void *buffer, size_t buffer_size,
  *
  *	@returns 0 upon success, anything else means an error.
  */
-typedef int (*ctr_io_interface_write)(void *io, const void *buffer, size_t buffer_size, size_t position);
+typedef int (*ctr_io_interface_write)(void *io, const void *buffer, size_t buffer_size, uint64_t position);
 
 /**	@brief Pointer to an io interface function used to read sectors.
  *
@@ -75,7 +75,7 @@ typedef int (*ctr_io_interface_write_sector)(void *io, const void *buffer, size_
  *
  *	@returns The size of the io interface's underlying disk storage in bytes.
  */
-typedef size_t (*ctr_io_interface_disk_size)(void *io);
+typedef uint64_t (*ctr_io_interface_disk_size)(void *io);
 
 /**	@brief Pointer to an io interface function used to get the sector size in
  *		bytes.
@@ -109,7 +109,7 @@ typedef struct
  *
  *	@returns 0 upon success, anything else means an error.
  */
-int ctr_io_read(void *io, void *buffer, size_t buffer_size, size_t position, size_t count);
+int ctr_io_read(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count);
 
 /**	@brief Writes bytes to the given io interface.
  *
@@ -124,7 +124,7 @@ int ctr_io_read(void *io, void *buffer, size_t buffer_size, size_t position, siz
  *
  *	@returns 0 upon success, anything else means an error.
  */
-int ctr_io_write(void *io, const void *buffer, size_t buffer_size, size_t position);
+int ctr_io_write(void *io, const void *buffer, size_t buffer_size, uint64_t position);
 
 /**	@brief Reads sectors from the given io interface.
  *
@@ -168,7 +168,7 @@ int ctr_io_write_sector(void *io, const void *buffer, size_t buffer_size, size_t
  *
  *	@returns The size of the io interface's underlying disk storage in bytes.
  */
-size_t ctr_io_disk_size(void *io);
+uint64_t ctr_io_disk_size(void *io);
 
 /**	@brief Returns the size of the sectors used by the io interface.
  *

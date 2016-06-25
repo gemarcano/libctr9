@@ -10,7 +10,7 @@
 #include "sdmmc/sdmmc.h"
 #include <string.h>
 
-static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, size_t position, size_t count, sdmmc_readsectors read)
+static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, uint64_t position, size_t count, sdmmc_readsectors read)
 {
 	int res = 0;
 	if (count && buffer_size)
@@ -64,7 +64,7 @@ static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size
 	return res;
 }
 
-static inline int ctr_sdmmc_implementation_write(const void *buffer, size_t buffer_size, size_t position, sdmmc_readsectors read, sdmmc_writesectors write)
+static inline int ctr_sdmmc_implementation_write(const void *buffer, size_t buffer_size, uint64_t position, sdmmc_readsectors read, sdmmc_writesectors write)
 {
 	int res = 0;
 	if (buffer_size)
