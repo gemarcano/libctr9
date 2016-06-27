@@ -8,6 +8,8 @@ test_LDADD = $(top_builddir)/src/libctr9.a
 
 EXTRA_DIST = arm9loaderhax.ld
 
+.PHONY: FORCE
+
 FORCE:
 
 $(top_builddir)/src/libctr9.a: FORCE

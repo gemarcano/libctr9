@@ -122,7 +122,7 @@ uint64_t ctr_fatfs_interface_disk_size(void *io);
  */
 size_t ctr_fatfs_interface_sector_size(void *io);
 
-#ifdef __clusplus
+#ifdef __cplusplus
 }
 #endif
 
