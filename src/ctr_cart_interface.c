@@ -10,7 +10,7 @@
 
 #define CFG_CARDCONF2 (*(volatile uint8_t*)0x10000010)
 
-static const ctr_io_interface nand_crypto_base =
+static const ctr_io_interface cart_base =
 {
 	ctr_cart_interface_read,
 	ctr_cart_interface_noop_write,
@@ -32,6 +32,8 @@ bool ctr_cart_interface_initialize(ctr_cart_interface *cart)
 		memset(cart, 0, sizeof(*cart));
 		return false;
 	}
+
+	cart->base = cart_base;
 
 	Cart_Init();
 	CTR_CmdReadHeader(cart->ncch_raw);
