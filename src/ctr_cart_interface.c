@@ -1,4 +1,4 @@
-#include <ctr9/ctr_cart.h>
+#include <ctr9/io/ctr_cart_interface.h>
 #include <ctr9/ctr_headers.h>
 #include <ctr9/gamecart/protocol.h>
 #include <ctr9/gamecart/command_ctr.h>
@@ -9,12 +9,22 @@
 
 #define CFG_CARDCONF2 (*(volatile uint8_t*)0x10000010)
 
+static const ctr_io_interface nand_crypto_base =
+{
+	ctr_cart_interface_read,
+	ctr_cart_interface_noop_write,
+	ctr_cart_interface_read_sector,
+	ctr_cart_interface_noop_write_sector,
+	ctr_cart_interface_disk_size,
+	ctr_cart_interface_sector_size
+};
+
 bool ctr_cart_inserted(void)
 {
 	return !(CFG_CARDCONF2 & 0x1);
 }
 
-bool ctr_cart_initialize(ctr_cart *cart)
+bool ctr_cart_interface_initialize(ctr_cart_interface *cart)
 {
 	if (!ctr_cart_inserted())
 	{
@@ -38,8 +48,9 @@ bool ctr_cart_initialize(ctr_cart *cart)
 	return true;
 }
 
-void ctr_cart_raw_read_sector(ctr_cart *cart, void* buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_cart_raw_interface_read_sector(void *io, void* buffer, size_t buffer_size, size_t sector, size_t count)
 {
+	ctr_cart_interface *cart = io;
 	if (count && ctr_cart_inserted())
 	{
 		const uint32_t unit_size = cart->media_unit_size;
@@ -48,8 +59,30 @@ void ctr_cart_raw_read_sector(ctr_cart *cart, void* buffer, size_t buffer_size, 
 		//else it does the right thing for unaligned access
 		CTR_CmdReadData(sector, unit_size, count_read, buffer);
 	}
+	return 0;
 }
 
+int ctr_cart_interface_noop_write(void *io, const void *buffer, size_t buffer_size, uint64_t position)
+{
+	return 1; //Can't write
+}
+
+int ctr_cart_interface_noop_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector)
+{
+	return 1; //Can't write
+}
+
+size_t ctr_cart_interface_sector_size(void *io)
+{
+	ctr_cart_interface *cart = io;
+	return cart->media_unit_size;
+}
+
+uint64_t ctr_cart_interface_disk_size(void *io)
+{
+	ctr_cart_interface *cart = io;
+	return cart->ncsd_header.media_size * cart->media_unit_size;
+}
 
 //Helper functions for handling the logical reading of cart stuff.
 //Cart has 3 sections: pre ncch header, ncch header, post
@@ -76,7 +109,7 @@ static inline size_t header_ncch_read(
 	size_t unit_size,
 	size_t current_sector,
 	size_t sectors_to_read,
-	ctr_cart *cart);
+	ctr_cart_interface *cart);
 
 static inline size_t header_ff_read(
 	void *buffer,
@@ -84,7 +117,7 @@ static inline size_t header_ff_read(
 	size_t unit_size,
 	size_t current_sector,
 	size_t sectors_to_read,
-	ctr_cart *cart);
+	ctr_cart_interface *cart);
 
 static inline size_t header_read(
 	void *buffer,
@@ -93,13 +126,14 @@ static inline size_t header_read(
 	size_t unit_size,
 	size_t current_sector,
 	size_t sectors_to_read,
-	ctr_cart *cart);
+	ctr_cart_interface *cart);
 
 #define MIN(A, B) (A) < (B) ? (A) : (B)
 #define MAX(A, B) (A) > (B) ? (A) : (B)
 
-void ctr_cart_read_sector(ctr_cart *cart, void* buffer, size_t buffer_size, size_t sector, size_t count)
+int ctr_cart_interface_read_sector(void *io, void* buffer, size_t buffer_size, size_t sector, size_t count)
 {
+	ctr_cart_interface *cart = io;
 	const uint32_t unit_size = cart->media_unit_size;
 	size_t sectors_left = MIN(buffer_size / unit_size, count);
 
@@ -108,7 +142,7 @@ void ctr_cart_read_sector(ctr_cart *cart, void* buffer, size_t buffer_size, size
 		const size_t ncch_start = 0x1000/unit_size;
 		const size_t ncch_end = 0x4000/unit_size;
 		size_t current_sector = sector;
-		
+
 		//section 1: pre header data
 		if (sectors_left && current_sector < ncch_start)
 		{
@@ -133,13 +167,15 @@ void ctr_cart_read_sector(ctr_cart *cart, void* buffer, size_t buffer_size, size
 			CTR_CmdReadData(current_sector, unit_size, sectors_left, buffer);
 		}
 	}
+
+	return 0;
 }
 
-typedef void (*read_sector_function)(ctr_cart *, void*, size_t, size_t, size_t);
+typedef int (*read_sector_function)(void*, void*, size_t, size_t, size_t);
 
 //FIXME This implementation was pretty much copied from include/ctr9/io/ctr_sdmmc_implementation.c
 //Would be nice to have one master implementation that everyone can target.
-static inline int ctr_cart_read_impl(ctr_cart *cart, void* buffer, size_t buffer_size, size_t position, size_t count, read_sector_function read)
+static inline int ctr_cart_interface_read_impl(ctr_cart_interface *cart, void* buffer, size_t buffer_size, size_t position, size_t count, read_sector_function read)
 {
 	int res = 0;
 	if (count && buffer_size)
@@ -194,19 +230,14 @@ static inline int ctr_cart_read_impl(ctr_cart *cart, void* buffer, size_t buffer
 	return res;
 }
 
-int ctr_cart_read(ctr_cart *cart, void* buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_cart_interface_read(void *io, void* buffer, size_t buffer_size, uint64_t position, size_t count)
 {
-	return ctr_cart_read_impl(cart, buffer, buffer_size, position, count, ctr_cart_read_sector);
+	return ctr_cart_interface_read_impl(io, buffer, buffer_size, position, count, ctr_cart_interface_read_sector);
 }
 
-int ctr_cart_raw_read(ctr_cart *cart, void* buffer, size_t buffer_size, size_t position, size_t count)
+int ctr_cart_raw_interface_read(void *io, void* buffer, size_t buffer_size, uint64_t position, size_t count)
 {
-	return ctr_cart_read_impl(cart, buffer, buffer_size, position, count, ctr_cart_raw_read_sector);
-}
-
-size_t ctr_cart_rom_size(ctr_cart *cart)
-{
-	return cart->ncsd_header.media_size * cart->media_unit_size;
+	return ctr_cart_interface_read_impl(io, buffer, buffer_size, position, count, ctr_cart_raw_interface_read_sector);
 }
 
 static inline size_t pre_header_read(
@@ -218,7 +249,7 @@ static inline size_t pre_header_read(
 
 {
 	const size_t pre_header_count = MIN(sectors_to_read, ncch_start - current_sector);
-	if (pre_header_count) 
+	if (pre_header_count)
 	{
 		CTR_CmdReadData(current_sector, unit_size, pre_header_count, buffer);
 	}
@@ -231,7 +262,7 @@ static inline size_t header_ncch_read(
 	size_t unit_size,
 	size_t current_sector,
 	size_t sectors_to_read,
-	ctr_cart *cart)
+	ctr_cart_interface *cart)
 
 {
 	const size_t ncch_count = MIN(sectors_to_read, ncch_start + 0x200/unit_size - current_sector);
@@ -249,7 +280,7 @@ static inline size_t header_ff_read(
 	size_t unit_size,
 	size_t current_sector,
 	size_t sectors_to_read,
-	ctr_cart *cart)
+	ctr_cart_interface *cart)
 
 {
 	const size_t ff_count = MIN(sectors_to_read, ncch_end - current_sector);
@@ -267,7 +298,7 @@ static inline size_t header_read(
 	size_t unit_size,
 	size_t current_sector,
 	size_t sectors_to_read,
-	ctr_cart *cart)
+	ctr_cart_interface *cart)
 
 {
 	const size_t header_count = MIN(sectors_to_read, ncch_end - current_sector);

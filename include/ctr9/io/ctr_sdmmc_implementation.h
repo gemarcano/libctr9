@@ -43,7 +43,6 @@ typedef int (*sdmmc_readsectors)(uint32_t sector_no, uint32_t numsectors, uint8_
  */
 typedef int (*sdmmc_writesectors)(uint32_t sector_no, uint32_t numsectors, const uint8_t *in);
 
-
 /** @brief General implementation for reading bytes using an sdmmc function.
  *
  *  @param[out] buffer Pointer to the buffer.

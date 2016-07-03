@@ -8,6 +8,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+void ioDelay(uint32_t thing);
+
 void CTR_SetSecKey(uint32_t value) {
     REG_CTRCARDSECCNT |= ((value & 3) << 8) | 4;
     while (!(REG_CTRCARDSECCNT & 0x4000));

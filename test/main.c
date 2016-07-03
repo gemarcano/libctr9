@@ -16,7 +16,7 @@
 #include <ctr9/ctr_screen.h>
 
 #include <ctr9/ctr_rtc.h>
-#include <ctr9/ctr_cart.h>
+#include <ctr9/io/ctr_cart_interface.h>
 
 #include "test.h"
 
@@ -624,13 +624,13 @@ int main()
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 
 	printf("Trying to read cart header...\n");
-	ctr_cart cart;
-	printf("Initialize cart: %d\n", ctr_cart_initialize(&cart));
+	ctr_cart_interface cart;
+	printf("Initialize cart: %d\n", ctr_cart_interface_initialize(&cart));
 	printf("%c%c%c%c\n", cart.ncsd_header.magic[0], cart.ncsd_header.magic[1], cart.ncsd_header.magic[2], cart.ncsd_header.magic[3]);
 	printf("%c%c%c%c\n", cart.ncch_header.magic[0], cart.ncch_header.magic[1], cart.ncch_header.magic[2], cart.ncch_header.magic[3]);
 
 	uint8_t temporary_cart[0x8000] = {0};
-	ctr_cart_read_sector(&cart, temporary_cart, 0x8000, 0, 0x8000 / cart.media_unit_size);
+	ctr_cart_interface_read_sector(&cart, temporary_cart, 0x8000, 0, 0x8000 / cart.media_unit_size);
 
 	printf("cart media unit size: %d\n", cart.media_unit_size);
 	printf("Finished reading, now trying to dump to SD.\n");
@@ -642,10 +642,10 @@ int main()
 	int open_res = f_open(&file, "SD:/dump.dump.bin", FA_WRITE | FA_CREATE_ALWAYS);
 	unsigned int bw;
 	int write_res = f_write(&file, temporary_cart, 0x8000, &bw);
-	ctr_cart_read(&cart, temporary_cart, 0x8000, 0x100, 4);
+	ctr_cart_interface_read(&cart, temporary_cart, 0x8000, 0x100, 4);
 	f_write(&file, temporary_cart, 4, &bw);
 	f_close(&file);
-	printf("ROM SIZE: %X\n", ctr_cart_rom_size(&cart));
+	printf("ROM SIZE: %X\n", ctr_cart_interface_disk_size(&cart));
 	printf("Finished dumping, hopefully.: %d\n %d %d\n", open_res, write_res, bw);
 	input_wait();
 	ctr_system_poweroff();

@@ -17,6 +17,8 @@
 
 extern uint8_t* bottomScreen;
 
+void ioDelay(uint32_t thing);
+
 uint32_t CartID = 0xFFFFFFFFu;
 uint32_t CartType = 0;
 
