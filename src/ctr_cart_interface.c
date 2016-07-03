@@ -2,6 +2,7 @@
 #include <ctr9/ctr_headers.h>
 #include <ctr9/gamecart/protocol.h>
 #include <ctr9/gamecart/command_ctr.h>
+#include <ctr9/io/ctr_io_implementation.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -171,73 +172,14 @@ int ctr_cart_interface_read_sector(void *io, void* buffer, size_t buffer_size, s
 	return 0;
 }
 
-typedef int (*read_sector_function)(void*, void*, size_t, size_t, size_t);
-
-//FIXME This implementation was pretty much copied from include/ctr9/io/ctr_sdmmc_implementation.c
-//Would be nice to have one master implementation that everyone can target.
-static inline int ctr_cart_interface_read_impl(ctr_cart_interface *cart, void* buffer, size_t buffer_size, size_t position, size_t count, read_sector_function read)
-{
-	int res = 0;
-	if (count && buffer_size)
-	{
-		size_t total_readable = count < buffer_size ? count : buffer_size;
-
-		uint8_t *dest = buffer;
-		const size_t unit_size = cart->media_unit_size;
-		uint8_t buf[unit_size];
-		const size_t base_sector = position / unit_size;
-
-		size_t bytes_read = 0;
-		size_t sectors_read = 0;
-
-		//Section 1: read first sector to extract the right number of bytes from it
-		const size_t start_location = position % unit_size;
-		read(cart, buf, sizeof(buf), base_sector, 1);
-		if (res) return res;
-
-		sectors_read++;
-
-		size_t section_readable = unit_size - start_location;
-		if (section_readable > total_readable)
-		{
-			section_readable = total_readable;
-		}
-
-		memcpy(dest, &buf[start_location], section_readable);
-		bytes_read += section_readable;
-
-		//Section 2: read all sectors until the last one
-		section_readable = (total_readable - bytes_read);
-		size_t mid_sectors = section_readable / unit_size;
-
-		if (mid_sectors)
-		{
-			read(cart, dest + bytes_read, section_readable, base_sector + sectors_read, mid_sectors);
-			if (res) return res;
-			sectors_read += mid_sectors;
-			bytes_read += mid_sectors * unit_size;
-		}
-
-		//Section 3: read last sector to extract the right number of bytes from it
-		section_readable = total_readable - bytes_read;
-		if (!res && section_readable)
-		{
-			read(cart, buf, sizeof(buf), base_sector + sectors_read, 1);
-			if (res) return res;
-			memcpy(dest + bytes_read, buf, section_readable);
-		}
-	}
-	return res;
-}
-
 int ctr_cart_interface_read(void *io, void* buffer, size_t buffer_size, uint64_t position, size_t count)
 {
-	return ctr_cart_interface_read_impl(io, buffer, buffer_size, position, count, ctr_cart_interface_read_sector);
+	return ctr_io_implementation_read(io, buffer, buffer_size, position, count, ctr_cart_interface_read_sector);
 }
 
 int ctr_cart_raw_interface_read(void *io, void* buffer, size_t buffer_size, uint64_t position, size_t count)
 {
-	return ctr_cart_interface_read_impl(io, buffer, buffer_size, position, count, ctr_cart_raw_interface_read_sector);
+	return ctr_io_implementation_read(io, buffer, buffer_size, position, count, ctr_cart_raw_interface_read_sector);
 }
 
 static inline size_t pre_header_read(

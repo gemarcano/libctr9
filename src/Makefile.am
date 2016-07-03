@@ -51,7 +51,9 @@ ctrioinclude_HEADERS = $(includedirectory)/ctr9/io/ctr_fatfs_interface.h \
 	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.c \
 	$(includedirectory)/ctr9/io/ctr_disks.h \
 	$(includedirectory)/ctr9/io/ctr_fatfs.h \
-	$(includedirectory)/ctr9/io/ctr_cart_interface.h
+	$(includedirectory)/ctr9/io/ctr_cart_interface.h \
+	$(includedirectory)/ctr9/io/ctr_io_implementation.h \
+	$(includedirectory)/ctr9/io/ctr_io_implementation.c
 
 ctrfatfsinclude_HEADERS = $(includedirectory)/ctr9/io/fatfs/ff.h \
 	$(includedirectory)/ctr9/io/fatfs/ctr_fatfs_disk.h \

@@ -100,7 +100,7 @@ static inline int ctr_sdmmc_implementation_write_sector(const void *buffer, size
 
 #include "ctr_sdmmc_implementation.c"
 
-#ifdef __clusplus
+#ifdef __cplusplus
 }
 #endif
 
