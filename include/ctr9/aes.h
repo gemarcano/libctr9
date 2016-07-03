@@ -23,6 +23,7 @@
 #define REG_AESKEYFIFO ((volatile uint32_t*)0x10009100)
 #define REG_AESKEYXFIFO ((volatile uint32_t*)0x10009104)
 #define REG_AESKEYYFIFO ((volatile uint32_t*)0x10009108)
+#define REG_AESMAC ((volatile uint32_t*)0x10009030)
 // see https://www.3dbrew.org/wiki/AES_Registers#AES_KEY0.2F1.2F2.2F3
 #define REG_AESKEY0123 ((volatile uint32_t*)0x10009040)
 

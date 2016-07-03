@@ -6,7 +6,10 @@ libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	ctr_rtc.c fatfs/diskio.c fatfs/ff.c fatfs/option/unicode.c ctr_system.c \
 	ctr_fatfs_interface.c fatfs/ctr_fatfs_disk.c ctr_disks.c \
 	fatfs/ctr_fatfs_disk.c ctr_fatfs.c ctr_interrupt.c ctr_system_ARM.c \
-	ctr_interrupt_asm.s ctr_screen.c ctr_hid.c
+	ctr_interrupt_asm.s ctr_screen.c ctr_hid.c ctr_pxi.c gamecart/command_ctr.c\
+	gamecart/command_ntr.c  gamecart/protocol.c  gamecart/protocol_ctr.c  \
+	gamecart/protocol_ntr.c ctr_cart.c gamecart/delay.s ctr_headers.c
+
 
 ctr_interrupt.o : AM_CFLAGS += -marm -fno-delete-null-pointer-checks #Force ARM mode for ctr_interrupt
 ctr_system_ARM.o : AM_CFLAGS += -marm #Force ARM mode for ctr_system_ARM
@@ -19,6 +22,7 @@ includedirectory = $(top_srcdir)/include
 
 ctrincludedir = $(includedir)/ctr9
 ctrioincludedir = $(includedir)/ctr9/io
+ctrgamecartincludedir = $(includedir)/ctr9/gamecart
 ctrfatfsincludedir = $(includedir)/ctr9/io/fatfs
 ctrsdmmcincludedir = $(includedir)/ctr9/io/sdmmc
 
@@ -27,7 +31,17 @@ ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
 	$(includedirectory)/ctr9/i2c.h $(includedirectory)/ctr9/io.h \
 	$(includedirectory)/ctr9/sha.h $(includedirectory)/ctr9/ctr_interrupt.h \
 	$(includedirectory)/ctr9/ctr_screen.h \
-	$(includedirectory)/ctr9/ctr_hid.h 
+	$(includedirectory)/ctr9/ctr_hid.h \ 
+	$(includedirectory)/ctr9/ctr_pxi.h \
+	$(includedirectory)/ctr9/ctr_cart.h \
+	$(includedirectory)/ctr9/ctr_headers.h
+
+
+ctrgamecartinclude_HEADERS = $(includedirectory)/ctr9/gamecart/protocol.h \
+	$(includedirectory)/ctr9/gamecart/command_ctr.h \
+	$(includedirectory)/ctr9/gamecart/command_ntr.h \
+	$(includedirectory)/ctr9/gamecart/protocol_ctr.h \
+	$(includedirectory)/ctr9/gamecart/protocol_ntr.h
 
 ctrioinclude_HEADERS = $(includedirectory)/ctr9/io/ctr_fatfs_interface.h \
 	$(includedirectory)/ctr9/io/ctr_io_interface.h \
