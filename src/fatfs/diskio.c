@@ -80,13 +80,11 @@ DRESULT disk_read (
 	DRESULT res = RES_PARERR;
 	if (pdrv < CTR_DISK_COUNT)
 	{
-		int result;
-
 		ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
 
 		if (!(disk->status & STA_NOINIT))
 		{
-			result = ctr_io_read_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset, count);
+			int result = ctr_io_read_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset, count);
 			res = result ? RES_ERROR : RES_OK;
 		}
 	}
@@ -110,13 +108,11 @@ DRESULT disk_write (
 	DRESULT res = RES_PARERR;
 	if (pdrv < CTR_DISK_COUNT)
 	{
-		int result;
-
 		ctr_fatfs_disk *disk = &ctr_fatfs_disks[pdrv];
 
 		if (!(disk->status & STA_NOINIT))
 		{
-			result = ctr_io_write_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset);
+			int result = ctr_io_write_sector(disk->io, buff, count * 0x200, sector + disk->sector_offset);
 			res = result ? RES_ERROR : RES_OK;
 		}
 	}

@@ -27,7 +27,6 @@ void ctr_fatfs_default_setup(ctr_nand_crypto_interface *ctr_io, ctr_nand_crypto_
 
 void ctr_fatfs_disk_initialize(ctr_fatfs_disk *disk, void *io, size_t sector_offset, size_t sectors)
 {
-	size_t sector_size = ctr_io_sector_size(io);
 	*disk = (ctr_fatfs_disk){io, sector_offset, sectors, STA_NOINIT};
 }
 

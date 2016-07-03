@@ -118,7 +118,6 @@ static void AES_SetKeyControl(uint32_t a) {
 
 //returns 1 if MAC valid otherwise 0
 static uint8_t card_aes(uint32_t *out, uint32_t *buff, size_t size) { // note size param ignored
-    uint8_t tmp = *REG_AESKEYCNT;
     *REG_AESCNT = 0x10C00;    //flush r/w fifo macsize = 001
 
     (*(volatile uint8_t*)0x10000008) |= 0x0C; //???

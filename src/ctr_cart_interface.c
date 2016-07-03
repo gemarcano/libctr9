@@ -82,7 +82,7 @@ size_t ctr_cart_interface_sector_size(void *io)
 uint64_t ctr_cart_interface_disk_size(void *io)
 {
 	ctr_cart_interface *cart = io;
-	return cart->ncsd_header.media_size * cart->media_unit_size;
+	return (uint64_t)cart->ncsd_header.media_size * cart->media_unit_size;
 }
 
 //Helper functions for handling the logical reading of cart stuff.
