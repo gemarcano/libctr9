@@ -10,6 +10,10 @@
 #include "sdmmc/sdmmc.h"
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline int ctr_sdmmc_implementation_read(void *buffer, size_t buffer_size, uint64_t position, size_t count, sdmmc_readsectors read)
 {
 	int res = 0;
@@ -136,4 +140,9 @@ static inline int ctr_sdmmc_implementation_write_sector(const void *buffer, size
 	}
 	return res;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 

@@ -69,11 +69,11 @@ static inline int ctr_io_implementation_read(void *io, void *buffer, size_t buff
  */
 static inline int ctr_io_implementation_write(void *io, const void *buffer, size_t buffer_size, uint64_t position, ctr_io_implementation_read_sector_f read, ctr_io_implementation_write_sector_f write);
 
-#include "ctr_io_implementation.c"
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "ctr_io_implementation.c"
 
 #endif//CTR_IO_IMPLEMENTATION_H_
 

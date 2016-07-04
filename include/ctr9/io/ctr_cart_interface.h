@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
 #ifndef CTR_CART_H_
 #define CTR_CART_H_
 
@@ -8,10 +16,15 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
 	ctr_io_interface base;
-
+	
+	uint32_t cart_id;
 	//From looking at  the cart code, the header may only be 0x200 in size...
 	ctr_ncch_header ncch_header;
 	uint8_t ncch_raw[0x200];
@@ -32,6 +45,10 @@ size_t ctr_cart_interface_sector_size(void *io);
 
 int ctr_cart_raw_interface_read_sector(void *io, void* buffer, size_t buffer_size, size_t sector, size_t count);
 int ctr_cart_raw_interface_read(void *io, void* buffer, size_t buffer_size, uint64_t position, size_t count);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_CART_H_
 

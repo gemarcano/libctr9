@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif//__cplusplus
+#endif
 
 /**	@brief Pointer to an io interface function used to read.
  *
@@ -181,7 +181,7 @@ size_t ctr_io_sector_size(void *io);
 
 #ifdef __cplusplus
 }
-#endif//__cplusplus
+#endif
 
 #endif//CTR_IO_INTERFACE_H_
 

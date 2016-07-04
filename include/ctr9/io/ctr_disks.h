@@ -5,6 +5,10 @@
 #include <ctr9/io/ctr_nand_crypto_interface.h>
 #include <ctr9/io/ctr_sd_interface.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**	@brief Convenience function to help initialize the IO interfaces commonly
  *		used in 3DS applications.
  *
@@ -30,6 +34,10 @@ int ctr_disks_initialize(
 	ctr_nand_crypto_interface *ctr_io,
 	ctr_nand_crypto_interface *twl_io,
 	ctr_sd_interface *sd_io);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_DISKS_H_
 

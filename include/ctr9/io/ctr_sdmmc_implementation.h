@@ -98,11 +98,11 @@ static inline int ctr_sdmmc_implementation_read_sector(void *buffer, size_t buff
  */
 static inline int ctr_sdmmc_implementation_write_sector(const void *buffer, size_t buffer_size, size_t sector, sdmmc_writesectors write);
 
-#include "ctr_sdmmc_implementation.c"
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "ctr_sdmmc_implementation.c"
 
 #endif//CTR_SDMMC_IMPLEMENTATION_H_
 

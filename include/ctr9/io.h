@@ -16,6 +16,8 @@
 #include "io/ctr_fatfs_interface.h"
 #include "io/ctr_disks.h"
 #include "io/fatfs/ctr_fatfs_disk.h"
+#include "io/ctr_fatfs.h"
+#include "io/ctr_cart_interface.h"
 
 #endif//CTR_IO_H_
 

@@ -6,6 +6,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define REG_NTRCARDMCNT    (*(volatile uint16_t*)0x10164000)
 #define REG_NTRCARDMDATA   (*(volatile uint16_t*)0x10164002)
 #define REG_NTRCARDROMCNT  (*(volatile uint32_t*)0x10164004)
@@ -62,3 +66,8 @@
 #define NTRKEY_PARAM 0x3F1FFFu
 
 void NTR_SendCommand(const uint32_t command[2], uint32_t pageSize, uint32_t latency, void* buffer);
+
+#ifdef __cplusplus
+}
+#endif
+

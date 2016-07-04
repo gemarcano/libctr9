@@ -17,6 +17,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**	@brief Enumerations for the different ARM9 CPU exceptions
  *
  *	These enumerations can be used as indices to set handlers for the exceptions
@@ -73,6 +77,10 @@ void ctr_interrupt_prepare(void);
  *		can be either Thumb or ARM code.
  */
 void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, void (*interrupt)(uint32_t*));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_INTERRUPT_H_
 

@@ -5,6 +5,10 @@
 #pragma once
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define REG_CARDCONF  (*(volatile uint16_t*)0x1000000C)
 #define REG_CARDCONF2 (*(volatile uint8_t*)0x10000010)
 
@@ -23,3 +27,9 @@ int Cart_IsInserted(void);
 uint32_t Cart_GetID(void);
 void Cart_Secure_Init(uint32_t* buf, uint32_t* out);
 void Cart_Dummy(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+

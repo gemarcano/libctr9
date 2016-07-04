@@ -13,6 +13,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
 	uint8_t seconds, minutes, hours, pad_, day, month, year;
@@ -34,6 +38,10 @@ void ctr_rtc_init(void);
  *	@returns The binary representation of the RTC BCD data.
  */
 ctr_rtc_data ctr_rtc_gettime(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_RTC_H_
 

@@ -16,6 +16,10 @@
 #include <ctr9/io/ctr_nand_crypto_interface.h>
 #include <ctr9/io/ctr_sd_interface.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**	@brief Structure holding information used by the fatfs implementation for
  *		keeping track of which io interfaces are used for which partition
  *		access.
@@ -56,6 +60,10 @@ void ctr_fatfs_disk_initialize(ctr_fatfs_disk *disk, void *io, size_t sector_off
 /**	@brief Destroys/clears the ctr_fatfs_disk structure.
  */
 void ctr_fatfs_disk_destroy(ctr_fatfs_disk *disk);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_FATFS_DISK_H_
 

@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define I2C1_REG_OFF 0x10161000
 #define I2C2_REG_OFF 0x10144000
 #define I2C3_REG_OFF 0x10148000
@@ -36,4 +40,8 @@ bool i2cWriteRegister(uint8_t dev_id, uint8_t reg, uint8_t data);
 
 bool i2cReadRegisterBuffer(uint8_t dev_id, uint8_t reg, uint8_t *buffer, size_t buf_size);
 bool i2cWriteRegisterBuffer(uint8_t dev_id, uint8_t reg, const uint8_t *buffer, size_t buf_size);
+
+#ifdef __cplusplus
+}
+#endif
 

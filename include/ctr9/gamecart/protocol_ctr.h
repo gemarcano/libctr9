@@ -7,6 +7,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define REG_CTRCARDCNT     (*(volatile uint32_t*)0x10004000)
 #define REG_CTRCARDBLKCNT  (*(volatile uint32_t*)0x10004004)
 #define REG_CTRCARDSECCNT  (*(volatile uint32_t*)0x10004008)
@@ -41,3 +45,8 @@ void CTR_SetSecKey(uint32_t value);
 void CTR_SetSecSeed(const uint32_t* seed, bool flag);
 
 void CTR_SendCommand(const uint32_t command[4], uint32_t pageSize, uint32_t blocks, uint32_t latency, void* buffer);
+
+#ifdef __cplusplus
+}
+#endif
+

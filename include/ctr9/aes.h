@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define AES_BLOCK_SIZE 0x10
 
 #define AES_CCM_DECRYPT_MODE (0u << 27)
@@ -23,7 +27,7 @@
 #define REG_AESKEYFIFO ((volatile uint32_t*)0x10009100)
 #define REG_AESKEYXFIFO ((volatile uint32_t*)0x10009104)
 #define REG_AESKEYYFIFO ((volatile uint32_t*)0x10009108)
-#define REG_AESMAC ((volatile uint32_t*)0x10009030)
+#define REG_AESMAC      ((volatile uint32_t*)0x10009030)
 // see https://www.3dbrew.org/wiki/AES_Registers#AES_KEY0.2F1.2F2.2F3
 #define REG_AESKEY0123 ((volatile uint32_t*)0x10009040)
 
@@ -40,7 +44,6 @@
 #define AES_CNT_TITLEKEY_DECRYPT_MODE (AES_CBC_DECRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
 #define AES_CNT_TITLEKEY_ENCRYPT_MODE (AES_CBC_ENCRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
 
-
 void setup_aeskeyX(uint8_t keyslot, void* keyx);
 void setup_aeskeyY(uint8_t keyslot, void* keyy);
 void setup_aeskey(uint8_t keyslot, void* keyy);
@@ -55,4 +58,8 @@ uint32_t aes_getwritecount(void);
 uint32_t aes_getreadcount(void);
 uint32_t aescnt_checkwrite(void);
 uint32_t aescnt_checkread(void);
+
+#ifdef __cplusplus
+}
+#endif
 

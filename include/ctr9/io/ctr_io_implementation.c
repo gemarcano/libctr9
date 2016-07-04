@@ -7,8 +7,11 @@
  ******************************************************************************/
 
 #include "ctr_io_implementation.h"
-#include "sdmmc/sdmmc.h"
 #include <string.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static inline int ctr_io_implementation_read(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count, ctr_io_implementation_read_sector_f read)
 {
@@ -109,4 +112,8 @@ static inline int ctr_io_implementation_write(void *io, const void *buffer, size
 	}
 	return res;
 }
+
+#ifdef __cplusplus
+}
+#endif
 

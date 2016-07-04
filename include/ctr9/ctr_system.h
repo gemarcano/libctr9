@@ -13,6 +13,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @brief Enumeration describing the running system.
  */
 typedef enum
@@ -65,6 +69,10 @@ ctr_system_type ctr_get_system_type(void);
  *		buffer has been drained.
  */
 void ctr_flush_cache(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_SYSTEM_H_
 

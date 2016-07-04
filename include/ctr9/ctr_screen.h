@@ -1,5 +1,19 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #ifndef CTR_SCREEN_H_
 #define CTR_SCREEN_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum
 {
@@ -25,6 +39,9 @@ void ctr_screen_enable_backlight(ctr_screen_enum aScreens);
  */
 void ctr_screen_disable_backlight(ctr_screen_enum aScreens);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_SCREEN_H_
 

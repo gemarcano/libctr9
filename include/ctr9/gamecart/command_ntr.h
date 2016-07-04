@@ -6,6 +6,15 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void NTR_CmdReset(void);
 uint32_t NTR_CmdGetCartId(void);
 void NTR_CmdEnter16ByteMode(void);
+
+#ifdef __cplusplus
+}
+#endif
+

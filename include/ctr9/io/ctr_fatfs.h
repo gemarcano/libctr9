@@ -15,6 +15,10 @@
 #include <ctr9/io/ctr_nand_crypto_interface.h>
 #include <ctr9/io/ctr_sd_interface.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**	@brief Initializes the entire IO subsystem.
  *
  *	This is a helper function that takes in pointers to all necessary io
@@ -42,6 +46,11 @@ int ctr_fatfs_initialize(
 	ctr_nand_crypto_interface *ctr_io,
 	ctr_nand_crypto_interface *twl_io,
 	ctr_sd_interface *sd_io);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif//CTR_FATFS_H_
 

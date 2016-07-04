@@ -1,8 +1,22 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #ifndef CTR_HID_H_
 #define CTR_HID_H_
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef uint32_t ctr_hid_button_type;
 
@@ -24,6 +38,10 @@ typedef uint32_t ctr_hid_button_type;
 
 bool ctr_hid_button_status(ctr_hid_button_type buttons);
 ctr_hid_button_type ctr_hid_get_buttons(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_HID_H_
 

@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define REG_SHACNT      ((volatile uint32_t*)0x1000A000)
 #define REG_SHABLKCNT   ((volatile uint32_t*)0x1000A004)
 #define REG_SHAHASH     ((volatile uint32_t*)0x1000A040)
@@ -21,8 +25,11 @@
 #define SHA224_MODE             0x00000010u
 #define SHA1_MODE               0x00000020u
 
-
 void sha_init(uint32_t mode);
 void sha_update(const void* src, uint32_t size);
 void sha_get(void* res);
+
+#ifdef __cplusplus
+}
+#endif
 

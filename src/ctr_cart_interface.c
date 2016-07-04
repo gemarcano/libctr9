@@ -39,6 +39,7 @@ bool ctr_cart_interface_initialize(ctr_cart_interface *cart)
 	CTR_CmdReadHeader(cart->ncch_raw);
 	ctr_ncch_header_load(&cart->ncch_header, cart->ncch_raw, 0x200);
 
+	cart->cart_id = Cart_GetID();
 	uint32_t buffer[0x200/4];
 	memcpy(buffer, cart->ncch_raw, 0x200);
 	Cart_Secure_Init(buffer, cart->sec_keys);

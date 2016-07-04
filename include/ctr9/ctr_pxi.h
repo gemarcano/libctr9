@@ -1,8 +1,22 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
+/** @file */
+
 #ifndef CTR_PXI_H_
 #define CTR_PXI_H_
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define PXI_SYNC9 (*(uint32_t*)0x10008000)
 #define PXI_CNT9 (*(uint32_t*)0x10008004)
@@ -38,6 +52,10 @@ bool ctr_pxi_get_error(void);
 bool ctr_pxi_push(uint32_t aData);
 
 bool ctr_pxi_pop(uint32_t *apData);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_PXI_H_
 
