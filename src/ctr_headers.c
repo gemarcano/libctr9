@@ -8,7 +8,7 @@
 	memcpy(&HDR_DST, (DATA) + (OFFSET), sizeof(HDR_DST)); \
 		OFFSET += sizeof(HDR_DST)
 
-void ctr_ncsd_header_load(ctr_ncsd_header *header, uint8_t *data, size_t data_size)
+void ctr_ncsd_header_load(ctr_ncsd_cart_header *header, const uint8_t *data, size_t data_size)
 {
 	if (data_size < 0x200) return;
 
@@ -37,7 +37,7 @@ void ctr_ncsd_header_load(ctr_ncsd_header *header, uint8_t *data, size_t data_si
 	header->save_crypto_extra = data[0x1FF];
 }
 
-void ctr_ncch_header_load(ctr_ncch_header *header, uint8_t *data, size_t data_size)
+void ctr_ncch_header_load(ctr_ncch_header *header, const uint8_t *data, size_t data_size)
 {
 	if (data_size < 0x200) return;
 	size_t offset = 0;

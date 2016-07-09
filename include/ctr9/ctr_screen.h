@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+/**	@brief Enum describing screen configurations
+ */
 typedef enum
 {
 	CTR_SCREEN_NONE = 0,

@@ -14,21 +14,23 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/**	@brief Struct representing the NCSD header for carts.
+ */
 typedef struct
-{   
+{
 	uint8_t signature[0x100]; //rsa 2048 signature of a sha256 of the header
-	uint8_t magic[4];
-	uint32_t media_size; 
-	uint8_t media_id[8]; //or title id
+	uint8_t magic[4]; //Should be the string NCSD
+	uint32_t media_size; //Size of NCSD image, in media units
+	uint8_t media_id[8]; //or title id (CTR-[etc])
 	uint8_t partition_type[8]; //0 == none, 1 == normal, 3 == FIRM, 4 == AGB_FIRM save
-	uint8_t partition_crypt[8]; //each byte of partition_* corresponds to a partition in the table
+	uint8_t partition_crypt[8]; //one byte per partition in the table
 	struct
-	{   
-		uint32_t media_offset;
-		uint32_t media_length;
+	{
+		uint32_t media_offset; //in media units
+		uint32_t media_length; //in media units
 	} partition_offset_length_table[8];
-	
-	uint8_t exheader_sha256[0x20];
+
+	uint8_t exheader_sha256[0x20]; //sha256 of exheader
 	uint32_t header_size;
 	uint32_t sector_zero_offset;
 	uint8_t partition_id_table[8][8];
@@ -38,8 +40,10 @@ typedef struct
 	uint8_t anti_piracy_; //This is a guess on the function of this thing, based on 3dbrew
 	uint8_t save_crypto_extra; //This is somewhat documented in Parition Flags for 9.6+
 
-} ctr_ncsd_header;
+} ctr_ncsd_cart_header;
 
+/**	@brief Struct representing the NCCH header.
+ */
 typedef struct
 {
 	uint8_t signature[0x100]; //rsa 2048 signature of a sha256 of the header
@@ -73,8 +77,33 @@ typedef struct
 	uint8_t romfs_superblock_sha256[0x20]; //starting at 0x0 of the RomFS over the number of media units specified in the RomFS hash region size
 } ctr_ncch_header;
 
-void ctr_ncsd_header_load(ctr_ncsd_header *header, uint8_t *data, size_t data_size);
-void ctr_ncch_header_load(ctr_ncch_header *header, uint8_t *data, size_t data_size);
+/**	@brief Loads the given ctr_ncsd_cart_header with the data from the actual
+ *		NCSD cart header in memory.
+ *
+ *	@param[out] header Struct to load.
+ *	@param[in] data Pointer to NCSD in memory to load into header struct.
+ *	@param[in] data_size Length of the buffer in memory with the NCSD data. This
+ *		function expects this number to be greater than or equal to 0x200, else
+ *		the function refuses to load the struct, even partially.
+ *
+ *	@post If data_size >= 0x200, header is updated to include the parsed data
+ *		from the NCSD header in memory, else nothing happens.
+ */
+void ctr_ncsd_header_load(ctr_ncsd_cart_header *header, const uint8_t *data, size_t data_size);
+
+/**	@brief Loads the given ctr_ncch_header with the data from the actual NCCH
+ *		header in memory.
+ *
+ *	@param[out] header Struct to load.
+ *	@param[in] data Pointer to NCCH in memory to load into header struct.
+ *	@param[in] data_size Length of the buffer in memory with the NCCH data. This
+ *		function expects this number to be greater than or equal to 0x200, else
+ *		the function refuses to load the struct, even partially.
+ *
+ *	@post If data_size >= 0x200, header is updated to include the parsed data
+ *		from the NCSD header in memory, else nothing happens.
+ */
+void ctr_ncch_header_load(ctr_ncch_header *header, const uint8_t *data, size_t data_size);
 
 #endif//CTR_HEADERS_H_
 

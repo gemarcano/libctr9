@@ -18,10 +18,13 @@
 extern "C" {
 #endif
 
+//Button type
 typedef uint32_t ctr_hid_button_type;
 
+//HID Register
 #define CTR_HID_REG     ((volatile ctr_hid_button_type*)0x10146000)
 
+//Button definitions
 #define CTR_HID_NON     0x000u
 #define CTR_HID_A       0x001u
 #define CTR_HID_B       0x002u
@@ -36,7 +39,19 @@ typedef uint32_t ctr_hid_button_type;
 #define CTR_HID_X       0x400u
 #define CTR_HID_Y       0x800u
 
+/**	@brief Returns whether the given button combination is pressed or not.
+ *
+ *	@param[in] buttons Button combination to check if they are pressed.
+ *
+ *	@returns True if the buttons passed in are pressed, false otherwise.
+ */
 bool ctr_hid_button_status(ctr_hid_button_type buttons);
+
+/**	@brief Returns all of the buttons pressed at the instant this is called.
+ *
+ *	@brief returns All of the buttons pressed at the time this function is
+ *		called.
+ */
 ctr_hid_button_type ctr_hid_get_buttons(void);
 
 #ifdef __cplusplus
