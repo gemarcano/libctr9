@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2016 Gabriel Marcano
+ *
+ * Refer to the COPYING.txt file at the top of the project directory. If that is
+ * missing, this file is licensed under the GPL version 2.0 or later.
+ *
+ ******************************************************************************/
+
 #include <ctr9/io/fatfs/ctr_fatfs_disk.h>
 
 void ctr_fatfs_default_setup(ctr_nand_crypto_interface *ctr_io, ctr_nand_crypto_interface *twl_io, ctr_sd_interface *sd_io)
