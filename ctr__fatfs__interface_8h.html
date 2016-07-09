@@ -130,21 +130,21 @@ Functions</h2></td></tr>
 <tr class="memitem:a154cf97cb27d30da18376f81cbcb989f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#a154cf97cb27d30da18376f81cbcb989f">ctr_fatfs_interface_destroy</a> (<a class="el" href="structctr__fatfs__interface.html">ctr_fatfs_interface</a> *io)</td></tr>
 <tr class="memdesc:a154cf97cb27d30da18376f81cbcb989f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the given fatfs io interface object.  <a href="#a154cf97cb27d30da18376f81cbcb989f">More...</a><br /></td></tr>
 <tr class="separator:a154cf97cb27d30da18376f81cbcb989f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a506079db2395309d67009fc8d54da868"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#a506079db2395309d67009fc8d54da868">ctr_fatfs_interface_read</a> (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td></tr>
-<tr class="memdesc:a506079db2395309d67009fc8d54da868"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads bytes from the given io interface.  <a href="#a506079db2395309d67009fc8d54da868">More...</a><br /></td></tr>
-<tr class="separator:a506079db2395309d67009fc8d54da868"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb663f84c82bb0feb9532dfd784eb611"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#acb663f84c82bb0feb9532dfd784eb611">ctr_fatfs_interface_write</a> (void *io, const void *buffer, size_t buffer_size, size_t position)</td></tr>
-<tr class="memdesc:acb663f84c82bb0feb9532dfd784eb611"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes bytes to the given io interface.  <a href="#acb663f84c82bb0feb9532dfd784eb611">More...</a><br /></td></tr>
-<tr class="separator:acb663f84c82bb0feb9532dfd784eb611"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb75f2c8423da1684342c13591060adf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#acb75f2c8423da1684342c13591060adf">ctr_fatfs_interface_read_sector</a> (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td></tr>
-<tr class="memdesc:acb75f2c8423da1684342c13591060adf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads sectors from the given io interface.  <a href="#acb75f2c8423da1684342c13591060adf">More...</a><br /></td></tr>
-<tr class="separator:acb75f2c8423da1684342c13591060adf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a652cb2a2eda61ac3da605a6bab7f04a3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#a652cb2a2eda61ac3da605a6bab7f04a3">ctr_fatfs_interface_write_sector</a> (void *io, const void *buffer, size_t buffer_size, size_t position)</td></tr>
-<tr class="memdesc:a652cb2a2eda61ac3da605a6bab7f04a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes sectors from the given io interface.  <a href="#a652cb2a2eda61ac3da605a6bab7f04a3">More...</a><br /></td></tr>
-<tr class="separator:a652cb2a2eda61ac3da605a6bab7f04a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4e8fe3bced6006309e0de185043628c"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#ae4e8fe3bced6006309e0de185043628c">ctr_fatfs_interface_disk_size</a> (void *io)</td></tr>
-<tr class="memdesc:ae4e8fe3bced6006309e0de185043628c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the underlying disk for the given io interface.  <a href="#ae4e8fe3bced6006309e0de185043628c">More...</a><br /></td></tr>
-<tr class="separator:ae4e8fe3bced6006309e0de185043628c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef004bfa32f077213afa75e6390341d7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#aef004bfa32f077213afa75e6390341d7">ctr_fatfs_interface_read</a> (void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)</td></tr>
+<tr class="memdesc:aef004bfa32f077213afa75e6390341d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads bytes from the given io interface.  <a href="#aef004bfa32f077213afa75e6390341d7">More...</a><br /></td></tr>
+<tr class="separator:aef004bfa32f077213afa75e6390341d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a023373e30735d5a0ac0a55964be80fc3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#a023373e30735d5a0ac0a55964be80fc3">ctr_fatfs_interface_write</a> (void *io, const void *buffer, size_t buffer_size, uint64_t position)</td></tr>
+<tr class="memdesc:a023373e30735d5a0ac0a55964be80fc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes bytes to the given io interface.  <a href="#a023373e30735d5a0ac0a55964be80fc3">More...</a><br /></td></tr>
+<tr class="separator:a023373e30735d5a0ac0a55964be80fc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08532934447ddef0c3fc59aef5424d8c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#a08532934447ddef0c3fc59aef5424d8c">ctr_fatfs_interface_read_sector</a> (void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)</td></tr>
+<tr class="memdesc:a08532934447ddef0c3fc59aef5424d8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads sectors from the given io interface.  <a href="#a08532934447ddef0c3fc59aef5424d8c">More...</a><br /></td></tr>
+<tr class="separator:a08532934447ddef0c3fc59aef5424d8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2f02755217dcd377b08f59be5e8b67d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#af2f02755217dcd377b08f59be5e8b67d">ctr_fatfs_interface_write_sector</a> (void *io, const void *buffer, size_t buffer_size, size_t sector)</td></tr>
+<tr class="memdesc:af2f02755217dcd377b08f59be5e8b67d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes sectors from the given io interface.  <a href="#af2f02755217dcd377b08f59be5e8b67d">More...</a><br /></td></tr>
+<tr class="separator:af2f02755217dcd377b08f59be5e8b67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd57e8f8de871a650763d6d514940319"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#acd57e8f8de871a650763d6d514940319">ctr_fatfs_interface_disk_size</a> (void *io)</td></tr>
+<tr class="memdesc:acd57e8f8de871a650763d6d514940319"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the underlying disk for the given io interface.  <a href="#acd57e8f8de871a650763d6d514940319">More...</a><br /></td></tr>
+<tr class="separator:acd57e8f8de871a650763d6d514940319"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a413e16700593e584aff1343e96b34581"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__fatfs__interface_8h.html#a413e16700593e584aff1343e96b34581">ctr_fatfs_interface_sector_size</a> (void *io)</td></tr>
 <tr class="memdesc:a413e16700593e584aff1343e96b34581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the sectors used by the io interface, which is 512 bytes for fatfs due to how it is configured.  <a href="#a413e16700593e584aff1343e96b34581">More...</a><br /></td></tr>
 <tr class="separator:a413e16700593e584aff1343e96b34581"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,12 +175,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae4e8fe3bced6006309e0de185043628c"></a>
+<a class="anchor" id="acd57e8f8de871a650763d6d514940319"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ctr_fatfs_interface_disk_size </td>
+          <td class="memname">uint64_t ctr_fatfs_interface_disk_size </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>io</em></td><td>)</td>
@@ -231,7 +231,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a506079db2395309d67009fc8d54da868"></a>
+<a class="anchor" id="aef004bfa32f077213afa75e6390341d7"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -256,7 +256,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">uint64_t&#160;</td>
           <td class="paramname"><em>position</em>, </td>
         </tr>
         <tr>
@@ -288,7 +288,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="acb75f2c8423da1684342c13591060adf"></a>
+<a class="anchor" id="a08532934447ddef0c3fc59aef5424d8c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -314,7 +314,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>position</em>, </td>
+          <td class="paramname"><em>sector</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -365,7 +365,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="acb663f84c82bb0feb9532dfd784eb611"></a>
+<a class="anchor" id="a023373e30735d5a0ac0a55964be80fc3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -390,7 +390,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">uint64_t&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>
@@ -415,7 +415,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a652cb2a2eda61ac3da605a6bab7f04a3"></a>
+<a class="anchor" id="af2f02755217dcd377b08f59be5e8b67d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -441,7 +441,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>position</em>&#160;</td>
+          <td class="paramname"><em>sector</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

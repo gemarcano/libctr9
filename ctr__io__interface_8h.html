@@ -124,53 +124,53 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ab9cde9bf42fb0444d7157b94409c3438"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#ab9cde9bf42fb0444d7157b94409c3438">ctr_io_interface_read</a>) (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td></tr>
-<tr class="memdesc:ab9cde9bf42fb0444d7157b94409c3438"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to read.  <a href="#ab9cde9bf42fb0444d7157b94409c3438">More...</a><br /></td></tr>
-<tr class="separator:ab9cde9bf42fb0444d7157b94409c3438"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a646e96cfb64d0ca0738573cb7c4b8cb6"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a646e96cfb64d0ca0738573cb7c4b8cb6">ctr_io_interface_write</a>) (void *io, const void *buffer, size_t buffer_size, size_t position)</td></tr>
-<tr class="memdesc:a646e96cfb64d0ca0738573cb7c4b8cb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to write.  <a href="#a646e96cfb64d0ca0738573cb7c4b8cb6">More...</a><br /></td></tr>
-<tr class="separator:a646e96cfb64d0ca0738573cb7c4b8cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63c301ef8d50c70b28e5c85978021254"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a63c301ef8d50c70b28e5c85978021254">ctr_io_interface_read</a>) (void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)</td></tr>
+<tr class="memdesc:a63c301ef8d50c70b28e5c85978021254"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to read.  <a href="#a63c301ef8d50c70b28e5c85978021254">More...</a><br /></td></tr>
+<tr class="separator:a63c301ef8d50c70b28e5c85978021254"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad86654bc12b694f8bcde738fabeefc56"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#ad86654bc12b694f8bcde738fabeefc56">ctr_io_interface_write</a>) (void *io, const void *buffer, size_t buffer_size, uint64_t position)</td></tr>
+<tr class="memdesc:ad86654bc12b694f8bcde738fabeefc56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to write.  <a href="#ad86654bc12b694f8bcde738fabeefc56">More...</a><br /></td></tr>
+<tr class="separator:ad86654bc12b694f8bcde738fabeefc56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34efbc360de76e7e3b6f783081f37c71"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a34efbc360de76e7e3b6f783081f37c71">ctr_io_interface_read_sector</a>) (void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)</td></tr>
 <tr class="memdesc:a34efbc360de76e7e3b6f783081f37c71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to read sectors.  <a href="#a34efbc360de76e7e3b6f783081f37c71">More...</a><br /></td></tr>
 <tr class="separator:a34efbc360de76e7e3b6f783081f37c71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0f2367bf7f0d70ea4132a071ddd3f11"><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#ae0f2367bf7f0d70ea4132a071ddd3f11">ctr_io_interface_write_sector</a>) (void *io, const void *buffer, size_t buffer_size, size_t sector)</td></tr>
 <tr class="memdesc:ae0f2367bf7f0d70ea4132a071ddd3f11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to write sectors.  <a href="#ae0f2367bf7f0d70ea4132a071ddd3f11">More...</a><br /></td></tr>
 <tr class="separator:ae0f2367bf7f0d70ea4132a071ddd3f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc0d60b225aaa94896eafbb118278bbf"><td class="memItemLeft" align="right" valign="top">typedef size_t(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#adc0d60b225aaa94896eafbb118278bbf">ctr_io_interface_disk_size</a>) (void *io)</td></tr>
-<tr class="memdesc:adc0d60b225aaa94896eafbb118278bbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to get the size of the disk.  <a href="#adc0d60b225aaa94896eafbb118278bbf">More...</a><br /></td></tr>
-<tr class="separator:adc0d60b225aaa94896eafbb118278bbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82627820c8f11f76ce3f42d288c1483a"><td class="memItemLeft" align="right" valign="top">typedef uint64_t(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a82627820c8f11f76ce3f42d288c1483a">ctr_io_interface_disk_size</a>) (void *io)</td></tr>
+<tr class="memdesc:a82627820c8f11f76ce3f42d288c1483a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to get the size of the disk.  <a href="#a82627820c8f11f76ce3f42d288c1483a">More...</a><br /></td></tr>
+<tr class="separator:a82627820c8f11f76ce3f42d288c1483a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a711603142cb4fd575422e8abfbaed9ad"><td class="memItemLeft" align="right" valign="top">typedef size_t(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a711603142cb4fd575422e8abfbaed9ad">ctr_io_interface_sector_size</a>) (void *io)</td></tr>
 <tr class="memdesc:a711603142cb4fd575422e8abfbaed9ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to an io interface function used to get the sector size in bytes.  <a href="#a711603142cb4fd575422e8abfbaed9ad">More...</a><br /></td></tr>
 <tr class="separator:a711603142cb4fd575422e8abfbaed9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acbad47942a09e56adbf08707319b627d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#acbad47942a09e56adbf08707319b627d">ctr_io_read</a> (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td></tr>
-<tr class="memdesc:acbad47942a09e56adbf08707319b627d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads bytes from the given io interface.  <a href="#acbad47942a09e56adbf08707319b627d">More...</a><br /></td></tr>
-<tr class="separator:acbad47942a09e56adbf08707319b627d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d646bbc47c6b5314f0d70f4ba1f3bb8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a4d646bbc47c6b5314f0d70f4ba1f3bb8">ctr_io_write</a> (void *io, const void *buffer, size_t buffer_size, size_t position)</td></tr>
-<tr class="memdesc:a4d646bbc47c6b5314f0d70f4ba1f3bb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes bytes to the given io interface.  <a href="#a4d646bbc47c6b5314f0d70f4ba1f3bb8">More...</a><br /></td></tr>
-<tr class="separator:a4d646bbc47c6b5314f0d70f4ba1f3bb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d14e0668f6b3938afacee8aa7539418"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a4d14e0668f6b3938afacee8aa7539418">ctr_io_read</a> (void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)</td></tr>
+<tr class="memdesc:a4d14e0668f6b3938afacee8aa7539418"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads bytes from the given io interface.  <a href="#a4d14e0668f6b3938afacee8aa7539418">More...</a><br /></td></tr>
+<tr class="separator:a4d14e0668f6b3938afacee8aa7539418"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af89eb6b8c666eec077df51b62c6718a1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#af89eb6b8c666eec077df51b62c6718a1">ctr_io_write</a> (void *io, const void *buffer, size_t buffer_size, uint64_t position)</td></tr>
+<tr class="memdesc:af89eb6b8c666eec077df51b62c6718a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes bytes to the given io interface.  <a href="#af89eb6b8c666eec077df51b62c6718a1">More...</a><br /></td></tr>
+<tr class="separator:af89eb6b8c666eec077df51b62c6718a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a949f2f5c646768e097218a973d613dec"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a949f2f5c646768e097218a973d613dec">ctr_io_read_sector</a> (void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)</td></tr>
 <tr class="memdesc:a949f2f5c646768e097218a973d613dec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads sectors from the given io interface.  <a href="#a949f2f5c646768e097218a973d613dec">More...</a><br /></td></tr>
 <tr class="separator:a949f2f5c646768e097218a973d613dec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61deea0ab3b5f922d24e8789d0170b7d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a61deea0ab3b5f922d24e8789d0170b7d">ctr_io_write_sector</a> (void *io, const void *buffer, size_t buffer_size, size_t sector)</td></tr>
 <tr class="memdesc:a61deea0ab3b5f922d24e8789d0170b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes sectors from the given io interface.  <a href="#a61deea0ab3b5f922d24e8789d0170b7d">More...</a><br /></td></tr>
 <tr class="separator:a61deea0ab3b5f922d24e8789d0170b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac79d6c6c171a5329416c875c69661670"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#ac79d6c6c171a5329416c875c69661670">ctr_io_disk_size</a> (void *io)</td></tr>
-<tr class="memdesc:ac79d6c6c171a5329416c875c69661670"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the underlying disk for the given io interface.  <a href="#ac79d6c6c171a5329416c875c69661670">More...</a><br /></td></tr>
-<tr class="separator:ac79d6c6c171a5329416c875c69661670"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a022ff6d7bcb560a65027ed1bd89e3276"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a022ff6d7bcb560a65027ed1bd89e3276">ctr_io_disk_size</a> (void *io)</td></tr>
+<tr class="memdesc:a022ff6d7bcb560a65027ed1bd89e3276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the underlying disk for the given io interface.  <a href="#a022ff6d7bcb560a65027ed1bd89e3276">More...</a><br /></td></tr>
+<tr class="separator:a022ff6d7bcb560a65027ed1bd89e3276"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a43b94b00e4e6258e6a4e6a483ecece"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__io__interface_8h.html#a9a43b94b00e4e6258e6a4e6a483ecece">ctr_io_sector_size</a> (void *io)</td></tr>
 <tr class="memdesc:a9a43b94b00e4e6258e6a4e6a483ecece"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the sectors used by the io interface.  <a href="#a9a43b94b00e4e6258e6a4e6a483ecece">More...</a><br /></td></tr>
 <tr class="separator:a9a43b94b00e4e6258e6a4e6a483ecece"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a class="anchor" id="adc0d60b225aaa94896eafbb118278bbf"></a>
+<a class="anchor" id="a82627820c8f11f76ce3f42d288c1483a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef size_t(* ctr_io_interface_disk_size) (void *io)</td>
+          <td class="memname">typedef uint64_t(* ctr_io_interface_disk_size) (void *io)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -180,12 +180,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab9cde9bf42fb0444d7157b94409c3438"></a>
+<a class="anchor" id="a63c301ef8d50c70b28e5c85978021254"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef int(* ctr_io_interface_read) (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td>
+          <td class="memname">typedef int(* ctr_io_interface_read) (void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -246,12 +246,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a646e96cfb64d0ca0738573cb7c4b8cb6"></a>
+<a class="anchor" id="ad86654bc12b694f8bcde738fabeefc56"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef int(* ctr_io_interface_write) (void *io, const void *buffer, size_t buffer_size, size_t position)</td>
+          <td class="memname">typedef int(* ctr_io_interface_write) (void *io, const void *buffer, size_t buffer_size, uint64_t position)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -295,12 +295,12 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ac79d6c6c171a5329416c875c69661670"></a>
+<a class="anchor" id="a022ff6d7bcb560a65027ed1bd89e3276"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ctr_io_disk_size </td>
+          <td class="memname">uint64_t ctr_io_disk_size </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>io</em></td><td>)</td>
@@ -315,7 +315,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="acbad47942a09e56adbf08707319b627d"></a>
+<a class="anchor" id="a4d14e0668f6b3938afacee8aa7539418"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -340,7 +340,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">uint64_t&#160;</td>
           <td class="paramname"><em>position</em>, </td>
         </tr>
         <tr>
@@ -452,7 +452,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4d646bbc47c6b5314f0d70f4ba1f3bb8"></a>
+<a class="anchor" id="af89eb6b8c666eec077df51b62c6718a1"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -477,7 +477,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">uint64_t&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>

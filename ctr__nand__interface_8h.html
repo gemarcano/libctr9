@@ -129,21 +129,21 @@ Functions</h2></td></tr>
 <tr class="memitem:a5aa05fdb2043459013aa2fd4ea54ad6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a5aa05fdb2043459013aa2fd4ea54ad6b">ctr_nand_interface_destroy</a> (<a class="el" href="structctr__nand__interface.html">ctr_nand_interface</a> *io)</td></tr>
 <tr class="memdesc:a5aa05fdb2043459013aa2fd4ea54ad6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the given NAND io interface object.  <a href="#a5aa05fdb2043459013aa2fd4ea54ad6b">More...</a><br /></td></tr>
 <tr class="separator:a5aa05fdb2043459013aa2fd4ea54ad6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4826fcc07f81f7ae5bbfdda08f0aecbe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a4826fcc07f81f7ae5bbfdda08f0aecbe">ctr_nand_interface_read</a> (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td></tr>
-<tr class="memdesc:a4826fcc07f81f7ae5bbfdda08f0aecbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads bytes from the given io interface.  <a href="#a4826fcc07f81f7ae5bbfdda08f0aecbe">More...</a><br /></td></tr>
-<tr class="separator:a4826fcc07f81f7ae5bbfdda08f0aecbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef66c68dfb0262b16036546f88a4087b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#aef66c68dfb0262b16036546f88a4087b">ctr_nand_interface_write</a> (void *io, const void *buffer, size_t buffer_size, size_t position)</td></tr>
-<tr class="memdesc:aef66c68dfb0262b16036546f88a4087b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes bytes to the given io interface.  <a href="#aef66c68dfb0262b16036546f88a4087b">More...</a><br /></td></tr>
-<tr class="separator:aef66c68dfb0262b16036546f88a4087b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97d9e1480c3744d590ff0c3b80c2140b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a97d9e1480c3744d590ff0c3b80c2140b">ctr_nand_interface_read_sector</a> (void *io, void *buffer, size_t buffer_size, size_t position, size_t count)</td></tr>
-<tr class="memdesc:a97d9e1480c3744d590ff0c3b80c2140b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads sectors from the given io interface.  <a href="#a97d9e1480c3744d590ff0c3b80c2140b">More...</a><br /></td></tr>
-<tr class="separator:a97d9e1480c3744d590ff0c3b80c2140b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9521385e63bdd19fc98816098902a79"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#ae9521385e63bdd19fc98816098902a79">ctr_nand_interface_write_sector</a> (void *io, const void *buffer, size_t buffer_size, size_t position)</td></tr>
-<tr class="memdesc:ae9521385e63bdd19fc98816098902a79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes sectors from the given io interface.  <a href="#ae9521385e63bdd19fc98816098902a79">More...</a><br /></td></tr>
-<tr class="separator:ae9521385e63bdd19fc98816098902a79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9160a69cd50ff749ead38d1f9e6c23a5"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a9160a69cd50ff749ead38d1f9e6c23a5">ctr_nand_interface_disk_size</a> (void *io)</td></tr>
-<tr class="memdesc:a9160a69cd50ff749ead38d1f9e6c23a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the underlying disk for the given io interface.  <a href="#a9160a69cd50ff749ead38d1f9e6c23a5">More...</a><br /></td></tr>
-<tr class="separator:a9160a69cd50ff749ead38d1f9e6c23a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ef05b5a51b4fc14807ff7333997ab0a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a4ef05b5a51b4fc14807ff7333997ab0a">ctr_nand_interface_read</a> (void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)</td></tr>
+<tr class="memdesc:a4ef05b5a51b4fc14807ff7333997ab0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads bytes from the given io interface.  <a href="#a4ef05b5a51b4fc14807ff7333997ab0a">More...</a><br /></td></tr>
+<tr class="separator:a4ef05b5a51b4fc14807ff7333997ab0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0f85a42816c1c62b1d4ea3c26241634"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#af0f85a42816c1c62b1d4ea3c26241634">ctr_nand_interface_write</a> (void *io, const void *buffer, size_t buffer_size, uint64_t position)</td></tr>
+<tr class="memdesc:af0f85a42816c1c62b1d4ea3c26241634"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes bytes to the given io interface.  <a href="#af0f85a42816c1c62b1d4ea3c26241634">More...</a><br /></td></tr>
+<tr class="separator:af0f85a42816c1c62b1d4ea3c26241634"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc21326e7f05a9c9833266b2c22ffeb2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#adc21326e7f05a9c9833266b2c22ffeb2">ctr_nand_interface_read_sector</a> (void *io, void *buffer, size_t buffer_size, size_t sector, size_t count)</td></tr>
+<tr class="memdesc:adc21326e7f05a9c9833266b2c22ffeb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads sectors from the given io interface.  <a href="#adc21326e7f05a9c9833266b2c22ffeb2">More...</a><br /></td></tr>
+<tr class="separator:adc21326e7f05a9c9833266b2c22ffeb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1483ab93043ae1c6f3c309cc63a260a8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a1483ab93043ae1c6f3c309cc63a260a8">ctr_nand_interface_write_sector</a> (void *io, const void *buffer, size_t buffer_size, size_t sector)</td></tr>
+<tr class="memdesc:a1483ab93043ae1c6f3c309cc63a260a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes sectors from the given io interface.  <a href="#a1483ab93043ae1c6f3c309cc63a260a8">More...</a><br /></td></tr>
+<tr class="separator:a1483ab93043ae1c6f3c309cc63a260a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a290c06532a2b53e490fc1fe0968ac770"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a290c06532a2b53e490fc1fe0968ac770">ctr_nand_interface_disk_size</a> (void *io)</td></tr>
+<tr class="memdesc:a290c06532a2b53e490fc1fe0968ac770"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the underlying disk for the given io interface.  <a href="#a290c06532a2b53e490fc1fe0968ac770">More...</a><br /></td></tr>
+<tr class="separator:a290c06532a2b53e490fc1fe0968ac770"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a573043922702f30c76d97ee3bd1d7bc9"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ctr__nand__interface_8h.html#a573043922702f30c76d97ee3bd1d7bc9">ctr_nand_interface_sector_size</a> (void *io)</td></tr>
 <tr class="memdesc:a573043922702f30c76d97ee3bd1d7bc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the sectors used by the io interface, which is 512 bytes for NAND.  <a href="#a573043922702f30c76d97ee3bd1d7bc9">More...</a><br /></td></tr>
 <tr class="separator:a573043922702f30c76d97ee3bd1d7bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,12 +174,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9160a69cd50ff749ead38d1f9e6c23a5"></a>
+<a class="anchor" id="a290c06532a2b53e490fc1fe0968ac770"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t ctr_nand_interface_disk_size </td>
+          <td class="memname">uint64_t ctr_nand_interface_disk_size </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>io</em></td><td>)</td>
@@ -218,7 +218,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4826fcc07f81f7ae5bbfdda08f0aecbe"></a>
+<a class="anchor" id="a4ef05b5a51b4fc14807ff7333997ab0a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -243,7 +243,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">uint64_t&#160;</td>
           <td class="paramname"><em>position</em>, </td>
         </tr>
         <tr>
@@ -275,7 +275,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a97d9e1480c3744d590ff0c3b80c2140b"></a>
+<a class="anchor" id="adc21326e7f05a9c9833266b2c22ffeb2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -301,7 +301,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>position</em>, </td>
+          <td class="paramname"><em>sector</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -352,7 +352,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aef66c68dfb0262b16036546f88a4087b"></a>
+<a class="anchor" id="af0f85a42816c1c62b1d4ea3c26241634"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -377,7 +377,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">uint64_t&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>
@@ -402,7 +402,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae9521385e63bdd19fc98816098902a79"></a>
+<a class="anchor" id="a1483ab93043ae1c6f3c309cc63a260a8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -428,7 +428,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>position</em>&#160;</td>
+          <td class="paramname"><em>sector</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
