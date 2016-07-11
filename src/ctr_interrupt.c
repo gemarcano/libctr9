@@ -6,8 +6,6 @@
  *
  ******************************************************************************/
 
-/** @file */
-
 #include <ctr9/ctr_interrupt.h>
 #include <ctr9/ctr_system.h>
 #include <stdint.h>

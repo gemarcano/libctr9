@@ -27,13 +27,12 @@ bool ctr_cart_inserted(void)
 
 bool ctr_cart_interface_initialize(ctr_cart_interface *cart)
 {
+	memset(cart, 0, sizeof(*cart));
+	cart->base = cart_base;
 	if (!ctr_cart_inserted())
 	{
-		memset(cart, 0, sizeof(*cart));
 		return false;
 	}
-
-	cart->base = cart_base;
 
 	Cart_Init();
 	CTR_CmdReadHeader(cart->ncch_raw);

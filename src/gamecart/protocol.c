@@ -13,7 +13,6 @@
 #include <ctr9/gamecart/protocol_ntr.h>
 #include <ctr9/gamecart/command_ctr.h>
 #include <ctr9/gamecart/command_ntr.h>
-//#include "delay.h"
 
 extern uint8_t* bottomScreen;
 

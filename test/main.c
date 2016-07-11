@@ -17,6 +17,7 @@
 
 #include <ctr9/ctr_rtc.h>
 #include <ctr9/io/ctr_cart_interface.h>
+#include <ctr9/ctr_timer.h>
 
 #include "test.h"
 
@@ -609,7 +610,7 @@ int main()
 	i2cWriteRegister(I2C_DEV_MCU, 0x30, 0x11);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
-	
+
 	printf("Testing a single write from buffer\n");
 	input_wait();
 	uint8_t temp_rtc[8] = { 11, 22, 33, 44, 0xBB, 0xAA,  0x99, 0x88};
@@ -630,6 +631,9 @@ int main()
 	printf("%c%c%c%c\n", cart.ncch_header.magic[0], cart.ncch_header.magic[1], cart.ncch_header.magic[2], cart.ncch_header.magic[3]);
 
 	uint8_t temporary_cart[0x8000] = {0};
+	printf("Cart inserted? : %d\n", ctr_cart_inserted());
+
+	if (!cart.media_unit_size) cart.media_unit_size = 512; //Make sure this is zero, because lazy
 	ctr_io_read_sector(&cart, temporary_cart, 0x8000, 0, 0x8000 / cart.media_unit_size);
 
 	printf("cart media unit size: %d\n", cart.media_unit_size);
@@ -647,6 +651,47 @@ int main()
 	f_close(&file);
 	printf("ROM SIZE: %X\n", ctr_cart_interface_disk_size(&cart));
 	printf("Finished dumping, hopefully.: %d\n %d %d\n", open_res, write_res, bw);
+
+	printf("Trying timer stuff\n");
+	ctr_timer_set_irq_enabled(CTR_TIMER0, false);
+	uint16_t starting_timer = ctr_timer_get_value(CTR_TIMER0);
+	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV1);
+	ctr_timer_set_count_up(CTR_TIMER0, false);
+	ctr_timer_set_state(CTR_TIMER0, false);
+
+	printf("Timer value: %d\n", starting_timer);
+	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+
+	ctr_timer_set_state(CTR_TIMER0, true);
+
+	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+
+	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV64);
+
+	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+
+	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV256);
+
+	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+
+	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV1024);
+
+	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+
 	input_wait();
 	ctr_system_poweroff();
 	return 0;
