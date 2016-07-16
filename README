@@ -1,6 +1,6 @@
 ________________________________________________________________________________
 
-(Working title) libctr9_io
+(Working title) libctr9
 
 Copyright 2016 Gabriel Marcano
 ________________________________________________________________________________
@@ -91,9 +91,9 @@ Example:
     -L$HOME/.local/usr/arm-none-eabi-9/lib -Os -Wall -Wextra -Wpedantic hello.c
 
 One setup that is recommended is to export a variable such as, CTRARM9, to point
-to the root of the prefix where libctr9_io is installed. This way, it is easier
-to point to the lib and include directories (such as by using $CTRARM9/include
-and $CTRARM9/lib).
+to the root of the prefix where libctr9 is installed. This way, it is easier to
+point to the lib and include directories (such as by using $CTRARM9/include and
+$CTRARM9/lib).
 
 
 --------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ header in the include/ directory should also be well documented and can be used
 as reference for programming.
 
 In addition, some documentation is hosted in GitHub pages:
-	https://gemarcano.github.io/libctr9_io/
+	https://gemarcano.github.io/libctr9/
 
 
 --------------------------------------------------------------------------------
