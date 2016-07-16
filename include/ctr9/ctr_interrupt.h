@@ -37,14 +37,6 @@ typedef enum
 	CTR_INTERRUPT_FIQ
 } ctr_interrupt_enum;
 
-/**	@brief Disables FIQ and IRQ interrupts.
- */
-void ctr_interrupt_global_disable(void);
-
-/**	@brief Enables FIQ and IRQ interrupts.
- */
-void ctr_interrupt_global_enable(void);
-
 /**	@brief Sets up the exception vectors in ITCM.
  *
  *	For this function to work, ITCM must be enabled and MPU must allow for
@@ -60,17 +52,19 @@ void ctr_interrupt_prepare(void);
  *	When the user-provided handler is called when an exception is generated,
  *	the parameter given to the function is an array with the following data
  *	from before the exception:
- *		[ cpsr, sp, lr, r0-r12 ]
+ *		[ cpsr, sp, lr, return address, r0-r12 ]
  *
- *	Note that lr is the lr as saved by the current exception mode, refer to the
- *	ARM documentation to see how much lr was modified relative to the PC of when
- *	the exceptiin was triggered. Any changes to any of the values in the input
- *	array WILL be written back to the corresponding registers when the exception
- *	returns, if the handler returns. This can be used to skip the instruction
- *	that caused a data abort, for example, by editing lr to skip it. Note that
- *	for lr adjustments, the mode of execution when the exception was triggered
- *	is important. Check the T bit of cpsr in the input array to determine the
- *	mode of execution when the exception was thrown.
+ *	Note that lr is the lr prior to running handler. The return address is what
+ *	is stored by the CPU to LR when switching into the exception handler. Refer
+ *	to the ARM documentation to see how much the return address was modified
+ *	relative to the PC of when the exceptiin was triggered. Any changes to any
+ *	of the values in the input array WILL be written back to the corresponding
+ *	registers when the exception returns, if the handler returns. This can be
+ *	used to skip the instruction that caused a data abort, for example, by
+ *	editing the reutnr address to skip it. Note that for return address
+ *	adjustments, the mode of execution when the exception was triggered is
+ *	important. Check the T bit of cpsr in the input array to determine the mode
+ *	of execution when the exception was thrown.
  *
  *	@param[in] interrupt_type Enumeration determining which exception to set up.
  *	@param[in] interrupt Handler to call when the exception is fired. The handler

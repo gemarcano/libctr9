@@ -13,11 +13,19 @@
 
 #define CTR_TIMER_REGISTER ((uint16_t(*)[2])(CTR_TIMER_REG_BASE))
 
+void ctr_timer_set_value(ctr_timer timer, uint16_t value)
+{
+	if (timer > 3)
+		return;
+
+	CTR_TIMER_REGISTER[timer][0] = value;
+}
+
 uint32_t ctr_timer_get_combined_value(ctr_timer base_timer)
 {
 	if (base_timer > 2)
 		return 0;
-	
+
 	atomic_uint_fast64_t raw = *(volatile atomic_uint_fast64_t*)(CTR_TIMER_REG_BASE + base_timer);
 	uint32_t result = ((raw >> 32) & 0xFFFF0000) | (raw & 0xFFFF);
 	return result;
@@ -27,24 +35,32 @@ uint16_t ctr_timer_get_value(ctr_timer timer)
 {
 	if (timer > 3)
 		return 0;
-	
+
 	return CTR_TIMER_REGISTER[timer][0];
 }
 
-bool ctr_timer_get_irq_enabled(ctr_timer timer)
+bool ctr_timer_get_irq_state(ctr_timer timer)
 {
 	if (timer > 3)
 		return false;
 	return CTR_TIMER_REGISTER[timer][1] & 0x0040;
 }
 
-void ctr_timer_set_irq_enabled(ctr_timer timer, bool enable)
+void ctr_timer_enable_irq(ctr_timer timer)
+{
+	if (timer > 3)
+		return;
+	uint16_t ctrl = CTR_TIMER_REGISTER[timer][1];
+	ctrl |= 1u << 6;
+	CTR_TIMER_REGISTER[timer][1] = ctrl;
+}
+
+void ctr_timer_disable_irq(ctr_timer timer)
 {
 	if (timer > 3)
 		return;
 	uint16_t ctrl = CTR_TIMER_REGISTER[timer][1];
 	ctrl &= ~0x0040u;
-	ctrl |= enable << 6;
 	CTR_TIMER_REGISTER[timer][1] = ctrl;
 }
 
@@ -55,13 +71,21 @@ bool ctr_timer_get_state(ctr_timer timer)
 	return CTR_TIMER_REGISTER[timer][2] & 0x0080;
 }
 
-void ctr_timer_set_state(ctr_timer timer, bool enable)
+void ctr_timer_enable(ctr_timer timer)
+{
+	if (timer > 3)
+		return;
+	uint16_t ctrl = CTR_TIMER_REGISTER[timer][1];
+	ctrl |= 1u << 7;
+	CTR_TIMER_REGISTER[timer][1] = ctrl;
+}
+
+void ctr_timer_disable(ctr_timer timer)
 {
 	if (timer > 3)
 		return;
 	uint16_t ctrl = CTR_TIMER_REGISTER[timer][1];
 	ctrl &= ~0x0080u;
-	ctrl |= enable << 7;
 	CTR_TIMER_REGISTER[timer][1] = ctrl;
 }
 

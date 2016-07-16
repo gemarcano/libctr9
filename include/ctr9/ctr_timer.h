@@ -36,14 +36,17 @@ typedef enum
 	CTR_TIMER3 = 3
 } ctr_timer;
 
+void ctr_timer_set_value(ctr_timer timer, uint16_t value);
 uint32_t ctr_timer_get_combined_value(ctr_timer base_timer);
 uint16_t ctr_timer_get_value(ctr_timer timer);
 
-bool ctr_timer_get_irq_enabled(ctr_timer timer);
-void ctr_timer_set_irq_enabled(ctr_timer timer, bool enable);
+void ctr_timer_enable_irq(ctr_timer timer);
+void ctr_timer_disable_irq(ctr_timer timer);
+bool ctr_timer_get_irq_state(ctr_timer timer);
 
 bool ctr_timer_get_state(ctr_timer timer);
-void ctr_timer_set_state(ctr_timer, bool enable);
+void ctr_timer_enable(ctr_timer);
+void ctr_timer_disable(ctr_timer);
 
 bool ctr_timer_get_count_up(ctr_timer timer);
 void ctr_timer_set_count_up(ctr_timer timer, bool enable);

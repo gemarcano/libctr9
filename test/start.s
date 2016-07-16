@@ -31,6 +31,11 @@ _entry:
 	@supervisor mode
 	orr r1, r0, #0x13
 	msr cpsr_c, r1
+	ldr sp, =0x8000
+
+	@system mode
+	orr r1, r0, #0x1F
+	msr cpsr_c, r1
 
 	@ Disable IRQ
 	mrs r0, cpsr

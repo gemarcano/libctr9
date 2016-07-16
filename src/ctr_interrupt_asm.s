@@ -20,20 +20,21 @@
 .macro CTR_INTERRUPT_VENEER table_offset=0
 	push {r0-r12,r14} @push "normal" registers
 
-	@switch to previous mode to grab stack pointer, then switch back
+	@switch to previous mode to grab stack pointer and LR, then switch back
 	mrs r1, cpsr
 	mrs r0, spsr
 	mov r3, r0
-	orr r3, #0xC0
-	bic r3, #0x20
+	orr r3, #0xC0 @make sure interrupts are disabled in mode to be switched to
+	bic r3, #0x20 @make sure the status flag T matches ARM mode
 
 	msr cpsr_c, r3
 	mov r3, r13
+	mov r4, r14
 	msr cpsr_c, r1
 
 	@push "special" registers, placing them in the front of the array to be
 	@passed
-	push {r0,r3,r14}
+	push {r0, r3, r4, r14}
 
 	adr r1, ctr_interrupt_handlers_location
 	ldr r2, [r1]
@@ -42,12 +43,12 @@
 	mov r0, sp
 
 	@Parameters: r0 - pointer to array on stack:
-	@    cpsr, sp, lr, r0-r12
+	@    cpsr, sp, lr, return, r0-r12
 	blx r2
 
 	@now determine the mode we were in previously
 	@if Thumb, make sure LR is updated
-	pop {r0,r3,r14}
+	pop {r0, r3, r4, r14}
 	tst r0, #0x20
 	beq 1f
 	orr r14, r14, #1

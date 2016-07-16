@@ -18,27 +18,6 @@ void ctr_interrupt_databrt_veneer(void);
 void ctr_interrupt_irq_veneer(void);
 void ctr_interrupt_fiq_veneer(void);
 
-void ctr_interrupt_global_disable(void)
-{
-	asm volatile(
-		"mrs r0, cpsr \n\t"
-		"orr r0, r0, #0x80 \n\t" //disable IRQ, bit 7, active low
-		"msr cpsr_c, r0 \n\t"
-		::: "r0"
-	);
-}
-
-void ctr_interrupt_global_enable(void)
-{
-	asm volatile (
-		"mrs r0, cpsr \n\t"
-		"bic r0, r0, #0x80 \n\t" //enable IRQ, bit 7, active low
-		"msr cpsr_c, r0 \n\t"
-		::: "r0"
-	);
-
-}
-
 typedef void (*interrupt_function)(void);
 typedef void (*ctr_interrupt_handler)(uint32_t* register_array);
 

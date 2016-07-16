@@ -18,6 +18,8 @@
 #include <ctr9/ctr_rtc.h>
 #include <ctr9/io/ctr_cart_interface.h>
 #include <ctr9/ctr_timer.h>
+#include <ctr9/ctr_system_clock.h>
+#include <ctr9/ctr_irq.h>
 
 #include "test.h"
 
@@ -478,7 +480,9 @@ static bool twl_test3(void *ctx)
 #include <ctr9/io/ctr_fatfs.h>
 
 extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
-void abort_interrupt(const uint32_t*);
+void abort_interrupt(uint32_t*);
+void prefetch_abort(uint32_t*);
+void undefined_instruction(uint32_t*);
 
 int main()
 {
@@ -572,6 +576,8 @@ int main()
 	printf("Preparing interrupts\n");
 	ctr_interrupt_prepare();
 	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, undefined_instruction);
+	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, prefetch_abort);
 	printf("abort handler: %X\n", ctr_interrupt_handlers[4]);
 	printf("testing abort\n");
 
@@ -653,44 +659,63 @@ int main()
 	printf("Finished dumping, hopefully.: %d\n %d %d\n", open_res, write_res, bw);
 
 	printf("Trying timer stuff\n");
-	ctr_timer_set_irq_enabled(CTR_TIMER0, false);
+	ctr_timer_disable_irq(CTR_TIMER0);
 	uint16_t starting_timer = ctr_timer_get_value(CTR_TIMER0);
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV1);
 	ctr_timer_set_count_up(CTR_TIMER0, false);
-	ctr_timer_set_state(CTR_TIMER0, false);
+	ctr_timer_disable(CTR_TIMER0);
+	ctr_timer_set_value(CTR_TIMER0, 0);
 
-	printf("Timer value: %d\n", starting_timer);
+	printf("Timer value: %u\n", starting_timer);
 	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
-	ctr_timer_set_state(CTR_TIMER0, true);
+	ctr_timer_enable(CTR_TIMER0);
 
-	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
 	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV64);
 
-	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
 	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV256);
 
-	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
 	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV1024);
 
-	printf("Timer effective fq: %d\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
-	printf("Timer value delta: %d\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
+
+	input_wait();
+	printf("Testing clock\n");
+	ctr_irq_initialize();
+	ctr_system_clock clock;
+	ctr_system_clock_initialize(&clock, CTR_TIMER0);
+	ctr_irq_master_enable();
+
+	for (size_t i = 0; i < 3; ++i)
+	{
+		uint64_t start = ctr_system_clock_get_ms(&clock);
+		uint64_t ms = start;
+		while (ms - start < 1000)
+		{
+			ms = ctr_system_clock_get_ms(&clock);
+		}
+		printf("second: %d\n", i);
+	}
 
 	input_wait();
 	ctr_system_poweroff();
