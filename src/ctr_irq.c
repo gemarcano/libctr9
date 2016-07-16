@@ -55,7 +55,7 @@ void ctr_irq_critical_enter(void)
 	}
 }
 
-void ctr_irq_critical_leave(void)
+void ctr_irq_critical_exit(void)
 {
 	if (!--critical_count)
 	{
@@ -77,7 +77,7 @@ typedef void (*ctr_interrupt_handler)(uint32_t *register_array);
 
 static void (*ctr_irq_handlers[29])(void) = { NULL };
 
-void ctr_irq_handler(uint32_t *register_array)
+static void ctr_irq_handler(uint32_t *register_array)
 {
 	//Check IRQ_IF
 	uint32_t pending = IRQ_IF_REG;

@@ -59,7 +59,7 @@ uint64_t ctr_system_clock_get_ms(ctr_system_clock *clock)
 {
 	ctr_irq_critical_enter();
 	uint64_t timestamp = clock->count;
-	ctr_irq_critical_leave();
+	ctr_irq_critical_exit();
 
 	uint32_t freq = ctr_timer_get_effective_frequency(clock->timer);
 	return timestamp * 1000u / (freq / (1u << 16)) ;
@@ -69,7 +69,7 @@ ctr_clock_time ctr_system_clock_get_time(ctr_system_clock *clock)
 {
 	ctr_irq_critical_enter();
 	uint64_t timestamp = clock->count;
-	ctr_irq_critical_leave();
+	ctr_irq_critical_exit();
 
 	uint32_t freq = ctr_timer_get_effective_frequency(clock->timer);
 	ctr_clock_time result;

@@ -17,13 +17,46 @@
 extern "C" {
 #endif
 
+/**	@brief Enable IRQs globally.
+ */
 void ctr_irq_master_disable(void);
 
+/**	@brief Disable IRQs globally.
+ */
 void ctr_irq_master_enable(void);
 
+/**	@brief Enters a critical section.
+ *
+ *	A critical section is defined as a section of code that cannot be
+ *	interrupted by anything else. This allows for exclusive access to certain
+ *	variables, for example, if they have to be shared between interrupts and
+ *	non-interrupt code.
+ *
+ *	This implementation of critical sections is re-entrant, meaning it is safe
+ *	to nest entries to a critical section. There is a limitation to how deep the
+ *	nesting can be (currently 2^32-1). Exceeding the maximum level of nesting
+ *	will yield undefined behavior.
+ *
+ *	@post A cricial section has been entered. No other IRQs can interrupt the
+ *		currently executing code until the section is exited.
+ */
 void ctr_irq_critical_enter(void);
-void ctr_irq_critical_leave(void);
 
+/**	@brief Exits a critical section.
+ *
+ *	If this function is called and execution is not in a critical section, this
+ *	invokes undefined behavior.
+ *
+ *	@post A critical section could have been exited if the section isn't nested.
+ *		In the case of nested critical sections, it merely keeps track of how
+ *		nested it is. The section is exited when it determines there are no more
+ *		nested sections to consider. If called when not in a critical section,
+ *		it invokes undefined behavior.
+ */
+void ctr_irq_critical_exit(void);
+
+/**	@brief Enums representing all the possible 3DS IRQ interrupts.
+ */
 typedef enum
 {
 	CTR_IRQ_DMAC_1_0 = 1,
@@ -61,16 +94,62 @@ typedef enum
 #define IRQ_IF_REG (*(volatile uint32_t*)0x10001004)
 #define IRQ_IE_REG (*(volatile uint32_t*)0x10001000)
 
-void ctr_irq_handler(uint32_t *register_array);
-
+/**	@brief Initializes the IRQ subsystem.
+ *
+ *	Sets up the internal IRQ handler via ctr_interrupt support.
+ *
+ *	Whenever an IRQ is raised, the handler checks the 3DS IRQ
+ *	registers to determine which ones need to be serviced, and
+ *	then calls the registered IRQ handlers. If no handler is
+ *	registered, nothing is executed.
+ *
+ *	@post The IRQ subsystem is initialized and handlers can be
+ *		installed via ctr_irq_register.
+ */
 void ctr_irq_initialize(void);
 
+/**	@brief Registers an IRQ handler.
+ *
+ *	This function registers an IRQ handler so that when the specified IRQ is
+ *	triggered the handler is called. Note that acknowledging the IRQ is left
+ *	to the handler.
+ *
+ *	@param[in] irq IRQ to register.
+ *	@param[in] handler Function to call to handle the IRQ.
+ *
+ *	@post Handler is registered and will be called when an IRQ is raised and the
+ *		specified IRQ bit in the 3DS IRQ registers is set.
+ */
 void ctr_irq_register(ctr_irq_enum irq, void (*handler)(void));
 
+/**	@brief Acknowledges an IRQ.
+ *
+ *	This function acknowledges the given IRQ by writing to the corresponding bit
+ *	on the 3DS IRQ status register (IRQ_IF). The interrupt pending bit will not
+ *	be reset unless the interrupt is acknowledged. Acknowledging an interrupt is
+ *	typically done once by the external IRQ handler once the condition that
+ *	triggered the interrupt is addressed.
+ *
+ *	@param[in] irq IRQ to acknowledge.
+ */
 void ctr_irq_acknowledge(ctr_irq_enum irq);
-void ctr_irq_enable(ctr_irq_enum irq);
-void ctr_irq_disable(ctr_irq_enum irq);
 
+/**	@brief Enables the given IRQ.
+ *
+ *	@param irq IRQ to enable.
+ *
+ *	@post The IRQ requested will now be able to trigger IRQs if a handler is
+ *		registered.
+ */
+void ctr_irq_enable(ctr_irq_enum irq);
+
+/**	@brief Disables the given IRQ.
+ *
+ *	@param irq IRQ to disable.
+ *
+ *	@post The IRQ requested will now not be able to trigger IRQs.
+ */
+void ctr_irq_disable(ctr_irq_enum irq);
 
 #ifdef __cplusplus
 }
