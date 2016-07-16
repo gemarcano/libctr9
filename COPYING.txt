@@ -24,3 +24,4 @@ outlined above. Other projects in use and their licenses:
     fatfs by ChaN: BSD-style licenced. Refer to
         http://elm-chan.org/fsw/ff/en/appnote.html#license for more
         information.
+	gamecart by Normmatt: Licensed under the GPL 2.0 or later.
