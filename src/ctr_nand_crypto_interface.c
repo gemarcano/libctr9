@@ -33,6 +33,13 @@ static inline void process_aes_ctr_block(void *buffer, uint8_t *ctr, uint32_t mo
 	add_ctr(ctr, 0x1);
 }
 
+static inline void process_aes_ctr_blocks(void *buffer, uint8_t *ctr, size_t blocks, uint32_t mode)
+{
+	set_ctr(ctr);
+	aes_decrypt(buffer, buffer, blocks, mode);
+	add_ctr(ctr, blocks);
+}
+
 int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
 {
 	crypto_io->base = nand_crypto_base;
@@ -73,7 +80,6 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 	return 0;
 }
 
-
 static void applyAESCTRSector(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, uint32_t sector, uint32_t count)
 {
 	if (count)
@@ -88,9 +94,19 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *crypto_io, uint8_t* buf
 
 		//apply AES CTR to the data
 		use_aeskey(crypto_io->keySlot);
-		for (uint32_t block = 0; block < (count * 0x200 / 0x10); ++block)
+		
+		size_t blocks_to_do = count * 0x200 / 0x10;
+		size_t block_sets = blocks_to_do / 4;
+		size_t blocks_left_over = block_sets * 4 - blocks_to_do;
+
+		for (size_t i = 0;  i < block_sets ; ++i)
 		{
-			process_aes_ctr_block(buffer + (block * 0x10), ctr, mode);
+			process_aes_ctr_blocks(buffer + (i * 0x40), ctr, 4, mode);
+		}
+
+		for (size_t i = 0; i < blocks_left_over; ++i)
+		{
+			process_aes_ctr_block(buffer + (block_sets * 0x40 + i * 0x10), ctr, mode);
 		}
 	}
 }
@@ -198,6 +214,7 @@ int ctr_nand_crypto_interface_read_sector(void *io, void *buffer, size_t buffer_
 	return res;
 }
 
+
 int ctr_nand_crypto_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector)
 {
 	int res = 0;
@@ -214,6 +231,7 @@ int ctr_nand_crypto_interface_write_sector(void *io, const void *buffer, size_t 
 			memcpy(buf, buffer, write_sectors * 0x200);
 
 			applyAESCTRSector(io, buf, sector + i, write_sectors);
+
 			res |= crypto_io->lower_io->write_sector(io, buf, write_sectors * 0x200, sector + i);
 		}
 	}

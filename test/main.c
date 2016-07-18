@@ -20,6 +20,7 @@
 #include <ctr9/ctr_timer.h>
 #include <ctr9/ctr_system_clock.h>
 #include <ctr9/ctr_irq.h>
+#include <ctr9/gfx/ctr_gfx.h>
 
 #include "test.h"
 
@@ -238,6 +239,7 @@ static bool nand_ctrnand_test4(void *ctx)
 	size_t buffer_size = data->buffer_size;
 
 	uint32_t loc = 0x0B95CA00; //CTRNAND
+
 	int res = ctr_io_read(&data->io, buffer, buffer_size/2, loc, buffer_size/2);
 	res |= ctr_io_read_sector(&data->io, buffer+buffer_size/2, buffer_size/2, loc /0x200, buffer_size/2/512);
 
@@ -246,6 +248,7 @@ static bool nand_ctrnand_test4(void *ctx)
 	res |= ctr_io_read(&data->io, buffer, buffer_size/2, loc+3, buffer_size/2-4);
 
 	bool test2 = memcmp(buffer, buffer + buffer_size/2 + 3, buffer_size/2 - 4) == 0;
+
 
 	return !res && test1 && test2;
 }
@@ -291,8 +294,9 @@ static bool nand_ctrnand_test6(void *ctx)
 	size_t text_size = 0x200;
 
 	int res = ctr_io_write_sector(&data->io, text, text_size, loc);
-	res |= ctr_io_read_sector(&data->io, buffer, buffer_size, loc, 1);
 
+	res |= ctr_io_read_sector(&data->io, buffer, buffer_size, loc, 1);
+	
 	bool test1 = !memcmp(buffer, text, text_size);
 
 	for (size_t i = 0; i < sizeof(text); ++i)
@@ -302,7 +306,9 @@ static bool nand_ctrnand_test6(void *ctx)
 
 	loc -= 0x200*4;
 	text_size = sizeof(text);
+
 	res |= ctr_io_write_sector(&data->io, text, text_size, loc);
+
 	res |= ctr_io_read_sector(&data->io, buffer, buffer_size, loc, text_size/0x200);
 
 	bool test2 = !memcmp(buffer, text, text_size);
@@ -486,10 +492,19 @@ void undefined_instruction(uint32_t*);
 
 int main()
 {
-	draw_init((draw_s*)0x23FFFE00);
+	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
+	ctr_gfx gfx;
+	ctr_gfx_initialize(&gfx, cakehax_fbs->top_left, cakehax_fbs->sub);
+
+	draw_init(cakehax_fbs);
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0x111111);
 	printf("UNIT TESTING\n");
+
+	ctr_interrupt_prepare();
+	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
+	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, undefined_instruction);
+	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, prefetch_abort);
 
 	char buffer[0x1000] = {0};
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
@@ -574,11 +589,7 @@ int main()
 	input_wait();
 
 	printf("Preparing interrupts\n");
-	ctr_interrupt_prepare();
-	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, undefined_instruction);
-	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, prefetch_abort);
-	printf("abort handler: %X\n", ctr_interrupt_handlers[4]);
+		printf("abort handler: %X\n", ctr_interrupt_handlers[4]);
 	printf("testing abort\n");
 
 	//Cause a data abort :P
@@ -706,6 +717,18 @@ int main()
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
+	ctr_gfx_set_top_pixel(&gfx, 0, 0, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 2, 0, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 4, 0, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 0, 2, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 0, 4, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 2, 2, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 4, 2, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 2, 4, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 4, 4, 0xFF00FFu);
+
+	
+
 	for (size_t i = 0; i < 3; ++i)
 	{
 		uint64_t start = ctr_system_clock_get_ms(&clock);
@@ -716,6 +739,17 @@ int main()
 		}
 		printf("second: %d\n", i);
 	}
+
+
+	ctr_gfx_set_bottom_pixel(&gfx, 0 + 100, 0, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 0, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 0, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 0 + 100, 2, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 0 + 100, 4, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 2, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 2, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 4, 0xFF00FFu);
+	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 4, 0xFF00FFu);
 
 	input_wait();
 	ctr_system_poweroff();
