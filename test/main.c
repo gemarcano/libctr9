@@ -20,7 +20,7 @@
 #include <ctr9/ctr_timer.h>
 #include <ctr9/ctr_system_clock.h>
 #include <ctr9/ctr_irq.h>
-#include <ctr9/gfx/ctr_gfx.h>
+#include <ctr9/ctr_gfx.h>
 
 #include "test.h"
 
@@ -717,15 +717,15 @@ int main()
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
-	ctr_gfx_set_top_pixel(&gfx, 0, 0, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 2, 0, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 4, 0, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 0, 2, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 0, 4, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 2, 2, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 4, 2, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 2, 4, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 4, 4, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 0 + 100, 0, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 0, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 0, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 0 + 100, 2, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 0 + 100, 4, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 2, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 2, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 4, 0xFF00FFu);
+	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 4, 0xFF00FFu);
 
 	
 
@@ -750,6 +750,11 @@ int main()
 	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 2, 0xFF00FFu);
 	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 4, 0xFF00FFu);
 	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 4, 0xFF00FFu);
+
+
+	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
+	ctr_gfx_bitmap bitmap = { 20, 4, bitmap_data };
+	ctr_gfx_top_draw_bitmap(&gfx, 0, 0, &bitmap);
 
 	input_wait();
 	ctr_system_poweroff();

@@ -143,12 +143,10 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
     {
         while (aescnt_checkwrite());
 
-        size_t ii = 0;
-
 		size_t blocks_to_read = blocks > 4 ? 4 : blocks;
 		
 		for (size_t wblocks = 0; wblocks < blocks_to_read; ++wblocks)
-        for (ii = in + AES_BLOCK_SIZE * wblocks; ii != in + (AES_BLOCK_SIZE * (wblocks + 1)); ii += 4)
+        for (size_t ii = in + AES_BLOCK_SIZE * wblocks; ii != in + (AES_BLOCK_SIZE * (wblocks + 1)); ii += 4)
         {
             uint32_t data = ((uint8_t*)ii)[0];
             data |= (uint32_t)((uint8_t*)ii)[1] << 8;
@@ -162,7 +160,7 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
 			for (size_t rblocks = 0; rblocks < blocks_to_read; ++rblocks)
             {
 				while (aescnt_checkread()) ;
-				for (ii = out + AES_BLOCK_SIZE * rblocks; ii != out + (AES_BLOCK_SIZE * (rblocks + 1)); ii += 4)
+				for (size_t ii = out + AES_BLOCK_SIZE * rblocks; ii != out + (AES_BLOCK_SIZE * (rblocks + 1)); ii += 4)
 				{
 					uint32_t data = read_aesrdfifo();
 					((uint8_t*)ii)[0] = data;
@@ -208,3 +206,4 @@ uint32_t aescnt_checkread()
     size_t ret = aes_getreadcount();
     return (ret <= 3);
 }
+
