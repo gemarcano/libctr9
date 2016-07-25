@@ -110,6 +110,23 @@ void add_ctr(void* ctr, uint32_t carry)
     }
 }
 
+void ctr_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+{
+    size_t blocks = size;
+    uint8_t *in = inbuf;
+    uint8_t *out = outbuf;
+    while (blocks)
+    {
+        set_ctr(ctr);
+        size_t current_blocks = blocks > 4 ? 4 : blocks;
+        aes_decrypt(in, out, current_blocks, mode);
+        blocks -= current_blocks;
+        in += 16 * current_blocks;
+        out += 16 * current_blocks;
+        add_ctr(ctr, current_blocks);
+    }
+}
+
 void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode)
 {
     uint32_t in  = (uint32_t)inbuf;
@@ -143,9 +160,9 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
     {
         while (aescnt_checkwrite());
 
-		size_t blocks_to_read = blocks > 4 ? 4 : blocks;
-		
-		for (size_t wblocks = 0; wblocks < blocks_to_read; ++wblocks)
+        size_t blocks_to_read = blocks - curblock > 4 ? 4 : blocks - curblock;
+
+        for (size_t wblocks = 0; wblocks < blocks_to_read; ++wblocks)
         for (size_t ii = in + AES_BLOCK_SIZE * wblocks; ii != in + (AES_BLOCK_SIZE * (wblocks + 1)); ii += 4)
         {
             uint32_t data = ((uint8_t*)ii)[0];
@@ -155,21 +172,20 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
             set_aeswrfifo(data);
         }
 
-		if (out)
+        if (out)
         {
-			for (size_t rblocks = 0; rblocks < blocks_to_read; ++rblocks)
+            for (size_t rblocks = 0; rblocks < blocks_to_read; ++rblocks)
             {
-				while (aescnt_checkread()) ;
-				for (size_t ii = out + AES_BLOCK_SIZE * rblocks; ii != out + (AES_BLOCK_SIZE * (rblocks + 1)); ii += 4)
-				{
-					uint32_t data = read_aesrdfifo();
-					((uint8_t*)ii)[0] = data;
-					((uint8_t*)ii)[1] = data >> 8;
-					((uint8_t*)ii)[2] = data >> 16;
-					((uint8_t*)ii)[3] = data >> 24;
-				}
-		
-			}
+                while (aescnt_checkread()) ;
+                for (size_t ii = out + AES_BLOCK_SIZE * rblocks; ii != out + (AES_BLOCK_SIZE * (rblocks + 1)); ii += 4)
+                {
+                    uint32_t data = read_aesrdfifo();
+                    ((uint8_t*)ii)[0] = data;
+                    ((uint8_t*)ii)[1] = data >> 8;
+                    ((uint8_t*)ii)[2] = data >> 16;
+                    ((uint8_t*)ii)[3] = data >> 24;
+                }
+            }
         }
         curblock += blocks_to_read;
     }

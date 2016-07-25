@@ -756,6 +756,18 @@ int main()
 	ctr_gfx_bitmap bitmap = { 20, 4, bitmap_data };
 	ctr_gfx_top_draw_bitmap(&gfx, 0, 0, &bitmap);
 
+	printf("Testing aes\n");
+
+	char input_buffer[0x10 * 5] = { 1,2,3,4,5,6 };
+	char output_buffer[0x10 * 5];
+	char output_buffer2[0x10 * 5];
+	uint8_t ctr[16] = {0};
+	uint8_t ctr2[16] = {0};
+	ctr_decrypt(input_buffer, output_buffer, 5, AES_CTR_MODE, ctr);
+	ctr_decrypt(output_buffer, output_buffer2, 5, AES_CTR_MODE, ctr2);
+	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*4));
+	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, sizeof(output_buffer)));
+
 	input_wait();
 	ctr_system_poweroff();
 	return 0;

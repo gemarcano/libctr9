@@ -39,7 +39,8 @@ ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
 	$(includedirectory)/ctr9/ctr_timer.h \
 	$(includedirectory)/ctr9/ctr_irq.h \
 	$(includedirectory)/ctr9/ctr_system_clock.h \
-	$(includedirectory)/ctr9/ctr_gfx.h
+	$(includedirectory)/ctr9/ctr_gfx.h \
+	$(includedirectory)/ctr9/ctr_gfx.c
 
 ctrgamecartinclude_HEADERS = $(includedirectory)/ctr9/gamecart/protocol.h \
 	$(includedirectory)/ctr9/gamecart/command_ctr.h \
