@@ -296,7 +296,7 @@ static bool nand_ctrnand_test6(void *ctx)
 	int res = ctr_io_write_sector(&data->io, text, text_size, loc);
 
 	res |= ctr_io_read_sector(&data->io, buffer, buffer_size, loc, 1);
-	
+
 	bool test1 = !memcmp(buffer, text, text_size);
 
 	for (size_t i = 0; i < sizeof(text); ++i)
@@ -727,7 +727,7 @@ int main()
 	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 4, 0xFF00FFu);
 	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 4, 0xFF00FFu);
 
-	
+
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -755,18 +755,58 @@ int main()
 	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
 	ctr_gfx_bitmap bitmap = { 20, 4, bitmap_data };
 	ctr_gfx_top_draw_bitmap(&gfx, 0, 0, &bitmap);
+	gfx.color = 0xFF00FF;
+	ctr_gfx_top_draw_bitmap(&gfx, 20, 4, &bitmap);
+	gfx.color = 0xFFFF;
+	ctr_gfx_top_draw_bitmap(&gfx, 40, 8, &bitmap);
+	gfx.color = 0xFF;
+	ctr_gfx_top_draw_bitmap(&gfx, 20, 14, &bitmap);
+	gfx.color = 0xFF0000;
+	ctr_gfx_top_draw_bitmap(&gfx, 0, 20, &bitmap);
 
 	printf("Testing aes\n");
 
-	char input_buffer[0x10 * 5] = { 1,2,3,4,5,6 };
-	char output_buffer[0x10 * 5];
-	char output_buffer2[0x10 * 5];
+	char input_buffer[0x10 * 0x20000] = { 1,2,3,4,5,6 };
+	for (size_t i = 0; i < sizeof(input_buffer); ++i)
+	{
+		input_buffer[i] = i;
+	}
+	char output_buffer[0x10 * 0x20000];
+	char output_buffer2[0x10 * 0x20000];
+	char output_buffer3[0x10 * 0x20000];
 	uint8_t ctr[16] = {0};
 	uint8_t ctr2[16] = {0};
-	ctr_decrypt(input_buffer, output_buffer, 5, AES_CTR_MODE, ctr);
-	ctr_decrypt(output_buffer, output_buffer2, 5, AES_CTR_MODE, ctr2);
+
+	set_ctr(ctr);
+	aes_decrypt(input_buffer, output_buffer, 5, AES_CTR_MODE);
+	set_ctr(ctr);
+	aes_decrypt(output_buffer, output_buffer2, 5, AES_CTR_MODE);
+	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*4));
+	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*5));
+
+	memset(ctr, 0, sizeof(ctr));
+	memset(ctr2, 0, sizeof(ctr2));
+	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE, ctr);
+	set_ctr(ctr2);
+	aes_decrypt(input_buffer, output_buffer2, 0x20000, AES_CTR_MODE);
+
+	printf("Comparing mid aes results: %d\n", memcmp(output_buffer, output_buffer2, sizeof(output_buffer)));
+
+	memset(ctr, 0, sizeof(ctr));
+	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE, ctr);
+	memset(ctr2, 0, sizeof(ctr2));
+	ctr_decrypt(output_buffer, output_buffer3, 0x20000, AES_CTR_MODE, ctr2);
+	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer3, 0x10*4));
+	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer3, sizeof(output_buffer)));
+
+	memset(ctr2, 0, sizeof(ctr2));
+	set_ctr(ctr2);
+	aes_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE);
+	set_ctr(ctr2);
+	aes_decrypt(output_buffer, output_buffer2, 0x20000, AES_CTR_MODE);
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*4));
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, sizeof(output_buffer)));
+	printf("Comparing aes results: %d\n", memcmp(output_buffer2, output_buffer3, sizeof(output_buffer)));
 
 	input_wait();
 	ctr_system_poweroff();
