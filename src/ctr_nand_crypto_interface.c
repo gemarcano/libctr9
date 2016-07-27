@@ -26,18 +26,9 @@ static const ctr_io_interface nand_crypto_base =
 	ctr_nand_crypto_interface_sector_size
 };
 
-static inline void process_aes_ctr_block(void *buffer, uint8_t *ctr, uint32_t mode)
-{
-	set_ctr(ctr);
-	aes_decrypt(buffer, buffer, 1, mode);
-	add_ctr(ctr, 0x1);
-}
-
 static inline void process_aes_ctr_blocks(void *buffer, uint8_t *ctr, size_t blocks, uint32_t mode)
 {
-	set_ctr(ctr);
-	aes_decrypt(buffer, buffer, blocks, mode);
-	add_ctr(ctr, blocks);
+	ctr_decrypt(buffer, buffer, blocks, mode, ctr);
 }
 
 int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
@@ -49,7 +40,7 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 
 	//Get the nonces for CTRNAND and TWL decryption
 	uint32_t NandCid[4];
-	alignas(32) uint8_t shasum[32];
+	alignas(4) uint8_t shasum[32];
 
 	sdmmc_get_cid(true, NandCid);
 
@@ -84,10 +75,9 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *crypto_io, uint8_t* buf
 {
 	if (count)
 	{
-		//FIXME perhaps let mode be set at construction time?
 		uint32_t mode = crypto_io->mode;
 
-		alignas(32) uint8_t ctr[16];
+		alignas(4) uint8_t ctr[16];
 
 		memcpy(ctr, crypto_io->ctr, 16);
 		add_ctr(ctr, sector * (0x200 / 0x10));
@@ -96,18 +86,7 @@ static void applyAESCTRSector(ctr_nand_crypto_interface *crypto_io, uint8_t* buf
 		use_aeskey(crypto_io->keySlot);
 		
 		size_t blocks_to_do = count * 0x200 / 0x10;
-		size_t block_sets = blocks_to_do / 4;
-		size_t blocks_left_over = block_sets * 4 - blocks_to_do;
-
-		for (size_t i = 0;  i < block_sets ; ++i)
-		{
-			process_aes_ctr_blocks(buffer + (i * 0x40), ctr, 4, mode);
-		}
-
-		for (size_t i = 0; i < blocks_left_over; ++i)
-		{
-			process_aes_ctr_block(buffer + (block_sets * 0x40 + i * 0x10), ctr, mode);
-		}
+		process_aes_ctr_blocks(buffer, ctr, blocks_to_do, mode);
 	}
 }
 
@@ -117,8 +96,8 @@ static void applyAESCTR(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, u
 	{
 		//FIXME Maybe move mode out?
 		uint32_t mode = crypto_io->mode;
-		alignas(32) uint8_t ctr[16];
-		alignas(32) uint8_t block_buffer[16];
+		alignas(4) uint8_t ctr[16];
+		alignas(4) uint8_t block_buffer[16];
 		uint32_t amount_read = 0;
 
 		use_aeskey(crypto_io->keySlot);
@@ -135,7 +114,7 @@ static void applyAESCTR(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, u
 		}
 
 		memcpy(block_buffer + block_offset, buffer, current_section_size);
-		process_aes_ctr_block(block_buffer, ctr, mode);
+		process_aes_ctr_blocks(block_buffer, ctr, 1, mode);
 		memcpy(buffer, block_buffer + block_offset, current_section_size);
 
 		amount_read = current_section_size;
@@ -146,10 +125,7 @@ static void applyAESCTR(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, u
 
 		if (current_section_size)
 		{
-			for (size_t byte = 0x0; byte < current_section_size; byte += 0x10)
-			{
-				process_aes_ctr_block(buffer + amount_read + byte, ctr, mode);
-			}
+			process_aes_ctr_blocks(buffer + amount_read, ctr, current_section_size / 0x10, mode);
 		}
 
 		amount_read += current_section_size;
@@ -159,7 +135,7 @@ static void applyAESCTR(ctr_nand_crypto_interface *crypto_io, uint8_t* buffer, u
 		if (current_section_size)
 		{
 			memcpy(block_buffer, buffer + amount_read, current_section_size);
-			process_aes_ctr_block(block_buffer, ctr, mode);
+			process_aes_ctr_blocks(block_buffer, ctr, 1, mode);
 			memcpy(buffer + amount_read, block_buffer, current_section_size);
 		}
 	}
@@ -188,7 +164,7 @@ int ctr_nand_crypto_interface_read(void *io, void *buffer, size_t buffer_size, u
 int ctr_nand_crypto_interface_write(void *io, const void *buffer, size_t buffer_size, uint64_t position)
 {
 	ctr_nand_crypto_interface *crypto_io = io;
-	alignas(32) uint8_t buf[0x200*4];
+	alignas(4) uint8_t buf[0x200*4];
 	int res = 0;
 	for (size_t i = 0; i < buffer_size && !res; i += sizeof(buf))
 	{

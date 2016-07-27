@@ -10,8 +10,12 @@
 bool ctr_execute_unit_test(ctr_unit_test *test)
 {
 	bool result;
-	printf("Executing unit test: %s\n", test->name);
-	printf("  Result: %s\n", (result = test->function(test->data)) ? "SUCCESS" : "FAILURE");
+	result = test->function(test->data);
+	if (!result)
+	{
+		printf("Executing unit test: %s\n", test->name);
+		printf("  Result: %s\n", result ? "SUCCESS" : "FAILURE");
+	}
 	return result;
 }
 
