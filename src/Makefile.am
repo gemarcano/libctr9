@@ -39,8 +39,7 @@ ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
 	$(includedirectory)/ctr9/ctr_timer.h \
 	$(includedirectory)/ctr9/ctr_irq.h \
 	$(includedirectory)/ctr9/ctr_system_clock.h \
-	$(includedirectory)/ctr9/ctr_gfx.h \
-	$(includedirectory)/ctr9/ctr_gfx.c
+	$(includedirectory)/ctr9/ctr_gfx.h
 
 ctrgamecartinclude_HEADERS = $(includedirectory)/ctr9/gamecart/protocol.h \
 	$(includedirectory)/ctr9/gamecart/command_ctr.h \
@@ -65,7 +64,7 @@ ctrfatfsinclude_HEADERS = $(includedirectory)/ctr9/io/fatfs/ff.h \
 	$(includedirectory)/ctr9/io/fatfs/ctr_fatfs_disk.h \
 	$(includedirectory)/ctr9/io/fatfs/diskio.h \
 	$(includedirectory)/ctr9/io/fatfs/ffconf.h \
-	$(includedirectory)/ctr9/io/fatfs/integer.h 
+	$(includedirectory)/ctr9/io/fatfs/integer.h
 
 ctrsdmmcinclude_HEADERS = $(includedirectory)/ctr9/io/sdmmc/sdmmc.h
 

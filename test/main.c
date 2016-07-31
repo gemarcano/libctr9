@@ -494,7 +494,10 @@ int main()
 {
 	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
 	ctr_gfx gfx;
-	ctr_gfx_initialize(&gfx, cakehax_fbs->top_left, cakehax_fbs->sub);
+	ctr_gfx_screen top_screen, bottom_screen;
+	ctr_gfx_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
+	ctr_gfx_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
+	ctr_gfx_initialize(&gfx, &top_screen, &bottom_screen);
 
 	draw_init(cakehax_fbs);
 	console_init(0xFFFFFF, 0);
@@ -640,7 +643,7 @@ int main()
 	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 8);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
-
+/*
 	printf("Trying to read cart header...\n");
 	ctr_cart_interface cart;
 	printf("Initialize cart: %d\n", ctr_cart_interface_initialize(&cart));
@@ -668,7 +671,7 @@ int main()
 	f_close(&file);
 	printf("ROM SIZE: %X\n", ctr_cart_interface_disk_size(&cart));
 	printf("Finished dumping, hopefully.: %d\n %d %d\n", open_res, write_res, bw);
-
+*/
 	printf("Trying timer stuff\n");
 	ctr_timer_disable_irq(CTR_TIMER0);
 	uint16_t starting_timer = ctr_timer_get_value(CTR_TIMER0);
@@ -763,6 +766,7 @@ int main()
 	ctr_gfx_top_draw_bitmap(&gfx, 20, 14, &bitmap);
 	gfx.color = 0xFF0000;
 	ctr_gfx_top_draw_bitmap(&gfx, 0, 20, &bitmap);
+	ctr_gfx_bottom_draw_bitmap(&gfx, 200, 200, &bitmap);
 
 	printf("Testing aes\n");
 
