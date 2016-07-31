@@ -8,6 +8,7 @@
 
 #include <ctr9/ctr_interrupt.h>
 #include <ctr9/ctr_system.h>
+#include <ctr9/ctr_cache.h>
 #include <stdint.h>
 
 void ctr_interrupt_reset_veneer(void);
@@ -47,35 +48,35 @@ void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler 
 void ctr_interrupt_prepare(void)
 {
 	//Secondary handler. Read payload address from next word
-	ACCESS_FUNCTION_PTR(0x01FF8020) = (interrupt_function)0xE51FF004;
-	ACCESS_FUNCTION_PTR(0x01FF8028) = (interrupt_function)0xE51FF004;
-	ACCESS_FUNCTION_PTR(0x01FF8030) = (interrupt_function)0xE51FF004;
-	ACCESS_FUNCTION_PTR(0x01FF8038) = (interrupt_function)0xE51FF004;
-	ACCESS_FUNCTION_PTR(0x01FF8040) = (interrupt_function)0xE51FF004;
-	ACCESS_FUNCTION_PTR(0x01FF8048) = (interrupt_function)0xE51FF004;
-	ACCESS_FUNCTION_PTR(0x01FF8050) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000020) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000028) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000030) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000038) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000040) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000048) = (interrupt_function)0xE51FF004;
+	ACCESS_FUNCTION_PTR(0x00000050) = (interrupt_function)0xE51FF004;
 
 	//Pointers to veneers, which then would load the actual user provide
 	//handlers
-	ACCESS_FUNCTION_PTR(0x01FF8024) = ctr_interrupt_reset_veneer;
-	ACCESS_FUNCTION_PTR(0x01FF802C) = ctr_interrupt_undef_veneer;
-	ACCESS_FUNCTION_PTR(0x01FF8034) = ctr_interrupt_swi_veneer;
-	ACCESS_FUNCTION_PTR(0x01FF803C) = ctr_interrupt_preabrt_veneer;
-	ACCESS_FUNCTION_PTR(0x01FF8044) = ctr_interrupt_databrt_veneer;
-	ACCESS_FUNCTION_PTR(0x01FF804C) = ctr_interrupt_irq_veneer;
-	ACCESS_FUNCTION_PTR(0x01FF8054) = ctr_interrupt_fiq_veneer;
+	ACCESS_FUNCTION_PTR(0x00000024) = ctr_interrupt_reset_veneer;
+	ACCESS_FUNCTION_PTR(0x0000002C) = ctr_interrupt_undef_veneer;
+	ACCESS_FUNCTION_PTR(0x00000034) = ctr_interrupt_swi_veneer;
+	ACCESS_FUNCTION_PTR(0x0000003C) = ctr_interrupt_preabrt_veneer;
+	ACCESS_FUNCTION_PTR(0x00000044) = ctr_interrupt_databrt_veneer;
+	ACCESS_FUNCTION_PTR(0x0000004C) = ctr_interrupt_irq_veneer;
+	ACCESS_FUNCTION_PTR(0x00000054) = ctr_interrupt_fiq_veneer;
 
 	//Actual exception handling code. Jumps to the secondary handler.
-	ACCESS_FUNCTION_PTR(0x01FF8000) = (interrupt_function)0xEA000006u;
-	ACCESS_FUNCTION_PTR(0x01FF8004) = (interrupt_function)0xEA000007u;
-	ACCESS_FUNCTION_PTR(0x01FF8008) = (interrupt_function)0xEA000008u;
-	ACCESS_FUNCTION_PTR(0x01FF800C) = (interrupt_function)0xEA000009u;
-	ACCESS_FUNCTION_PTR(0x01FF8010) = (interrupt_function)0xEA00000Au;
-	ACCESS_FUNCTION_PTR(0x01FF8014) = (interrupt_function)0xEAFFFFFEu;
-	ACCESS_FUNCTION_PTR(0x01FF8018) = (interrupt_function)0xEA00000Au;
-	ACCESS_FUNCTION_PTR(0x01FF801C) = (interrupt_function)0xEA00000Bu;
+	ACCESS_FUNCTION_PTR(0x00000000) = (interrupt_function)0xEA000006u;
+	ACCESS_FUNCTION_PTR(0x00000004) = (interrupt_function)0xEA000007u;
+	ACCESS_FUNCTION_PTR(0x00000008) = (interrupt_function)0xEA000008u;
+	ACCESS_FUNCTION_PTR(0x0000000C) = (interrupt_function)0xEA000009u;
+	ACCESS_FUNCTION_PTR(0x00000010) = (interrupt_function)0xEA00000Au;
+	ACCESS_FUNCTION_PTR(0x00000014) = (interrupt_function)0xEAFFFFFEu;
+	ACCESS_FUNCTION_PTR(0x00000018) = (interrupt_function)0xEA00000Au;
+	ACCESS_FUNCTION_PTR(0x0000001C) = (interrupt_function)0xEA00000Bu;
 
-	ctr_flush_cache();
+	ctr_cache_flush_instruction_range((void*)0x0, (void*)0x8000);
 
 	//switch to low vectors
 	asm volatile (

@@ -37,7 +37,6 @@ typedef enum
 } ctr_timer;
 
 void ctr_timer_set_value(ctr_timer timer, uint16_t value);
-uint32_t ctr_timer_get_combined_value(ctr_timer base_timer);
 uint16_t ctr_timer_get_value(ctr_timer timer);
 
 void ctr_timer_enable_irq(ctr_timer timer);

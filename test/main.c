@@ -21,6 +21,7 @@
 #include <ctr9/ctr_system_clock.h>
 #include <ctr9/ctr_irq.h>
 #include <ctr9/ctr_gfx.h>
+#include <ctr9/ctr_cache.h>
 
 #include "test.h"
 

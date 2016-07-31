@@ -63,13 +63,6 @@ void ctr_system_reset(void);
  */
 ctr_system_type ctr_get_system_type(void);
 
-/**	@brief Flushes all of the ARM9 CPU caches, and drains the write buffer.
- *
- *	@post All CPU caches (instruction and data) have been flushed, and the write
- *		buffer has been drained.
- */
-void ctr_flush_cache(void);
-
 #ifdef __cplusplus
 }
 #endif

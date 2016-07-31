@@ -9,7 +9,6 @@
 #include <ctr9/ctr_timer.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdatomic.h>
 
 #define CTR_TIMER_REGISTER ((uint16_t(*)[2])(CTR_TIMER_REG_BASE))
 
@@ -19,16 +18,6 @@ void ctr_timer_set_value(ctr_timer timer, uint16_t value)
 		return;
 
 	CTR_TIMER_REGISTER[timer][0] = value;
-}
-
-uint32_t ctr_timer_get_combined_value(ctr_timer base_timer)
-{
-	if (base_timer > 2)
-		return 0;
-
-	atomic_uint_fast64_t raw = *(volatile atomic_uint_fast64_t*)(CTR_TIMER_REG_BASE + base_timer);
-	uint32_t result = ((raw >> 32) & 0xFFFF0000) | (raw & 0xFFFF);
-	return result;
 }
 
 uint16_t ctr_timer_get_value(ctr_timer timer)
