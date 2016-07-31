@@ -1,15 +1,23 @@
+@*******************************************************************************
+@* Copyright (C) 2016 Gabriel Marcano
+@*
+@* Refer to the COPYING.txt file at the top of the project directory. If that is
+@* missing, this file is licensed under the GPL version 2.0 or later.
+@*
+@******************************************************************************/
+
 .arm
 
 .align 4
 
 .global ctr_cache_clean_and_flush_all, ctr_cache_flush_data_all
 .global ctr_cache_flush_data_entry, ctr_cache_data_clean_entry
-.global ctr_cache_data_clean_and_flush_entry, ctr_cache_data_clean_index_entry,
+.global ctr_cache_data_clean_and_flush_entry, ctr_cache_data_clean_index_entry
 .global ctr_cache_data_clean_and_flush_index_entry
 .global ctr_cache_flush_instruction_all, ctr_cache_flush_instruction_entry
 .global ctr_cache_prefetch_instruction_line, ctr_cache_clean_and_flush
 .global ctr_cache_clean_data_range, ctr_cache_flush_data_range
-.global ctr_cache_flush_instruction_range
+.global ctr_cache_flush_instruction_range, ctr_cache_drain_write_buffer
 
 ctr_cache_clean_and_flush_all:
 	mov r1, #0 @segment
@@ -109,3 +117,7 @@ ctr_cache_flush_data_range:
 ctr_cache_flush_instruction_range:
 	define_range_function c5
 
+ctr_cache_drain_write_buffer:
+	mov r0, #0
+	mcr p15, 0, r0, c7, c10, 4
+	bx lr

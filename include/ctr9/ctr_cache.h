@@ -160,6 +160,13 @@ void ctr_cache_flush_data_range(void *start, void *end);
  */
 void ctr_cache_flush_instruction_range(void *start, void *end);
 
+/**	@brief Drains the write buffer.
+ *
+ *	@post The write buffer has been drained-- all data pending to be written to
+ *		memory has been written.
+ */
+void ctr_cache_drain_write_buffer(void);
+
 #ifdef __cplusplus
 }
 #endif

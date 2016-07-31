@@ -76,7 +76,9 @@ void ctr_interrupt_prepare(void)
 	ACCESS_FUNCTION_PTR(0x00000018) = (interrupt_function)0xEA00000Au;
 	ACCESS_FUNCTION_PTR(0x0000001C) = (interrupt_function)0xEA00000Bu;
 
+	ctr_cache_clean_data_range((void*)0x0, (void*)0x8000);
 	ctr_cache_flush_instruction_range((void*)0x0, (void*)0x8000);
+	ctr_cache_drain_write_buffer();
 
 	//switch to low vectors
 	asm volatile (
