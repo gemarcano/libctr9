@@ -11,27 +11,27 @@ _entry:
 	@system mode
 	orr r1, r0, #0x1F
 	msr cpsr_c, r1
-	ldr sp, =0x8000
+	ldr sp, =0x10000
 
 	@abort mode
 	orr r1, r0, #0x17
 	msr cpsr_c, r1
-	ldr sp, =0x8000
+	ldr sp, =0x10000
 
 	@IRQ mode
 	orr r1, r0, #0x12
 	msr cpsr_c, r1
-	ldr sp, =0x8000
+	ldr sp, =0x10000
 
 	@FIQ mode
 	orr r1, r0, #0x11
 	msr cpsr_c, r1
-	ldr sp, =0x8000
+	ldr sp, =0x10000
 
 	@supervisor mode
 	orr r1, r0, #0x13
 	msr cpsr_c, r1
-	ldr sp, =0x8000
+	ldr sp, =0x10000
 
 	@system mode
 	orr r1, r0, #0x1F
@@ -149,7 +149,7 @@ _entry:
 	mcr p15, 0, r5, c6, c5, 0
 	mcr p15, 0, r6, c6, c6, 0
 	mcr p15, 0, r7, c6, c7, 0
-	mov r0, #0xA5
+	mov r0, #0b10101001
 	mcr p15, 0, r0, c2, c0, 0  @ data cacheable
 	mcr p15, 0, r0, c2, c0, 1  @ instruction cacheable
 	mcr p15, 0, r0, c3, c0, 0  @ data bufferable
