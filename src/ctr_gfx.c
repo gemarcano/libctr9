@@ -28,19 +28,12 @@ void ctr_gfx_screen_initialize(ctr_gfx_screen *screen, uint8_t *framebuffer, siz
 	}
 }
 
-void ctr_gfx_initialize(ctr_gfx *gfx, ctr_gfx_screen *top, ctr_gfx_screen *bot)
-{
-	gfx->top_screen = *top;
-	gfx->bottom_screen = *bot;
-	gfx->color = 0xFFFFFF;
-}
-
 static inline uint8_t *ctr_gfx_screen_get_pixel_ptr(ctr_gfx_screen *screen, size_t x, size_t y)
 {
 	return screen->framebuffer + ((x * screen->height) + ((screen->height - 1 - y))) * screen->pixel_size;
 }
 
-static inline uint32_t ctr_gfx_screen_get_pixel(ctr_gfx_screen *screen, size_t x, size_t y)
+uint32_t ctr_gfx_screen_get_pixel(ctr_gfx_screen *screen, size_t x, size_t y)
 {
 	uint32_t result = 0;
 	uint8_t *pixel = ctr_gfx_screen_get_pixel_ptr(screen, x, y);
@@ -51,7 +44,7 @@ static inline uint32_t ctr_gfx_screen_get_pixel(ctr_gfx_screen *screen, size_t x
 	return result;
 }
 
-static inline void ctr_gfx_screen_set_pixel(ctr_gfx_screen *screen, size_t x, size_t y, uint32_t pixel)
+void ctr_gfx_screen_set_pixel(ctr_gfx_screen *screen, size_t x, size_t y, uint32_t pixel)
 {
 	uint8_t *p = ctr_gfx_screen_get_pixel_ptr(screen, x, y);
 	for (size_t i = 0; i < screen->pixel_size; ++i)
@@ -60,27 +53,7 @@ static inline void ctr_gfx_screen_set_pixel(ctr_gfx_screen *screen, size_t x, si
 	}
 }
 
-uint32_t ctr_gfx_get_top_pixel(ctr_gfx *gfx, size_t x, size_t y)
-{
-	return ctr_gfx_screen_get_pixel(&gfx->top_screen, x, y);
-}
-
-uint32_t ctr_gfx_get_bottom_pixel(ctr_gfx *gfx, size_t x, size_t y)
-{
-	return ctr_gfx_screen_get_pixel(&gfx->bottom_screen, x, y);
-}
-
-void ctr_gfx_set_top_pixel(ctr_gfx *gfx, size_t x, size_t y, uint32_t pixel)
-{
-	ctr_gfx_screen_set_pixel(&gfx->top_screen, x, y, pixel);
-}
-
-void ctr_gfx_set_bottom_pixel(ctr_gfx *gfx, size_t x, size_t y, uint32_t pixel)
-{
-	ctr_gfx_screen_set_pixel(&gfx->bottom_screen, x, y, pixel);
-}
-
-static inline void ctr_gfx_screen_draw_bitmap(ctr_gfx_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_gfx_bitmap *bitmap)
+void ctr_gfx_screen_draw_bitmap(ctr_gfx_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_gfx_bitmap *bitmap)
 {
 	if (bitmap->width && bitmap->height)
 	{
@@ -101,15 +74,5 @@ static inline void ctr_gfx_screen_draw_bitmap(ctr_gfx_screen *screen, size_t x, 
 			}
 		}
 	}
-}
-
-void ctr_gfx_top_draw_bitmap(ctr_gfx *gfx, size_t x, size_t y, ctr_gfx_bitmap *bitmap)
-{
-	ctr_gfx_screen_draw_bitmap(&gfx->top_screen, x, y, gfx->color, bitmap);
-}
-
-void ctr_gfx_bottom_draw_bitmap(ctr_gfx *gfx, size_t x, size_t y, ctr_gfx_bitmap *bitmap)
-{
-	ctr_gfx_screen_draw_bitmap(&gfx->bottom_screen, x, y, gfx->color, bitmap);
 }
 

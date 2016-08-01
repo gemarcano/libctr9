@@ -494,11 +494,9 @@ void undefined_instruction(uint32_t*);
 int main()
 {
 	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
-	ctr_gfx gfx;
 	ctr_gfx_screen top_screen, bottom_screen;
 	ctr_gfx_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
 	ctr_gfx_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
-	ctr_gfx_initialize(&gfx, &top_screen, &bottom_screen);
 
 	draw_init(cakehax_fbs);
 	console_init(0xFFFFFF, 0);
@@ -721,17 +719,15 @@ int main()
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
-	ctr_gfx_set_top_pixel(&gfx, 0 + 100, 0, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 0, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 0, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 0 + 100, 2, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 0 + 100, 4, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 2, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 2, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 2 + 100, 4, 0xFF00FFu);
-	ctr_gfx_set_top_pixel(&gfx, 4 + 100, 4, 0xFF00FFu);
-
-
+	ctr_gfx_screen_set_pixel(&top_screen, 0 + 100, 0, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 2 + 100, 0, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 4 + 100, 0, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 0 + 100, 2, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 0 + 100, 4, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 2 + 100, 2, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 4 + 100, 2, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 2 + 100, 4, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&top_screen, 4 + 100, 4, 0xFF00FFu);
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -745,29 +741,25 @@ int main()
 	}
 
 
-	ctr_gfx_set_bottom_pixel(&gfx, 0 + 100, 0, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 0, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 0, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 0 + 100, 2, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 0 + 100, 4, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 2, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 2, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 2 + 100, 4, 0xFF00FFu);
-	ctr_gfx_set_bottom_pixel(&gfx, 4 + 100, 4, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 0 + 100, 0, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 2 + 100, 0, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 4 + 100, 0, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 0 + 100, 2, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 0 + 100, 4, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 2 + 100, 2, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 4 + 100, 2, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 2 + 100, 4, 0xFF00FFu);
+	ctr_gfx_screen_set_pixel(&bottom_screen, 4 + 100, 4, 0xFF00FFu);
 
 
 	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
 	ctr_gfx_bitmap bitmap = { 20, 4, bitmap_data };
-	ctr_gfx_top_draw_bitmap(&gfx, 0, 0, &bitmap);
-	gfx.color = 0xFF00FF;
-	ctr_gfx_top_draw_bitmap(&gfx, 20, 4, &bitmap);
-	gfx.color = 0xFFFF;
-	ctr_gfx_top_draw_bitmap(&gfx, 40, 8, &bitmap);
-	gfx.color = 0xFF;
-	ctr_gfx_top_draw_bitmap(&gfx, 20, 14, &bitmap);
-	gfx.color = 0xFF0000;
-	ctr_gfx_top_draw_bitmap(&gfx, 0, 20, &bitmap);
-	ctr_gfx_bottom_draw_bitmap(&gfx, 200, 200, &bitmap);
+	ctr_gfx_screen_draw_bitmap(&top_screen, 0, 0, 0xFF00FF, &bitmap);
+	ctr_gfx_screen_draw_bitmap(&top_screen, 20, 4, 0x00FFFF, &bitmap);
+	ctr_gfx_screen_draw_bitmap(&top_screen, 40, 8, 0x0000FF, &bitmap);
+	ctr_gfx_screen_draw_bitmap(&top_screen, 20, 14, 0x00FF00, &bitmap);
+	ctr_gfx_screen_draw_bitmap(&top_screen, 0, 20, 0xFF0000, &bitmap);
+	ctr_gfx_screen_draw_bitmap(&bottom_screen, 200, 200, 0xFF0000, &bitmap);
 
 	printf("Testing aes\n");
 
