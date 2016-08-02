@@ -14,6 +14,8 @@
 #include "ctr_io_interface.h"
 #include "sdmmc/sdmmc.h"
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -110,6 +112,12 @@ uint64_t ctr_sd_interface_disk_size(void *io);
  *  @returns 512 bytes as the sector size for SD cards.
  */
 size_t ctr_sd_interface_sector_size(void *io);
+
+/**	@brief Returns whether the SD is inserted.
+ *
+ *	@returns True if the SD card is detected, false otherwise.
+ */
+bool ctr_sd_interface_inserted(void);
 
 #ifdef __cplusplus
 }

@@ -10,6 +10,7 @@
 #include <ctr9/io/sdmmc/sdmmc.h>
 #include <ctr9/io/ctr_sdmmc_implementation.h>
 #include <string.h>
+#include <stdbool.h>
 
 static const ctr_io_interface sd_base =
 {
@@ -61,5 +62,13 @@ uint64_t ctr_sd_interface_disk_size(void *io)
 size_t ctr_sd_interface_sector_size(void *io)
 {
 	return 512u;
+}
+
+#define EMMC_STATUS0 (*((volatile uint16_t*)0x1000601c))
+
+bool ctr_sd_interface_inserted(void)
+{
+	// FIXME Wait some time to make sure the SD card is detected
+	return (EMMC_STATUS0 & (1 << 5));
 }
 

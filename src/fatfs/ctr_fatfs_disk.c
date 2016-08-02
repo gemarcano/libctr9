@@ -28,7 +28,7 @@ void ctr_fatfs_default_setup(ctr_nand_crypto_interface *ctr_io, ctr_nand_crypto_
 
 	if (sd_io)
 	{
-		params = (ctr_setup_disk_parameters){sd_io, 0, ctr_io_disk_size(sd_io)};
+		params = (ctr_setup_disk_parameters){sd_io, 0, ctr_io_disk_size(sd_io) / ctr_io_sector_size(sd_io)};
 		disk_ioctl(3, CTR_SETUP_DISK, &params);
 	}
 }
