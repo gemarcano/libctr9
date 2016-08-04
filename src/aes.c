@@ -1,6 +1,8 @@
 /* original version by megazig */
 #include <ctr9/aes.h>
 
+#include <string.h>
+
 //FIXME some things make assumptions about alignemnts!
 
 void setup_aeskeyX(uint8_t keyslot, void* keyx)
@@ -107,6 +109,44 @@ void add_ctr(void* ctr, uint32_t carry)
         outctr[i*4+1] = counter[i]>>16;
         outctr[i*4+2] = counter[i]>>8;
         outctr[i*4+3] = counter[i]>>0;
+    }
+}
+
+void ecb_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+{
+    size_t blocks_left = size;
+    size_t blocks;
+    uint8_t *in  = inbuf;
+    uint8_t *out = outbuf;
+
+    while (blocks_left)
+    {
+        set_ctr(ctr);
+        blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
+        aes_decrypt(in, out, blocks, mode);
+        //add_ctr(ctr, blocks);
+        in += blocks * AES_BLOCK_SIZE;
+        out += blocks * AES_BLOCK_SIZE;
+        blocks_left -= blocks;
+    }
+}
+
+void cbc_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+{
+    size_t blocks_left = size;
+    size_t blocks;
+    uint8_t *in  = inbuf;
+    uint8_t *out = outbuf;
+
+    while (blocks_left)
+    {
+        set_ctr(ctr);
+        blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
+        memcpy(ctr, in + (blocks - 1) * AES_BLOCK_SIZE, AES_BLOCK_SIZE);
+        aes_decrypt(in, out, blocks, mode);
+        in += blocks * AES_BLOCK_SIZE;
+        out += blocks * AES_BLOCK_SIZE;
+        blocks_left -= blocks;
     }
 }
 

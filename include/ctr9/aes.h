@@ -43,6 +43,10 @@ extern "C" {
 #define AES_CNT_TWLNAND_MODE AES_CTR_MODE
 #define AES_CNT_TITLEKEY_DECRYPT_MODE (AES_CBC_DECRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
 #define AES_CNT_TITLEKEY_ENCRYPT_MODE (AES_CBC_ENCRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
+#define AES_CNT_CBC_DECRYPT_MODE      (AES_CBC_DECRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
+#define AES_CNT_CBC_ENCRYPT_MODE      (AES_CBC_ENCRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
+#define AES_CNT_ECB_DECRYPT_MODE      (AES_ECB_DECRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
+#define AES_CNT_ECB_ENCRYPT_MODE      (AES_ECB_ENCRYPT_MODE | AES_CNT_INPUT_ORDER | AES_CNT_OUTPUT_ORDER | AES_CNT_INPUT_ENDIAN | AES_CNT_OUTPUT_ENDIAN)
 
 void setup_aeskeyX(uint8_t keyslot, void* keyx);
 void setup_aeskeyY(uint8_t keyslot, void* keyy);
@@ -52,6 +56,8 @@ void set_ctr(void* iv);
 void add_ctr(void* ctr, uint32_t carry);
 void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode);
 void ctr_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+void ecb_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+void cbc_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 void aes_fifos(void* inbuf, void* outbuf, size_t blocks);
 void set_aeswrfifo(uint32_t value);
 uint32_t read_aesrdfifo(void);
