@@ -112,23 +112,9 @@ void add_ctr(void* ctr, uint32_t carry)
     }
 }
 
-void ecb_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+void ecb_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode)
 {
-    size_t blocks_left = size;
-    size_t blocks;
-    uint8_t *in  = inbuf;
-    uint8_t *out = outbuf;
-
-    while (blocks_left)
-    {
-        set_ctr(ctr);
-        blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
-        aes_decrypt(in, out, blocks, mode);
-        //add_ctr(ctr, blocks);
-        in += blocks * AES_BLOCK_SIZE;
-        out += blocks * AES_BLOCK_SIZE;
-        blocks_left -= blocks;
-    }
+    aes_decrypt(inbuf, outbuf, size, mode);
 }
 
 void cbc_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
