@@ -25,7 +25,7 @@ typedef uint32_t ctr_hid_button_type;
 #define CTR_HID_REG     ((volatile ctr_hid_button_type*)0x10146000)
 
 //Button definitions
-#define CTR_HID_NON     0x000u
+#define CTR_HID_NONE     0x000u
 #define CTR_HID_A       0x001u
 #define CTR_HID_B       0x002u
 #define CTR_HID_SELECT  0x004u
