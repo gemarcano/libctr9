@@ -11,6 +11,8 @@
 #include <ctr9/ctr_system.h>
 #include <ctr9/aes.h>
 #include <ctr9/i2c.h>
+#include <ctr9/sha.h>
+
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -48,6 +50,7 @@ void ctr_system_reset(void)
 void ctr_twl_keyslot_setup(void)
 {
 	//Only a9lh really needs to bother with this, and it really only needs to happen once, before ITCM gets messed up.
+	//FIXME do a sanity check to see if the key has been set up for some reason
 	static bool setup = false;
 	if (!setup && ctr_detect_a9lh_entry())
 	{
@@ -73,4 +76,25 @@ void ctr_twl_keyslot_setup(void)
 	}
 	setup = true;
 }
+
+/*
+void ctr_n3ds_ctrnand_keyslot_setup(void)
+{
+	//FIXME do a sanity check to see if the key has been set up for some reason
+	static bool setup = false;
+	if (!setup && ctr_detect_a9lh_entry())
+	{
+		//Get OTP sha hash ASAP
+		uint8_t otp_sha[32];
+		memcpy(otp_sha, REG_SHAHASH, sizeof(otp_sha));
+
+		setup_aeskeyX(0x11, otp_sha);
+		setup_aeskeyY(0x11, otp_sha + 16);
+		use_aeskey(0x11);
+
+
+	}
+	setup = true;
+}
+*/
 

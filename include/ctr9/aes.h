@@ -58,6 +58,7 @@ void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode);
 void ctr_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 void ecb_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode);
 void cbc_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+void ccm_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 void aes_fifos(void* inbuf, void* outbuf, size_t blocks);
 void set_aeswrfifo(uint32_t value);
 uint32_t read_aesrdfifo(void);

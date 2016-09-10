@@ -19,6 +19,22 @@
 .global ctr_cache_clean_data_range, ctr_cache_flush_data_range
 .global ctr_cache_flush_instruction_range, ctr_cache_drain_write_buffer
 
+.type ctr_cache_clean_and_flush_all, %function
+.type ctr_cache_flush_data_all, %function
+.type ctr_cache_flush_data_entry, %function
+.type ctr_cache_data_clean_entry, %function
+.type ctr_cache_data_clean_and_flush_entry, %function
+.type ctr_cache_data_clean_index_entry, %function
+.type ctr_cache_data_clean_and_flush_index_entry, %function
+.type ctr_cache_flush_instruction_all, %function
+.type ctr_cache_flush_instruction_entry, %function
+.type ctr_cache_prefetch_instruction_line, %function
+.type ctr_cache_clean_and_flush, %function
+.type ctr_cache_clean_data_range, %function
+.type ctr_cache_flush_data_range, %function
+.type ctr_cache_flush_instruction_range, %function
+.type ctr_cache_drain_write_buffer, %function
+
 ctr_cache_clean_and_flush_all:
 	mov r1, #0 @segment
 

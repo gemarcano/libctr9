@@ -22,8 +22,13 @@ extern "C" {
 
 typedef enum
 {
-	NAND_CTR, NAND_TWL
+	CRYPTO_CCM, CRYPTO_CTR, CRYPTO_CBC, CRYPTO_ECB
 } ctr_crypto_type;
+
+typedef enum
+{
+	CTR_CRYPTO_ENCRYPTED, CTR_CRYPTO_PLAINTEXT
+} ctr_crypto_disk_type;
 
 /**	@brief Filter io interface to apply encryption while acting on the
  *		underlying interface.
@@ -35,7 +40,12 @@ typedef struct
 
 	uint8_t keySlot;
 	uint8_t ctr[16];
+	uint32_t input_mode;
+	uint32_t output_mode;
 	uint32_t mode;
+
+	void (*crypto_input)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+	void (*crypto_output)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 
 } ctr_crypto_interface;
 

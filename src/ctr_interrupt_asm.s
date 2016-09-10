@@ -15,6 +15,15 @@
 .global ctr_interrupt_databrt_veneer, ctr_interrupt_irq_veneer
 .global ctr_interrupt_fiq_veneer
 
+.type ctr_interrupt_reset_veneer, %function
+.type ctr_interrupt_undef_veneer, %function
+.type ctr_interrupt_swi_veneer, %function
+.type ctr_interrupt_preabrt_veneer, %function
+.type ctr_interrupt_databrt_veneer, %function
+.type ctr_interrupt_irq_veneer, %function
+.type ctr_interrupt_irq_veneer, %function
+.type ctr_interrupt_fiq_veneer, %function
+
 .extern ctr_interrupt_handlers
 
 .macro CTR_INTERRUPT_VENEER table_offset=0

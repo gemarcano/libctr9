@@ -26,6 +26,11 @@ static const ctr_io_interface crypto_base =
 	ctr_crypto_interface_sector_size
 };
 
+static inline void ecb_wrapper(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+{
+	ecb_decrypt(inbuf, outbuf, size, mode);
+}
+
 static inline void process_aes_ctr_blocks(void *buffer, uint8_t *ctr, size_t blocks, uint32_t mode)
 {
 	ctr_decrypt(buffer, buffer, blocks, mode, ctr);
@@ -33,13 +38,87 @@ static inline void process_aes_ctr_blocks(void *buffer, uint8_t *ctr, size_t blo
 
 int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, uint32_t *ctr, ctr_io_interface *lower_io)
 {
+ /*
 	crypto_io->base = crypto_base;
 	crypto_io->lower_io = lower_io;
 	crypto_io->keySlot = keySlot;
-	crypto_io->mode = mode;
+	crypto_io->input_mode = (mode & ~(7u << 27)); //Mask out any mode bits
+	crypto_io->output_mode = (mode & ~(7u << 27)); //Mask out any mode bits
 	memcpy(crypto_io->ctr, ctr, 16);
 
+	uint32_t *encrypt_mode, *decrypt_mode;
+	void (**crypto_encrypt)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+	void (**crypto_decrypt)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+
+	if (type == CTR_CRYPTO_PLAINTEXT)
+	{
+		encrypt_mode = &crypto_io->output_mode;
+		decrypt_mode = &crypto_io->input_mode;
+		crypto_encrypt = &crypto_io->crypto_output;
+		crypto_decrypt = &crypto_io->crypto_input;
+	}
+	else
+	{
+		encrypt_mode = &crypto_io->input_mode;
+		decrypt_mode = &crypto_io->output_mode;
+		crypto_encrypt = &crypto_io->crypto_input;
+		crypto_decrypt = &crypto_io->crypto_output;
+	}
+
+	switch (type)
+	{
+		case CRYPTO_CCM:
+			*encrypt_mode |= AES_CCM_ENCRYPT_MODE;
+			*decrypt_mode |= AES_CCM_DECRYPT_MODE;
+			*crypto_encrypt = ccm_encrypt;
+			*crypto_decrypt = ccm_decrypt;
+			break;
+		case CRYPTO_CTR:
+			*encrypt_mode |= AES_CTR_MODE;
+			*decrypt_mode |= AES_CTR_MODE;
+			*crypto_encrypt = ctr_decrypt;
+			*crypto_decrypt = ctr_decrypt;
+
+			break;
+
+		case CRYPTO_CBC:
+			*encrypt_mode |= AES_CBC_ENCRYPT_MODE;
+			*decrypt_mode |= AES_CBC_DECRYPT_MODE;
+			*crypto_encrypt = cbc_encrypt;
+			*crypto_decrypt = cbc_decrypt;
+
+			break;
+		case CRYPTO_ECB:
+		default:
+			*encrypt_mode |= AES_ECB_ENCRYPT_MODE;
+			*decrypt_mode |= AES_ECB_DECRYPT_MODE;
+			*crypto_encrypt = ecb_wrapper;
+			*crypto_decrypt = ecb_wrapper;
+
+			break;
+	}
+*/
 	return 0;
+}
+
+static void encrypt_sector(ctr_crypto_interface *crypto_io, uint8_t* buffer, uint32_t sector, uint32_t count)
+{
+	if (count)
+	{
+		uint32_t mode = crypto_io->mode;
+		size_t sector_size = ctr_io_sector_size(crypto_io);
+
+		alignas(4) uint8_t ctr[16];
+
+		memcpy(ctr, crypto_io->ctr, 16);
+		add_ctr(ctr, sector * (sector_size / 0x10));
+
+		//apply AES CTR to the data
+		use_aeskey(crypto_io->keySlot);
+
+		size_t blocks_to_do = count * 0x200 / 0x10;
+		process_aes_ctr_blocks(buffer, ctr, blocks_to_do, mode);
+	}
 }
 
 static void applyAESCTRSector(ctr_crypto_interface *crypto_io, uint8_t* buffer, uint32_t sector, uint32_t count)
@@ -55,12 +134,11 @@ static void applyAESCTRSector(ctr_crypto_interface *crypto_io, uint8_t* buffer, 
 
 		//apply AES CTR to the data
 		use_aeskey(crypto_io->keySlot);
-		
+
 		size_t blocks_to_do = count * 0x200 / 0x10;
 		process_aes_ctr_blocks(buffer, ctr, blocks_to_do, mode);
 	}
 }
-
 static void applyAESCTR(ctr_crypto_interface *crypto_io, uint8_t* buffer, uint32_t location, uint32_t count)
 {
 	if (count)

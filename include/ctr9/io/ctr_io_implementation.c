@@ -18,23 +18,24 @@ static inline int ctr_io_implementation_read(void *io, void *buffer, size_t buff
 	int res = 0;
 	if (count && buffer_size)
 	{
+		const size_t sector_size = ctr_io_sector_size(io);
 		size_t total_readable = count < buffer_size ? count : buffer_size;
 
 		uint8_t *dest = buffer;
-		uint8_t buf[0x200u];
-		const size_t base_sector = position / 0x200u;
+		uint8_t buf[sector_size];
+		const size_t base_sector = position / sector_size;
 
 		size_t bytes_read = 0;
 		size_t sectors_read = 0;
 
 		//Section 1: read first sector to extract the right number of bytes from it
-		const size_t start_location = position % 0x200u;
+		const size_t start_location = position % sector_size;
 		res |= read(io, buf, sizeof(buf), base_sector, 1);
 		if (res) return res;
 
 		sectors_read++;
 
-		size_t section_readable = 0x200u - start_location;
+		size_t section_readable = sector_size - start_location;
 		if (section_readable > total_readable)
 		{
 			section_readable = total_readable;
@@ -45,14 +46,14 @@ static inline int ctr_io_implementation_read(void *io, void *buffer, size_t buff
 
 		//Section 2: read all sectors until the last one
 		section_readable = (total_readable - bytes_read);
-		size_t mid_sectors = section_readable / 0x200;
+		size_t mid_sectors = section_readable / sector_size;
 
 		if (mid_sectors)
 		{
 			res |= read(io, dest + bytes_read, section_readable, base_sector + sectors_read, mid_sectors);
 			if (res) return res;
 			sectors_read += mid_sectors;
-			bytes_read += mid_sectors * 0x200u;
+			bytes_read += mid_sectors * sector_size;
 		}
 
 		//Section 3: read last sector to extract the right number of bytes from it
@@ -72,10 +73,11 @@ static inline int ctr_io_implementation_write(void *io, const void *buffer, size
 	int res = 0;
 	if (buffer_size)
 	{
+		const size_t sector_size = ctr_io_sector_size(io);
 		const uint8_t *source = buffer;
-		uint8_t buf[0x200u];
-		const size_t base_sector = position / 0x200u;
-		const size_t start_location = position % 0x200u;
+		uint8_t buf[sector_size];
+		const size_t base_sector = position / sector_size;
+		const size_t start_location = position % sector_size;
 
 		size_t bytes_written = 0;
 		size_t sectors_written = 0;
@@ -84,21 +86,21 @@ static inline int ctr_io_implementation_write(void *io, const void *buffer, size
 		res |= read(io, buf, sizeof(buf), base_sector, ++sectors_written);
 		if (res) return res;
 
-		const size_t writeable = 0x200u - start_location;
+		const size_t writeable = sector_size - start_location;
 		bytes_written += writeable < buffer_size ? writeable : buffer_size;
 
 		memcpy(buf + start_location, source, bytes_written);
 		res |= write(io, buf, sizeof(buffer), base_sector);
 		if (res) return res;
 
-		const size_t mid_sectors = (buffer_size-bytes_written) / 0x200u;
+		const size_t mid_sectors = (buffer_size-bytes_written) / sector_size;
 		//Section 2: write all sectors until the last one
 		if (mid_sectors)
 		{
 			res |= write(io, source + bytes_written, buffer_size-bytes_written, base_sector + sectors_written);
 			if (res) return res;
 			sectors_written += mid_sectors;
-			bytes_written += mid_sectors * 0x200u;
+			bytes_written += mid_sectors * sector_size;
 		}
 
 		//Section 3: read last sector to write back after adding the last bytes from the buffer

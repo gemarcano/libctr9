@@ -50,6 +50,15 @@ typedef struct
 	ctr_sd_interface io;
 } sd_test_data;
 
+typedef struct
+{
+	char *buffer;
+	size_t buffer_size;
+
+	uint8_t data[0x1000];
+	ctr_memory_interface mem_io;
+} memory_test_data;
+
 static bool nand_test1(void *ctx)
 {
 	nand_test_data *data = ctx;
@@ -484,6 +493,132 @@ static bool twl_test3(void *ctx)
 	return !res2 && test1;
 }
 
+static bool memory_test1(void *ctx)
+{
+	memory_test_data *data = ctx;
+	ctr_memory_interface_initialize(&data->mem_io, data->data, sizeof(data->data));
+
+	for (size_t i = 0; i < sizeof(data->data); ++i)
+		data->data[i] = i;
+
+	return true;
+}
+
+static bool memory_test2(void *ctx)
+{
+	memory_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+	ctr_memory_interface_read_sector(&data->mem_io, buffer, buffer_size, 55, 55);
+
+	for (size_t i = 0; i < 55; ++i)
+		if (i+55 != buffer[i])
+			return false;
+
+	return true;
+}
+
+static bool memory_test3(void *ctx)
+{
+	memory_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+	ctr_memory_interface_read(&data->mem_io, buffer, buffer_size, 55, 55);
+
+	for (size_t i = 0; i < 55; ++i)
+		if (i+55 != buffer[i])
+			return false;
+
+	return true;
+}
+
+static bool memory_test4(void *ctx)
+{
+	memory_test_data *data = ctx;
+	uint8_t stuff[0x200];
+	for (size_t i = 0; i < sizeof(stuff); ++i)
+		stuff[i] = 255-i;
+
+	ctr_memory_interface_write_sector(&data->mem_io, stuff, sizeof(stuff), 55);
+
+	return (!memcmp((char*)data->mem_io.buffer + 55, stuff, sizeof(stuff)));
+}
+
+static bool memory_test5(void *ctx)
+{
+	memory_test_data *data = ctx;
+	uint8_t stuff[0x200];
+	for (size_t i = 0; i < sizeof(stuff); ++i)
+		stuff[i] = 255-i;
+
+	ctr_memory_interface_write(&data->mem_io, stuff, sizeof(stuff), 55);
+
+	return (!memcmp((char*)data->mem_io.buffer + 55, stuff, sizeof(stuff)));
+}
+
+static bool crypto_memory_test1(void *ctx)
+{
+	nand_crypto_test_data *data = ctx;
+	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, &data->lower_io->base);
+
+	return !res;
+}
+
+static bool crypto_memory_test2(void *ctx)
+{
+	nand_crypto_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+
+	ctr_nand_interface nand_io;
+	ctr_nand_crypto_interface crypto_io;
+
+	ctr_nand_interface_initialize(&nand_io);
+	ctr_nand_crypto_interface_initialize(&crypto_io, 0x04, NAND_CTR, &nand_io.base);
+
+	ctr_io_read_sector(&nand_io, ((ctr_memory_interface*)(data->io.lower_io))->buffer, ((ctr_memory_interface*)(data->io.lower_io))->buffer_size, 0, 1);
+	char buffer2[512];
+	ctr_io_read_sector(&crypto_io, buffer2, sizeof(buffer2), 0, 1);
+
+	int res = ctr_nand_crypto_interface_read_sector(&data->io, buffer, buffer_size, 55, 55);
+
+
+	return memcmp(buffer, buffer2 + 55, 55) == 0;
+}
+
+static bool crypto_memory_test3(void *ctx)
+{
+	nand_crypto_test_data *data = ctx;
+	char *buffer = data->buffer;
+	size_t buffer_size = data->buffer_size;
+	int res = ctr_nand_crypto_interface_read(&data->io, buffer, buffer_size, 55, 55);
+
+	return true;
+}
+
+static bool crypto_memory_test4(void *ctx)
+{
+	nand_crypto_test_data *data = ctx;
+	uint8_t stuff[0x200];
+	for (size_t i = 0; i < sizeof(stuff); ++i)
+		stuff[i] = 255-i;
+
+	int res = ctr_nand_crypto_interface_write_sector(&data->io, stuff, sizeof(stuff), 55);
+
+	return true;
+}
+
+static bool crypto_memory_test5(void *ctx)
+{
+	nand_crypto_test_data *data = ctx;
+	uint8_t stuff[0x200];
+	for (size_t i = 0; i < sizeof(stuff); ++i)
+		stuff[i] = 255-i;
+
+	//int res = ctr_nand_crypto_interface_write(&data->io, stuff, sizeof(stuff), 55);
+
+	return true;
+}
 #include <ctr9/io/ctr_fatfs.h>
 
 extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
@@ -513,6 +648,8 @@ int main()
 	nand_crypto_test_data nand_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
 	nand_crypto_test_data twl_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
 	sd_test_data sd_ctx = {buffer, sizeof(buffer), {{0}}};
+	memory_test_data memory_ctx = {buffer, sizeof(buffer), {0}, {{0}}};
+	nand_crypto_test_data crypto_memory_ctx = {buffer, sizeof(buffer), {{0}}, &memory_ctx.mem_io};
 
 	ctr_unit_test nand_tests_f[11];
 	ctr_unit_tests nand_tests;
@@ -554,10 +691,32 @@ int main()
 	ctr_unit_tests_add_test(&twl_crypto_tests, (ctr_unit_test){ "twl mount and read", &twl_crypto_ctx, twl_test2 });
 	ctr_unit_tests_add_test(&twl_crypto_tests, (ctr_unit_test){ "twl mount nested", &twl_crypto_ctx, twl_test3 });
 
+	ctr_unit_test memory_tests_f[5];
+	ctr_unit_tests memory_tests;
+	ctr_unit_tests_initialize(&memory_tests, "ctr io memory tests", memory_tests_f, 5);
+	ctr_unit_tests_add_test(&memory_tests, (ctr_unit_test){ "memory_initialize", &memory_ctx, memory_test1 });
+	ctr_unit_tests_add_test(&memory_tests, (ctr_unit_test){ "memory_read_sector", &memory_ctx, memory_test2 });
+	ctr_unit_tests_add_test(&memory_tests, (ctr_unit_test){ "memory_read", &memory_ctx, memory_test3 });
+	ctr_unit_tests_add_test(&memory_tests, (ctr_unit_test){ "memory_write_sector", &memory_ctx, memory_test4 });
+	ctr_unit_tests_add_test(&memory_tests, (ctr_unit_test){ "memory_write", &memory_ctx, memory_test5 });
+
+
+	ctr_unit_test crypto_memory_tests_f[5];
+	ctr_unit_tests crypto_memory_tests;
+	ctr_unit_tests_initialize(&crypto_memory_tests, "ctr crypto io memory tests", crypto_memory_tests_f, 5);
+	ctr_unit_tests_add_test(&crypto_memory_tests, (ctr_unit_test){ "crypto memory_initialize", &crypto_memory_ctx, crypto_memory_test1 });
+	ctr_unit_tests_add_test(&crypto_memory_tests, (ctr_unit_test){ "crypto memory_read_sector", &crypto_memory_ctx, crypto_memory_test2 });
+	ctr_unit_tests_add_test(&crypto_memory_tests, (ctr_unit_test){ "crypto memory_read", &crypto_memory_ctx, crypto_memory_test3 });
+	ctr_unit_tests_add_test(&crypto_memory_tests, (ctr_unit_test){ "crypto memory_write_sector", &crypto_memory_ctx, crypto_memory_test4 });
+	ctr_unit_tests_add_test(&crypto_memory_tests, (ctr_unit_test){ "crypto memory_write", &crypto_memory_ctx, crypto_memory_test5 });
+
+
 	int res = ctr_execute_unit_tests(&nand_tests);
 	res |= ctr_execute_unit_tests(&nand_crypto_tests);
 	res |= ctr_execute_unit_tests(&sd_tests);
 	res |= ctr_execute_unit_tests(&twl_crypto_tests);
+	res |= ctr_execute_unit_tests(&memory_tests);
+	res |= ctr_execute_unit_tests(&crypto_memory_tests);
 
 	FATFS fs = { 0 };
 	FIL test_file = { 0 };
@@ -806,7 +965,7 @@ int main()
 	printf("Comparing aes results: %d\n", memcmp(output_buffer2, output_buffer3, sizeof(output_buffer)));
 
 	alignas(4) uint8_t test_key[16] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
-	alignas(4) uint8_t test_key_i[16] = { 0x3c, 0x4f, 0xcf, 0x09, 0x88, 0x15, 0xf7, 0xab, 0xa6, 0xd2, 0xae, 0x28, 0x16, 0x15, 0x7e, 0x2b }; 
+	alignas(4) uint8_t test_key_i[16] = { 0x3c, 0x4f, 0xcf, 0x09, 0x88, 0x15, 0xf7, 0xab, 0xa6, 0xd2, 0xae, 0x28, 0x16, 0x15, 0x7e, 0x2b };
 	alignas(4) uint8_t test_iv[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 	alignas(4) uint8_t cipher_cbc[32] = { 0x76, 0x49, 0xab, 0xac, 0x81, 0x19, 0xb2, 0x46, 0xce, 0xe9, 0x8e, 0x9b, 0x12, 0xe9, 0x19, 0x7d,
 		0x50, 0x86, 0xcb, 0x9b, 0x50, 0x72, 0x19, 0xee, 0x95, 0xdb, 0x11, 0x3a, 0x91, 0x76, 0x78, 0xb2};

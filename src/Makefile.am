@@ -10,7 +10,7 @@ libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	gamecart/command_ntr.c  gamecart/protocol.c  gamecart/protocol_ctr.c  \
 	gamecart/protocol_ntr.c ctr_cart_interface.c gamecart/delay.s ctr_headers.c \
 	ctr_timer.c ctr_irq.c ctr_system_clock.c ctr_gfx.c ctr_cache.s \
-	ctr_crypto_interface.c
+	ctr_crypto_interface.c ctr_memory_interface.c
 
 ctr_interrupt.o : AM_CFLAGS += -marm #Force ARM mode for ctr_interrupt
 ctr_irq.o : AM_CFLAGS += -marm #Force ARM mode for ctr_system_ARM
@@ -59,8 +59,8 @@ ctrioinclude_HEADERS = $(includedirectory)/ctr9/io/ctr_fatfs_interface.h \
 	$(includedirectory)/ctr9/io/ctr_cart_interface.h \
 	$(includedirectory)/ctr9/io/ctr_io_implementation.h \
 	$(includedirectory)/ctr9/io/ctr_io_implementation.c \
-	$(includedirectory)/ctr9/io/ctr_crypto_interface.h
-
+	$(includedirectory)/ctr9/io/ctr_crypto_interface.h \
+	$(includedirectory)/ctr9/io/ctr_memory_interface.h
 
 ctrfatfsinclude_HEADERS = $(includedirectory)/ctr9/io/fatfs/ff.h \
 	$(includedirectory)/ctr9/io/fatfs/ctr_fatfs_disk.h \

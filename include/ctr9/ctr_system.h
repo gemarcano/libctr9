@@ -36,6 +36,11 @@ bool ctr_detect_a9lh_entry(void);
  *	This only really matters if arm9 execution is obtained via a9lh, or prior to
  *	a FIRM load. Nothing happens if FIRM had been launched previously.
  *
+ *	@pre The areas of ITCM with TWL information are intact.
+ *	@post TWL keys are setup. Note that this also does use the SHA subsystem, so
+ *		the SHA register is modified. This means that under a9lh this overwrites
+ *		the OTP hash, so back it up before calling this function.
+ *
  *	@post The TWL keyslot is setup properly.
  */
 void ctr_twl_keyslot_setup(void);

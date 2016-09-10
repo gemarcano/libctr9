@@ -88,6 +88,7 @@ void add_ctr(void* ctr, uint32_t carry)
     int32_t i;
 
     for(i = 0; i < 4; i++) {
+		//FIXME this assumes alignment...
         counter[i] = ((uint32_t)outctr[i*4+0]<<24) | ((uint32_t)outctr[i*4+1]<<16) | ((uint32_t)outctr[i*4+2]<<8) | ((uint32_t)outctr[i*4+3]<<0);
     }
 
