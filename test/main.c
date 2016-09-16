@@ -23,6 +23,8 @@
 #include <ctr9/ctr_gfx.h>
 #include <ctr9/ctr_cache.h>
 
+int DEBUG = 0;
+
 #include "test.h"
 
 void scribble_screen(void);
@@ -830,6 +832,11 @@ int main()
 	printf("ROM SIZE: %X\n", ctr_cart_interface_disk_size(&cart));
 	printf("Finished dumping, hopefully.: %d\n %d %d\n", open_res, write_res, bw);
 */
+	mmcdevice dev1= *getMMCDevice(1);
+	mmcdevice dev0= *getMMCDevice(0);
+	printf("SDHandle: %d\n", dev0.isSDHC);
+	printf("SDHandle: %d\n", dev1.isSDHC);
+
 	printf("Trying timer stuff\n");
 	ctr_timer_disable_irq(CTR_TIMER0);
 	uint16_t starting_timer = ctr_timer_get_value(CTR_TIMER0);
