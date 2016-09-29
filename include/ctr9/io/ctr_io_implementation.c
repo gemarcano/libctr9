@@ -90,7 +90,7 @@ static inline int ctr_io_implementation_write(void *io, const void *buffer, size
 		bytes_written += writeable < buffer_size ? writeable : buffer_size;
 
 		memcpy(buf + start_location, source, bytes_written);
-		res |= write(io, buf, sizeof(buffer), base_sector);
+		res |= write(io, buf, sizeof(buf), base_sector);
 		if (res) return res;
 
 		const size_t mid_sectors = (buffer_size-bytes_written) / sector_size;

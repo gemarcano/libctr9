@@ -605,9 +605,12 @@ static bool crypto_memory_test4(void *ctx)
 	for (size_t i = 0; i < sizeof(stuff); ++i)
 		stuff[i] = 255-i;
 
-	int res = ctr_nand_crypto_interface_write_sector(&data->io, stuff, sizeof(stuff), 55);
+	int res = ctr_nand_crypto_interface_write_sector(&data->io, stuff, sizeof(stuff), 0x0);
+	uint8_t stuff2[sizeof(stuff)];
+	res = ctr_nand_crypto_interface_read_sector(&data->io, stuff2, sizeof(stuff2), 0x0, sizeof(stuff2));
 
-	return true;
+	bool result = !memcmp(stuff, stuff2, sizeof(stuff));
+	return result;
 }
 
 static bool crypto_memory_test5(void *ctx)
@@ -617,9 +620,12 @@ static bool crypto_memory_test5(void *ctx)
 	for (size_t i = 0; i < sizeof(stuff); ++i)
 		stuff[i] = 255-i;
 
-	//int res = ctr_nand_crypto_interface_write(&data->io, stuff, sizeof(stuff), 55);
+	int res = ctr_nand_crypto_interface_write(&data->io, stuff, 5, 10);
+	uint8_t stuff2[sizeof(stuff)];
+	res = ctr_nand_crypto_interface_read(&data->io, stuff2, sizeof(stuff2), 0x5, sizeof(stuff2)-5);
 
-	return true;
+	bool result = !memcmp(stuff, stuff2 + 5, 10);
+	return result;
 }
 #include <ctr9/io/ctr_fatfs.h>
 
