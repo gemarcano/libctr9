@@ -622,9 +622,9 @@ static bool crypto_memory_test5(void *ctx)
 
 	int res = ctr_nand_crypto_interface_write(&data->io, stuff, 5, 10);
 	uint8_t stuff2[sizeof(stuff)];
-	res = ctr_nand_crypto_interface_read(&data->io, stuff2, sizeof(stuff2), 0x5, sizeof(stuff2)-5);
+	res = ctr_nand_crypto_interface_read(&data->io, stuff2, sizeof(stuff2), 10, sizeof(stuff2)-5);
 
-	bool result = !memcmp(stuff, stuff2 + 5, 10);
+	bool result = !memcmp(stuff, stuff2, 5);
 	return result;
 }
 #include <ctr9/io/ctr_fatfs.h>

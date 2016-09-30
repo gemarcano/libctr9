@@ -292,6 +292,13 @@ typedef struct
 	size_t window_size;
 	size_t window_offset;
 
+	size_t sector;
+	size_t sector_size;
+
+	size_t block;
+	size_t block_offset;
+	size_t block_size;
+
 	const uint8_t *buffer;
 	const size_t buffer_size;
 	size_t buffer_offset;
@@ -300,52 +307,82 @@ typedef struct
 } write_window;
 
 //window_size is a multiple of the sector size by definition
-static inline void setup_window(ctr_nand_crypto_interface *io, write_window *window, size_t sector, size_t sector_size, size_t block_size)
+static inline int setup_window(ctr_nand_crypto_interface *io, write_window *window, size_t sector, size_t sector_size, size_t block_size)
 {
 	//FIXME what if sectors_to_copy > window_size?
 	//That can never happen, since window_size == lcm(sector_size, block_size) * 4 + sector_size * sectors_per_block, so window size should be large enough for at least 4 blocks
 	size_t sectors_to_copy_prior = get_chunks_to_complete_relative_chunk_backwards(sector, sector_size, block_size);
-	window->current_sector -= sectors_to_copy_prior;
+
+	window->sector = sector - sectors_to_copy_prior;
+	window->current_sector = sector;
+	window->sector_size = sector_size;
+
+	window->block = get_prev_relative_chunk(window->current_sector, sector_size, block_size);
+	window->block_offset = get_chunk_position(window->block, block_size) - get_chunk_position(window->sector, sector_size);
+	window->block_size = block_size;
+
 	window->window_offset = sectors_to_copy_prior * sector_size;
+
+	int res = ctr_io_read_sector(io->lower_io, window->window, window->window_size, window->sector, sectors_to_copy_prior);
+
+	return res;
+}
+
+static inline void update_window(write_window *window, size_t sectors_processed)
+{
+	size_t sector_size = window->sector_size;
+	size_t block_size = window->block_size;
+	size_t window_size = window->window_size;
+	size_t bytes_processed = sectors_processed * sector_size;
+
+	//Copy sector that contain part of next block
+	size_t remaining_bytes = window->window_size - bytes_processed;
+	memmove(window->window, window->window + window->window_offset, remaining_bytes);
+
+	window->current_sector += sectors_processed;
+	window->sector += sectors_processed - remaining_bytes / sector_size;
+
+	size_t sectors_ = get_chunks_to_complete_relative_chunk_backwards(window->current_sector, sector_size, block_size);
+	window->block = get_prev_relative_chunk(window->current_sector, sector_size, block_size);
+	window->block_offset = remaining_bytes;
+	window->window_offset = remaining_bytes;
 }
 
 static inline int process_window(ctr_nand_crypto_interface *io, write_window *window, size_t sector_size, size_t block_size, void (*block_function)(void *io, void *buffer, uint64_t block, size_t block_count))
 {
+	//FIXME what if we try to read more than there is disk? Return zeros?
 	size_t sectors_to_read = (window->window_size - window->window_offset) / sector_size;
 	int res = ctr_io_read_sector(io->lower_io, window->window + window->window_offset, window->window_size - window->window_offset, window->current_sector, sectors_to_read);
 	if (res)
 		return -1;
 
-	size_t current_block = get_next_relative_chunk(window->current_sector, sector_size, block_size);
-	uint64_t block_pos = get_chunk_position(current_block, block_size);
-	uint64_t block_start_offset = block_pos - get_chunk_position(window->current_sector, sector_size);
+	size_t block_start_offset = window->block_offset;
 	uint8_t *pos = window->window + block_start_offset;
-	size_t blocks_to_process = window->window_size / block_size;
 
-	//In the case that blocks are aligned to sectors, this is not necessary... FIXME
-	block_function(io, pos, current_block, blocks_to_process);
-
-	//now copy data from buffer
 	size_t amount_to_copy = window->window_size - window->window_offset;
 	if (amount_to_copy > window->buffer_size - window->buffer_offset)
 		amount_to_copy = window->buffer_size - window->buffer_offset;
 
-	memcpy(window->window + window->window_offset, window->buffer + window->buffer_offset, window->window_size - window->window_offset);
-	window->buffer_offset += window->window_size - window->window_offset;
+	//In the case that blocks are aligned to sectors, this is not necessary... FIXME
+	//only process parts that won't be overwritten completely
+	//	from block_start_offset to window->window_offset
+	size_t blocks_to_process = CEIL(window->window_offset - block_start_offset, block_size);
+	block_function(io, pos, window->block, blocks_to_process);
 
-	block_function(io, pos, current_block, blocks_to_process);
+	//now copy data from buffer
+	memcpy(window->window + window->window_offset, window->buffer + window->buffer_offset, amount_to_copy);
+	window->buffer_offset += amount_to_copy;
 
-	size_t sectors_processed = (window->window_size - window->window_offset)/sector_size;
-	res = ctr_io_write_sector(io->lower_io, window->window, sectors_processed * sector_size, window->current_sector);
+	blocks_to_process = CEIL(amount_to_copy + window->window_offset - block_start_offset, block_size);
+	block_function(io, pos, window->block, blocks_to_process);
+
+	size_t sectors_processed = (amount_to_copy + window->window_offset) / sector_size;
+	res = ctr_io_write_sector(io->lower_io, window->window, sectors_processed * sector_size, window->sector);
 	if (res)
 		return -2;
 
 	//Copy sector that contain part of next block
-	size_t remaining_bytes = window->window_size - (uint64_t)sectors_processed * sector_size;
-	memmove(window->window, window->window + window->window_offset, remaining_bytes);
-
-	window->current_sector += sectors_processed;
-	window->window_offset = remaining_bytes;
+	update_window(window, sectors_processed);
 
 	return window->buffer_offset >= window->buffer_size;
 }
@@ -383,7 +420,6 @@ int ctr_nand_crypto_interface_write_sector(void *io, const void *buffer, size_t 
 
 		setup_window(io, &window, sector, sector_size, block_size);
 
-		size_t sectors_left = number_of_sectors;
 		res = process_window(io, &window, sector_size, block_size, block_function);
 		while(!res)
 		{
