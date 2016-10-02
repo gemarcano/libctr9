@@ -33,7 +33,9 @@ typedef enum
 /**	@brief Filter io interface to apply encryption while acting on the
  *		underlying interface.
  */
-typedef struct
+typedef struct ctr_crypto_interface ctr_crypto_interface;
+
+struct ctr_crypto_interface
 {
 	ctr_io_interface base;
 	ctr_io_interface *lower_io;
@@ -44,10 +46,14 @@ typedef struct
 	uint32_t output_mode;
 	uint32_t mode;
 
+	void (*advance_ctr_input)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
+	void (*advance_ctr_output)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
 	void (*crypto_input)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 	void (*crypto_output)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 
-} ctr_crypto_interface;
+	size_t block_size;
+
+};
 
 /**	@brief Initialize the given crypto io interface object.
  *
@@ -63,7 +69,7 @@ typedef struct
  *
  *	@post The io interface has been initialized and can be used for decrypting.
  */
-int ctr_crypto_interface_initialize(ctr_crypto_interface *io, uint8_t key_slot, uint32_t mode, uint32_t *ctr, ctr_io_interface* lower_io);
+int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint32_t *ctr, ctr_io_interface *lower_io);
 
 /** @brief Destroys the given crypto io interface object.
  *

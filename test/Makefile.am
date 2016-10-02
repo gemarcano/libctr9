@@ -3,7 +3,7 @@ include $(top_srcdir)/common.mk
 EXTRA_PROGRAMS = test
 test_CFLAGS=$(AM_CFLAGS) -T$(srcdir)/arm9loaderhax.ld -nostartfiles
 test_LDFLAGS=$(AM_LDFLAGS) -lctr -lc -lgcc
-test_SOURCES = main.c start.s test.c test.h interrupt.c
+test_SOURCES = main.c start.s test.c test.h interrupt.c nand_tests.h nand_tests.c nand_crypto_tests.h nand_crypto_tests.c sd_tests.h sd_tests.c twl_tests.c twl_tests.h memory_tests.h memory_tests.c crypto_memory_tests.h crypto_memory_tests.c
 test_LDADD = $(top_builddir)/src/libctr9.a
 
 EXTRA_DIST = arm9loaderhax.ld
@@ -20,5 +20,5 @@ clean-local:
 	rm -f test.bin
 
 test.bin: test
-	$(OBJCOPY) $(OCFLAGS) -O binary test test.bin
+	cp test test.bin
 

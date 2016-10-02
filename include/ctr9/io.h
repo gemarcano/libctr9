@@ -19,6 +19,7 @@
 #include "io/ctr_fatfs.h"
 #include "io/ctr_cart_interface.h"
 #include "io/ctr_memory_interface.h"
+#include "io/ctr_crypto_interface.h"
 
 #endif//CTR_IO_H_
 
