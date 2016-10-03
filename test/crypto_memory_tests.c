@@ -24,7 +24,7 @@ static bool crypto_memory_test2(void *ctx)
 	ctr_nand_interface_initialize(&nand_io);
 	ctr_nand_crypto_interface_initialize(&crypto_io, 0x04, NAND_CTR, &nand_io.base);
 
-	ctr_io_read_sector(&nand_io, ((ctr_memory_interface*)(data->io.lower_io))->buffer, ((ctr_memory_interface*)(data->io.lower_io))->buffer_size, 0, 1);
+	ctr_io_read_sector(&nand_io, ((ctr_memory_interface*)(data->io.crypto_io.lower_io))->buffer, ((ctr_memory_interface*)(data->io.crypto_io.lower_io))->buffer_size, 0, 1);
 	char buffer2[512];
 	ctr_io_read_sector(&crypto_io, buffer2, sizeof(buffer2), 0, 1);
 

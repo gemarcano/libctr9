@@ -11,6 +11,7 @@
 #ifndef CTR_NAND_CRYPTO_INTERFACE_H_
 #define CTR_NAND_CRYPTO_INTERFACE_H_
 
+#include "ctr_crypto_interface.h"
 #include "ctr_io_interface.h"
 #include "sdmmc/sdmmc.h"
 
@@ -30,12 +31,7 @@ typedef enum
 typedef struct
 {
 	ctr_io_interface base;
-	ctr_io_interface *lower_io;
-
-	uint8_t keySlot;
-	uint8_t ctr[16];
-	uint32_t mode;
-
+	ctr_crypto_interface crypto_io;
 } ctr_nand_crypto_interface;
 
 /**	@brief Initialize the given NAND crypto io interface object.

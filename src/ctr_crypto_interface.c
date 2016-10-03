@@ -74,7 +74,7 @@ static inline void input(void *io, void *buffer, uint64_t block, size_t block_co
 	ctr_crypto_interface *crypto_io = io;
 	if (block_count)
 	{
-		uint32_t mode = crypto_io->mode;
+		uint32_t mode = crypto_io->input_mode;
 		alignas(4) uint8_t ctr[16];
 
 		memcpy(ctr, crypto_io->ctr, 16);
@@ -92,7 +92,7 @@ static inline void output(void *io, void *buffer, uint64_t block, size_t block_c
 	ctr_crypto_interface *crypto_io = io;
 	if (block_count)
 	{
-		uint32_t mode = crypto_io->mode;
+		uint32_t mode = crypto_io->output_mode;
 		alignas(4) uint8_t ctr[16];
 
 		memcpy(ctr, crypto_io->ctr, 16);
@@ -149,8 +149,8 @@ int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t key
 		case CRYPTO_CCM:
 			*encrypt_mode |= AES_CCM_ENCRYPT_MODE;
 			*decrypt_mode |= AES_CCM_DECRYPT_MODE;
-			*crypto_encrypt = ccm_encrypt;
-			*crypto_decrypt = ccm_decrypt;
+			//*crypto_encrypt = ccm_decrypt; FIXME TODO
+			//*crypto_decrypt = ccm_decrypt; FIXME TODO
 			*advance_ctr_encrypt = ccm_advance_ctr;
 			*advance_ctr_decrypt = ccm_advance_ctr;
 			break;
@@ -166,7 +166,7 @@ int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t key
 		case CRYPTO_CBC:
 			*encrypt_mode |= AES_CBC_ENCRYPT_MODE;
 			*decrypt_mode |= AES_CBC_DECRYPT_MODE;
-			*crypto_encrypt = cbc_encrypt;
+			*crypto_encrypt = cbc_decrypt;
 			*crypto_decrypt = cbc_decrypt;
 			*advance_ctr_encrypt = cbc_advance_ctr;
 			*advance_ctr_decrypt = cbc_advance_ctr;

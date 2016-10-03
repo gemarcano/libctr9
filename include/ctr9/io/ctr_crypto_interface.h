@@ -44,7 +44,6 @@ struct ctr_crypto_interface
 	uint8_t ctr[16];
 	uint32_t input_mode;
 	uint32_t output_mode;
-	uint32_t mode;
 
 	void (*advance_ctr_input)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
 	void (*advance_ctr_output)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
