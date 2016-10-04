@@ -24,16 +24,8 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <stdlib.h>
-#include <inttypes.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <errno.h>
 
 #include <ctr9/io/sdmmc/sdmmc.h>
-//#include "DrawCharacter.h"
 
 #define DATA32_SUPPORT
 
