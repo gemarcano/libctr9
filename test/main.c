@@ -349,6 +349,7 @@ int main()
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*4));
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*5));
 
+
 	memset(ctr, 0, sizeof(ctr));
 	memset(ctr2, 0, sizeof(ctr2));
 	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE, ctr);
@@ -401,12 +402,47 @@ int main()
 	{
 		printf("%02X ", output_buffer[i]);
 	}
+	printf("\n");
+
+	memcpy(iv, test_iv, AES_BLOCK_SIZE);
+	ctr_memory_interface mem_io;
+	ctr_memory_interface_initialize(&mem_io, cipher_cbc, sizeof(cipher_cbc));
+	ctr_crypto_interface test1;
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io);
+	memset(output_buffer, 0xFF, sizeof(output_buffer));
+	ctr_io_read(&test1, output_buffer, sizeof(output_buffer), 0, 32);
+	for (size_t i = 0; i < 32; ++i)
+	{
+		printf("%02X ", output_buffer[i]);
+	}
+	printf("Comparing ctr_crypto cbc results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
+
 
 	ecb_decrypt(cipher_ecb, output_buffer, 0x2, AES_CNT_ECB_DECRYPT_MODE);
 	printf("Comparing ecb results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
+
+	ctr_memory_interface_initialize(&mem_io, cipher_ecb, sizeof(cipher_ecb));
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io);
+	memset(output_buffer, 0xFF, sizeof(output_buffer));
+	ctr_io_read(&test1, output_buffer, sizeof(output_buffer), 0, 32);
+	printf("Comparing ctr_crypto ecb results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
+
+
 	cbc_decrypt(plaintext, output_buffer, 0x2, AES_CNT_CBC_ENCRYPT_MODE, iv);
 	printf("Comparing cbc results: %d\n", memcmp(output_buffer, cipher_cbc, AES_BLOCK_SIZE * 2));
+
+	memcpy(iv, test_iv, AES_BLOCK_SIZE);
+	memset(output_buffer, 0xFF, sizeof(output_buffer));
+	ctr_memory_interface_initialize(&mem_io, output_buffer, sizeof(output_buffer));
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io);
+	ctr_io_write(&test1, plaintext, sizeof(plaintext), 0);
+	ctr_io_read(&mem_io, output_buffer2, sizeof(output_buffer2), 0, 32);
+
+	printf("Comparing ctr_crypto cbc results: %d\n", memcmp(output_buffer2, cipher_cbc, AES_BLOCK_SIZE * 2));
+	ctr_memory_interface_initialize(&mem_io, cipher_ecb, sizeof(cipher_ecb));
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io);
+
 	aes_decrypt(plaintext, output_buffer, 0x2, AES_CNT_ECB_ENCRYPT_MODE);
 	printf("Comparing ecb results: %d\n", memcmp(output_buffer, cipher_ecb, AES_BLOCK_SIZE * 2));
 

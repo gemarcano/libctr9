@@ -12,9 +12,9 @@
 #define CTR_CRYPTO_INTERFACE_H_
 
 #include "ctr_io_interface.h"
-#include "sdmmc/sdmmc.h"
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,7 +51,6 @@ struct ctr_crypto_interface
 	void (*crypto_output)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
 
 	size_t block_size;
-
 };
 
 /**	@brief Initialize the given crypto io interface object.
@@ -68,7 +67,7 @@ struct ctr_crypto_interface
  *
  *	@post The io interface has been initialized and can be used for decrypting.
  */
-int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint32_t *ctr, ctr_io_interface *lower_io);
+int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, ctr_io_interface *lower_io);
 
 /** @brief Destroys the given crypto io interface object.
  *

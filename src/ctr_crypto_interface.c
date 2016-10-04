@@ -104,7 +104,7 @@ static inline void output(void *io, void *buffer, uint64_t block, size_t block_c
 	}
 }
 
-int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint32_t *ctr, ctr_io_interface *lower_io)
+int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, ctr_io_interface *lower_io)
 {
 	crypto_io->base = crypto_base;
 	crypto_io->lower_io = lower_io;
@@ -494,6 +494,7 @@ static inline int process_window(ctr_crypto_interface *io, write_window *window,
 	//only process parts that won't be overwritten completely
 	//	from block_start_offset to window->window_offset
 	size_t blocks_to_process = CEIL(window->window_offset - block_start_offset, block_size);
+	if (!blocks_to_process) blocks_to_process = 1;
 	output_function(io, pos, window->block, blocks_to_process);
 
 	//now copy data from buffer
@@ -503,8 +504,10 @@ static inline int process_window(ctr_crypto_interface *io, write_window *window,
 	blocks_to_process = CEIL(amount_to_copy + window->window_offset - block_start_offset, block_size);
 	input_function(io, pos, window->block, blocks_to_process);
 
+	//We need to write out the full blocks processed actually, not just the sectors
 	size_t sectors_processed = (amount_to_copy + window->window_offset) / sector_size;
-	res = ctr_io_write_sector(io->lower_io, window->window, sectors_processed * sector_size, window->sector);
+	size_t sectors_to_copy = CEIL(blocks_to_process * block_size, sector_size);
+	res = ctr_io_write_sector(io->lower_io, window->window, sectors_to_copy * sector_size, window->sector);
 	if (res)
 		return -2;
 
