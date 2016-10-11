@@ -77,7 +77,8 @@ void ctr_twl_keyslot_setup(void)
 	setup = true;
 }
 
-/*
+#include <ctr9/io.h>
+
 void ctr_n3ds_ctrnand_keyslot_setup(void)
 {
 	//FIXME do a sanity check to see if the key has been set up for some reason
@@ -86,15 +87,40 @@ void ctr_n3ds_ctrnand_keyslot_setup(void)
 	{
 		//Get OTP sha hash ASAP
 		uint8_t otp_sha[32];
-		memcpy(otp_sha, REG_SHAHASH, sizeof(otp_sha));
+		memcpy(otp_sha, (void*)REG_SHAHASH, sizeof(otp_sha));
 
 		setup_aeskeyX(0x11, otp_sha);
 		setup_aeskeyY(0x11, otp_sha + 16);
 		use_aeskey(0x11);
 
+		ctr_nand_interface io;
+		ctr_nand_interface_initialize(&io);
+		ctr_crypto_interface cr;
+		uint8_t ctr[16];
+		ctr_crypto_interface_initialize(&cr, 0x11, AES_CNT_ECB_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, ctr, &io.base);
+		uint8_t sector[512];
+		ctr_io_read_sector(&cr, sector, sizeof(sector), 0x96, 1);
+		for (int i = 0; i < 16; ++i)
+		{
+			tfp_printf("%02X", sector[i]);
+		}
+		tfp_printf("\n");
 
+		for (int i = 16; i < 32; ++i)
+		{
+			tfp_printf("%02X", sector[i]);
+		}
+		tfp_printf("\n");
+
+		ctr_io_read(&cr, sector, sizeof(sector), 0x96 * 512, 16);
+		for (int i = 0; i < 16; ++i)
+		{
+			tfp_printf("%02X", sector[i]);
+		}
+		tfp_printf("\n");
+
+		input_wait();
 	}
 	setup = true;
 }
-*/
 

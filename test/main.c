@@ -60,14 +60,21 @@ static bool crypto_tests1(void *ctx)
 
 
 #include <ctr9/io/ctr_fatfs.h>
+#include <ctr9/sha.h>
+
 
 extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
 void abort_interrupt(uint32_t*);
 void prefetch_abort(uint32_t*);
 void undefined_instruction(uint32_t*);
 
+uint8_t otp_sha[32];
+
 int main()
 {
+	memset(otp_sha, 0, 0x20);
+	memcpy(otp_sha, REG_SHAHASH, 0x20);
+
 	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
 	ctr_gfx_screen top_screen, bottom_screen;
 	ctr_gfx_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
@@ -77,6 +84,14 @@ int main()
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0x111111);
 	printf("UNIT TESTING\n");
+
+for (int i = 0; i < 32; ++i)
+	{
+		printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
+	}
+	printf("\n");
+
+	ctr_n3ds_ctrnand_keyslot_setup();
 
 	ctr_interrupt_prepare();
 	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
@@ -415,6 +430,7 @@ int main()
 	{
 		printf("%02X ", output_buffer[i]);
 	}
+	printf("\n");
 	printf("Comparing ctr_crypto cbc results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
 
 
@@ -462,6 +478,10 @@ int main()
 	f_open(&dump, "SD:/dump.cbc", FA_WRITE | FA_READ  | FA_CREATE_ALWAYS);
 	int br;
 	f_write(&dump, output_buffer2, 0x1FFFF * 16, &br);
+	f_close(&dump);
+
+	f_open(&dump, "SD:/sha.sha.sha", FA_WRITE | FA_READ | FA_CREATE_ALWAYS);
+	f_write(&dump, otp_sha, 32, &br);
 	f_close(&dump);
 
 	input_wait();
