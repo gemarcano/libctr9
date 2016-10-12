@@ -28,11 +28,11 @@ typedef struct
 	uint8_t enc_keyx[16];
 	uint8_t keyy[16];
 	uint8_t ctr[16];
-	uint8_t ascii_size;
+	uint8_t ascii_size[8];
 	uint8_t unknown[8]; //FIXME
 	uint8_t control_block[16];
 	uint8_t hardware_debug[16]; //9.5+
-	uint8_t enc_key16x; //9.5+
+	uint8_t enc_key16x[16]; //9.5+
 } ctr_arm9bin_header;
 
 void ctr_firm_section_header_load(ctr_firm_section_header *header, void *data);
