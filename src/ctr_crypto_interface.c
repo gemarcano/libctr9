@@ -202,13 +202,13 @@ int ctr_crypto_interface_write(void *io, const void *buffer, size_t buffer_size,
 uint64_t ctr_crypto_interface_disk_size(void *io)
 {
 	ctr_crypto_interface *crypto_io = io;
-	return crypto_io->lower_io->disk_size(io);
+	return crypto_io->lower_io->disk_size(crypto_io->lower_io);
 }
 
 size_t ctr_crypto_interface_sector_size(void *io)
 {
 	ctr_crypto_interface *crypto_io = io;
-	return crypto_io->lower_io->sector_size(io);
+	return crypto_io->lower_io->sector_size(crypto_io->lower_io);
 }
 
 //Begin block/sector hell

@@ -85,7 +85,7 @@ int main()
 	draw_clear_screen(SCREEN_TOP, 0x111111);
 	printf("UNIT TESTING\n");
 
-for (int i = 0; i < 32; ++i)
+	for (int i = 0; i < 32; ++i)
 	{
 		printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
 	}

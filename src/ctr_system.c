@@ -79,10 +79,11 @@ void ctr_twl_keyslot_setup(void)
 
 #include <ctr9/io.h>
 #include <ctr9/ctr_firm.h>
+#include <stdlib.h>
 
 void ctr_n3ds_ctrnand_keyslot_setup(void)
 {
-/*
+	/*
 	//FIXME do a sanity check to see if the key has been set up for some reason
 	static bool setup = false;
 	if (!setup && ctr_detect_a9lh_entry())
@@ -102,29 +103,11 @@ void ctr_n3ds_ctrnand_keyslot_setup(void)
 		ctr_crypto_interface cr;
 		uint8_t ctr[16];
 		ctr_crypto_interface_initialize(&cr, 0x11, AES_CNT_ECB_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, ctr, &io.base);
-		uint8_t sector[512];
-		ctr_io_read_sector(&cr, sector, sizeof(sector), 0x96, 1);
-		for (int i = 0; i < 16; ++i)
-		{
-			tfp_printf("%02X", sector[i]);
-		}
-		tfp_printf("\n");
-
-		for (int i = 16; i < 32; ++i)
-		{
-			tfp_printf("%02X", sector[i]);
-		}
-		tfp_printf("\n");
-
-		ctr_io_read(&cr, sector, sizeof(sector), 0x96 * 512, 16);
-		for (int i = 0; i < 16; ++i)
-		{
-			tfp_printf("%02X", sector[i]);
-		}
-		tfp_printf("\n");
+		uint8_t key[16];
+		ctr_io_read(&cr, key, sizeof(key), 0x96 * 512, 16);
 
 		//get first key in secret sector (FIXME do we always want this to happen??? even for 9.5+?)
-		setup_aeskey(0x11, &sector[0]);
+		setup_aeskey(0x11, key);
 
 		//Decrypt FIRM and extract headers
 		ctr_nand_crypto_interface firm_io;
@@ -132,26 +115,13 @@ void ctr_n3ds_ctrnand_keyslot_setup(void)
 
 		uint8_t firm_data[0x200];
 		ctr_io_read_sector(&firm_io, firm_data, sizeof(firm_data), 0x0B130000/0x200, 1);
-		for (int i = 0; i < 64; ++i)
-		{
-			tfp_printf("%02X", firm_data[i]);
-		}
-		tfp_printf("\n");
 
 		ctr_firm_header firm_header;
 		ctr_firm_header_load(&firm_header, firm_data);
-
-		tfp_printf("A9 entry: %08X\n", firm_header.arm9_entry);
-		tfp_printf("ARM9 section: offset: %08X\n", firm_header.section_headers[2].offset);
-
 		ctr_io_read_sector(&firm_io, firm_data, sizeof(firm_data), (0x0B130000 + firm_header.section_headers[2].offset)/0x200, 1);
+
 		ctr_arm9bin_header a9_header;
 		ctr_arm9bin_header_load(&a9_header, firm_data);
-
-		tfp_printf("ctr: ");
-		for (int i = 0; i < 16; ++i)
-			tfp_printf("%02X", a9_header.ctr[i]);
-		tfp_printf("\n");
 
 		//Prepare key15
 		uint8_t key15x[16];
@@ -164,53 +134,32 @@ void ctr_n3ds_ctrnand_keyslot_setup(void)
 		uint8_t tmp2[16];
 		ctr_io_read(&ecb_io, tmp2, sizeof(tmp2), 0, 16);
 
-		for (int i = 0; i < 16; ++i)
-		{
-			tfp_printf("%02X", tmp2[i]);
-		}
-		tfp_printf("\n");
 		setup_aeskeyX(0x15, tmp2);
 		setup_aeskeyY(0x15, a9_header.keyy);
 
-		for (int i = 0; i < 16; ++i)
-		{
-			tfp_printf("%02X", a9_header.keyy[i]);
-		}
-		tfp_printf("\n");
-
 		//Extract the size of the arm9bin
-		size_t arm9_size = 0;
-		for (size_t i = 0; i < sizeof(a9_header.ascii_size) && a9_header.ascii_size[i]; ++i)
-		{
-			tfp_printf("%c", a9_header.ascii_size[i]);
-			arm9_size = (arm9_size * 10) + ((size_t)a9_header.ascii_size[i] - '0');
-		}
-		tfp_printf("\nSize:%d\n", arm9_size);
+		char ascii_size[sizeof(a9_header.ascii_size)+1];
+		ascii_size[sizeof(a9_header.ascii_size)] = '\0'; //Make sure this thing is null terminated
+		memcpy(ascii_size, a9_header.ascii_size, sizeof(a9_header.ascii_size));
+		size_t arm9_size = (size_t)strtol(ascii_size, NULL, 10);
 
 		//Now, actually read the arm9bin
 		uint8_t arm9bin[arm9_size];
 
-		tfp_printf("offset: %d\n", firm_header.section_headers[2].offset);
 		ctr_io_read(&firm_io, arm9bin, sizeof(arm9bin), 0x0B130000 + firm_header.section_headers[2].offset + 0x800, arm9_size);
-
 		ctr_sd_interface sd;
 		ctr_fatfs_initialize(NULL, NULL, NULL, &sd);
+
+		//If we want to use firm_io as the underlying thing, we need to subtract the position/16 from the ctr, since the internal advance function will add that offset back
+		subtract_ctr(a9_header.ctr, (0x0B130000 + firm_header.section_headers[2].offset + 0x800)/ AES_BLOCK_SIZE);
+		ctr_crypto_interface arm9_io;
+		ctr_crypto_interface_initialize(&arm9_io, 0x15, AES_CNT_CTRNAND_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, a9_header.ctr, &firm_io.base);
+		ctr_io_read(&arm9_io, arm9bin, sizeof(arm9bin), 0x0B130000 + firm_header.section_headers[2].offset + 0x800, arm9_size);
 
 		FATFS fs3;
 		FIL dump;
 		f_mount(&fs3, "SD:", 0);
-		f_open(&dump, "SD:/arm9.raw.dump", FA_WRITE | FA_READ  | FA_CREATE_ALWAYS);
 		unsigned int br;
-		f_write(&dump, arm9bin, arm9_size, &br);
-		f_close(&dump);
-
-		//If we want to use firm_io as the underlying thing, we need to subtract the position/16 from the ctr, since the internal advance function will add that offset back
-		uint8_t arm9bin2[arm9_size];
-		memcpy(arm9bin2, arm9bin, arm9_size);
-		ctr_memory_interface_initialize(&mem_io, arm9bin2, arm9_size);
-		ctr_crypto_interface arm9_io;
-		ctr_crypto_interface_initialize(&arm9_io, 0x15, AES_CNT_CTRNAND_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, a9_header.ctr, &mem_io.base);
-		ctr_io_read(&arm9_io, arm9bin, sizeof(arm9bin), 0, arm9_size);
 
 		f_open(&dump, "SD:/arm9.dump", FA_WRITE | FA_READ  | FA_CREATE_ALWAYS);
 		f_write(&dump, arm9bin, arm9_size, &br);

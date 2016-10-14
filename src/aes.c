@@ -113,6 +113,37 @@ void add_ctr(void* ctr, uint32_t carry)
     }
 }
 
+void subtract_ctr(void* ctr, uint32_t carry)
+{
+    //ctr is in big endian format, 16 bytes
+    uint32_t counter[4];
+    uint8_t *outctr = (uint8_t *) ctr;
+
+    //Convert each 4 byte part of ctr to uint32_t equivalents
+    for(size_t i = 0; i < 4; i++) {
+        //FIXME this assumes alignment...
+        counter[i] = ((uint32_t)outctr[i*4+0]<<24) | ((uint32_t)outctr[i*4+1]<<16) | ((uint32_t)outctr[i*4+2]<<8) | ((uint32_t)outctr[i*4+3]<<0);
+    }
+
+    for(size_t i = 0; i < 4; ++i)
+    {
+        uint32_t sub;
+        //using modular arithmetic to handle carry
+        sub = counter[3-i] - carry;
+        carry = counter[3-i] < carry;
+
+        counter[3-i] = sub;
+    }
+
+    for(size_t i = 0; i < 4; i++)
+    {
+        outctr[i*4+0] = counter[i]>>24;
+        outctr[i*4+1] = counter[i]>>16;
+        outctr[i*4+2] = counter[i]>>8;
+        outctr[i*4+3] = counter[i]>>0;
+    }
+}
+
 void ecb_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode)
 {
     aes_decrypt(inbuf, outbuf, size, mode);
