@@ -8,8 +8,8 @@
 
 /** @file */
 
-//FIXME Document the fact that excpetion setup requires MPU to be setup so that
-//ITCM is accessible from 0x0000 to 0x8000. Also, stacks must be setup (should
+//FIXME Document the fact that exception setup requires MPU to be setup so that
+//ITCM is accessible from 0x0000 to 0x10000. Also, stacks must be setup (should
 //I do that when I install the exceptions...?)
 
 #ifndef CTR_INTERRUPT_H_

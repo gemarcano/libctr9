@@ -14,6 +14,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**	@brief Struct representing the NCSD header for carts.
  */
 typedef struct
@@ -104,6 +108,10 @@ void ctr_ncsd_header_load(ctr_ncsd_cart_header *header, const uint8_t *data, siz
  *		from the NCSD header in memory, else nothing happens.
  */
 void ctr_ncch_header_load(ctr_ncch_header *header, const uint8_t *data, size_t data_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_HEADERS_H_
 

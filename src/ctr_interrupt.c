@@ -85,6 +85,7 @@ void ctr_interrupt_prepare(void)
 		"mrc p15, 0, r0, c1, c0, 0 \n\t"
 		"bic r0, #(1<<13) \n\t"
 		"mcr p15, 0, r0, c1, c0, 0 \n\t"
+		:::"r0"
 	);
 }
 

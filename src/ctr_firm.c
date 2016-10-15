@@ -5,9 +5,9 @@
 memcpy(&((O)->E), A, sizeof((O)->E)); \
 A += sizeof((O)->E);
 
-void ctr_firm_section_header_load(ctr_firm_section_header *header, void *data)
+void ctr_firm_section_header_load(ctr_firm_section_header *header, const void *data)
 {
-	uint8_t *d = data;
+	const uint8_t *d = data;
 	LOAD(header, offset, d);
 	LOAD(header, load_address, d);
 	LOAD(header, size, d);
@@ -15,9 +15,9 @@ void ctr_firm_section_header_load(ctr_firm_section_header *header, void *data)
 	LOAD(header, sha256hash, d);
 }
 
-void ctr_firm_header_load(ctr_firm_header *header, void *data)
+void ctr_firm_header_load(ctr_firm_header *header, const void *data)
 {
-	uint8_t *d = data;
+	const uint8_t *d = data;
 	LOAD(header, magic, d);
 	LOAD(header, reserved1, d);
 	LOAD(header, arm11_entry, d);
@@ -31,9 +31,9 @@ void ctr_firm_header_load(ctr_firm_header *header, void *data)
 	LOAD(header, rsa2048signature, d);
 }
 
-void ctr_arm9bin_header_load(ctr_arm9bin_header *header, void *data)
+void ctr_arm9bin_header_load(ctr_arm9bin_header *header, const void *data)
 {
-	uint8_t *d = data;
+	const uint8_t *d = data;
 	LOAD(header, enc_keyx, d);
 	LOAD(header, keyy, d);
 	LOAD(header, ctr, d);

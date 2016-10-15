@@ -14,6 +14,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CTR_ITCM_ADDRESS 0x00000000u
 
 #define CTR_ARM9_MEM_ADDRESS 0x08000000u
@@ -182,6 +186,10 @@ void ctr_memory_set_dtcm_state(bool state);
  *
  */
 ctr_memory_region ctr_memory_get_region(uintptr_t location);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif//CTR_MEMORY_H_
 
