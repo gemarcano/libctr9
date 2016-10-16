@@ -68,6 +68,12 @@ void ctr_system_reset(void);
  */
 ctr_system_type ctr_get_system_type(void);
 
+/**	@brief Sets up the keyslot required for N3DS CTRNAND access.
+ *
+ *	@post Possible to use keyslot 0x5 to decrypt N3DS CTRNAND.
+ */
+void ctr_n3ds_ctrnand_keyslot_setup(void);
+
 #ifdef __cplusplus
 }
 #endif

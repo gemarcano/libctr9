@@ -8,6 +8,7 @@
 
 /** @file */
 
+#include <ctr9/io/ctr_nand_crypto_interface.h>
 #include <ctr9/ctr_system.h>
 #include <ctr9/aes.h>
 #include <ctr9/i2c.h>
@@ -197,65 +198,28 @@ static size_t hash_search(const void *data, size_t data_size, uint32_t target_ha
 
 void ctr_n3ds_ctrnand_keyslot_setup(void)
 {
-	//FIXME do a sanity check to see if the key has been set up for some reason
-/*	static bool setup = false;
-	if (!setup && ctr_detect_a9lh_entry())
+	char data2[16];
+	ctr_nand_interface io;
+	ctr_nand_crypto_interface io2;
+	ctr_nand_interface_initialize(&io);
+	ctr_nand_crypto_interface_initialize(&io2, 0x03, NAND_TWL, &io.base);
+
+	static const char data[] = {0x3, 0xc3, 0x1c, 0x0a, 0xcd, 0xc7, 0x55, 0x66, 0x5d, 0xe1, 0x57, 0xe8, 0x0c, 0x13, 0x2c, 0x9e};
+
+	for (size_t i = 0; i < 2; ++i)
 	{
-		load_key_from_sha(0x11);
-
-		//decrypt secret sector
-		//get first key in secret sector (FIXME do we always want this to happen??? even for 9.5+?)
-		load_key_from_secret_sector(0, 0x11);
-
-		//Decrypt FIRM and extract headers
-		uint8_t ctr[16];
-		ctr_nand_interface io;
-		ctr_nand_interface_initialize(&io);
-		ctr_nand_crypto_interface firm_io;
-		ctr_nand_crypto_interface_initialize(&firm_io, 0x06, NAND_CTR, &io.base);
-
-		ctr_firm_header firm_header;
-		ctr_arm9bin_header a9_header;
-		load_firm_headers(&firm_io, &firm_header, &a9_header);
-
-		//Prepare key15
-		load_key15(&a9_header);
-
-		//Extract the size of the arm9bin
-		char ascii_size[sizeof(a9_header.ascii_size)+1];
-		ascii_size[sizeof(a9_header.ascii_size)] = '\0'; //Make sure this thing is null terminated
-		memcpy(ascii_size, a9_header.ascii_size, sizeof(a9_header.ascii_size));
-		size_t arm9_size = (size_t)strtol(ascii_size, NULL, 10);
-
-
-		//If we want to use firm_io as the underlying thing, we need to subtract the position/16 from the ctr, since the internal advance function will add that offset back
-		memcpy(ctr, a9_header.ctr, 16);
-
-		subtract_ctr(ctr, (0x0B130000 + firm_header.section_headers[2].offset + 0x800)/ AES_BLOCK_SIZE);
-		ctr_crypto_interface arm9_io;
-		ctr_crypto_interface_initialize(&arm9_io, 0x15, AES_CNT_CTRNAND_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, ctr, &firm_io.base);
-
-		//Now, actually read the arm9bin
-		uint8_t arm9bin[arm9_size];
-		ctr_io_read(&arm9_io, arm9bin, sizeof(arm9bin), 0x0B130000 + firm_header.section_headers[2].offset + 0x800, arm9_size);
-
-		const uint32_t target_hash = 106069265;
-		const uint8_t target_sha[32] = { 0x98, 0x24, 0x27, 0x14, 0x22, 0xb0, 0x6b, 0xf2, 0x10, 0x96, 0x9c, 0x36, 0x42, 0x53, 0x7c, 0x86, 0x62, 0x22, 0x5c, 0xfd, 0x6f, 0xae, 0x9b, 0x0a, 0x85, 0xa5, 0xce, 0x21, 0xaa, 0xb6, 0xc8, 0x4d };
-
-		size_t index = hash_search(arm9bin, sizeof(arm9bin), target_hash, target_sha);
-		tfp_printf("index: %d\n", index);
-
-		FATFS fs3;
-		FIL dump;
-		f_mount(&fs3, "SD:", 0);
-		unsigned int br;
-
-		f_open(&dump, "SD:/arm9.dump", FA_WRITE | FA_READ  | FA_CREATE_ALWAYS);
-		f_write(&dump, arm9bin, arm9_size, &br);
-		f_close(&dump);
-
-		input_wait();
+		ctr_io_read(&io, data2+i*8, sizeof(data2)-i*8, 0x100, 4);
+		ctr_io_read(&io2, data2+i*8+4, sizeof(data2)-i*8-4, 0x00012E00+3, 4);
 	}
-	setup = true;*/
+
+	ctr_nand_crypto_interface_destroy(&io2);
+	ctr_nand_interface_destroy(&io);
+
+	for (size_t i = 0; i < 16; ++i)
+	{
+		data2[i] ^= data[i];
+	}
+
+	setup_aeskeyY(0x05, data2);
 }
 

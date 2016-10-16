@@ -6,15 +6,15 @@
  *
  ******************************************************************************/
 
-#include <ctr9/io/ctr_nand_crypto_interface.h>
-#include <ctr9/io/sdmmc/sdmmc.h>
 #include <string.h>
 #include <ctr9/aes.h>
 #include <ctr9/sha.h>
 
 #include <stdalign.h>
 
+#include <ctr9/io/ctr_nand_crypto_interface.h>
 #include <ctr9/io/ctr_io_implementation.h>
+#include <ctr9/ctr_system.h>
 
 //FIXME these are unique per instance... or are they?
 
@@ -33,9 +33,19 @@ static inline void process_aes_ctr_blocks(void *buffer, void *ctr, uint64_t bloc
 	ctr_decrypt(buffer, buffer, blocks, mode, ctr);
 }
 
+static inline void check_and_do_n3ds_init()
+{
+	static bool setup = false;
+	if (!setup && ctr_detect_a9lh_entry() && ctr_get_system_type() == SYSTEM_N3DS)
+	{
+		ctr_n3ds_ctrnand_keyslot_setup();
+	}
+}
+
 int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
 {
 	crypto_io->base = nand_crypto_base;
+
 
 	//Get the nonces for CTRNAND and TWL decryption
 	uint32_t mode;
@@ -48,6 +58,7 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 	switch (crypto_type)
 	{
 		case NAND_CTR:
+			check_and_do_n3ds_init();
 			sha_init(SHA256_MODE);
 			sha_update((uint8_t*)NandCid, 16);
 			sha_get(shasum);
@@ -70,7 +81,7 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 			return 1; //Unknown type
 	}
 
-	ctr_crypto_interface_initialize(&crypto_io->crypto_io, keySlot, mode, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, ctr, lower_io);
+	ctr_crypto_interface_initialize(&crypto_io->crypto_io, keySlot, mode, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, (uint8_t*)ctr, lower_io);
 	return 0;
 }
 
