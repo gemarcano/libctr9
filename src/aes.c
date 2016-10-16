@@ -5,9 +5,9 @@
 
 //FIXME some things make assumptions about alignemnts!
 
-void setup_aeskeyX(uint8_t keyslot, void* keyx)
+void setup_aeskeyX(uint8_t keyslot, const void* keyx)
 {
-    uint32_t * _keyx = (uint32_t*)keyx;
+    const uint32_t * _keyx = (const uint32_t*)keyx;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYXFIFO = _keyx[0];
@@ -24,9 +24,9 @@ void setup_aeskeyX(uint8_t keyslot, void* keyx)
     }
 }
 
-void setup_aeskeyY(uint8_t keyslot, void* keyy)
+void setup_aeskeyY(uint8_t keyslot, const void* keyy)
 {
-    uint32_t * _keyy = (uint32_t*)keyy;
+    const uint32_t * _keyy = (const uint32_t*)keyy;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYYFIFO = _keyy[0];
@@ -43,9 +43,9 @@ void setup_aeskeyY(uint8_t keyslot, void* keyy)
     }
 }
 
-void setup_aeskey(uint8_t keyslot, void* key)
+void setup_aeskey(uint8_t keyslot, const void* key)
 {
-    uint32_t * _key = (uint32_t*)key;
+    const uint32_t * _key = (const uint32_t*)key;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYFIFO = _key[0];
