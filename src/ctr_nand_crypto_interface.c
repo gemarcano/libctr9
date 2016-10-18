@@ -42,6 +42,15 @@ static inline void check_and_do_n3ds_init()
 	}
 }
 
+static inline void check_and_do_twl_init()
+{
+	static bool setup = false;
+	if (!setup && ctr_detect_a9lh_entry())
+	{
+		ctr_twl_keyslot_setup();
+	}
+}
+
 int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, uint8_t keySlot, ctr_nand_crypto_type crypto_type, ctr_io_interface *lower_io)
 {
 	crypto_io->base = nand_crypto_base;
@@ -67,6 +76,7 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 			break;
 
 		case NAND_TWL:
+			check_and_do_twl_init();
 			sha_init(SHA1_MODE);
 			sha_update((uint8_t*)NandCid, 16);
 			sha_get(shasum);
