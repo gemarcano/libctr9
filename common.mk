@@ -1,4 +1,4 @@
-INCPATHS=-I$(top_srcdir)/include
+INCPATHS=-I$(top_srcdir)/include -I$(CTRARM9)/include/freetype2
 C9FLAGS=-mcpu=arm946e-s -march=armv5te -mlittle-endian -mword-relocations
 
 THUMBFLAGS=-mthumb #-mthumb-interwork

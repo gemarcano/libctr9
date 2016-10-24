@@ -3,7 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctr/console.h>
-#include <ctr/printf.h>
+//#include <ctr/printf.h>
+#include <stdio.h>
 #include <ctr/draw.h>
 #include <ctr/headers.h>
 #include <ctr/hid.h>
@@ -22,6 +23,7 @@
 #include <ctr9/ctr_irq.h>
 #include <ctr9/ctr_gfx.h>
 #include <ctr9/ctr_cache.h>
+#include <ctr9/io/ctr_console_dotab.h>
 
 int DEBUG = 0;
 
@@ -70,8 +72,16 @@ void undefined_instruction(uint32_t*);
 
 uint8_t otp_sha[32];
 
+#include <ctr9/ctr_freetype.h>
+#include <errno.h>
+#include <ctr9/io/ctr_fatfs_dotab.h>
+
 int main()
 {
+	ctr_console_dotab_initialize();
+	int asd = ctr_freetype_initialize();
+	ctr_fatfs_dotab_initialize();
+
 	memset(otp_sha, 0, 0x20);
 	memcpy(otp_sha, REG_SHAHASH, 0x20);
 
@@ -84,10 +94,15 @@ int main()
 	console_init(0xFFFFFF, 0);
 	draw_clear_screen(SCREEN_TOP, 0x111111);
 	printf("UNIT TESTING\n");
+	printf("freetype: %d\n", asd);
 
+	int d;
 	for (int i = 0; i < 32; ++i)
 	{
-		printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
+		char tmp[0x1000];
+		iprintf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
+		//puts(tmp);
+		//d = printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
 	}
 	printf("\n");
 
@@ -147,7 +162,10 @@ int main()
 	printf("trying to mount\n");
 	if ((res2 = f_mount(&fs, "CTRNAND:", 1)) != FR_OK)
 	{
-		printf("WTF MOUNT FAILED; %d\n", res2);
+		char tmp[0x1000];
+		sprintf(tmp, "WTF MOUNT FAILED; %d\n", res2);
+		puts(tmp);
+		//printf("WTF MOUNT FAILED; %d\n", res2);
 	}
 	else if ((res2 = f_open(&test_file, "CTRNAND:/rw/sys/SecureInfo_A", FA_READ)) != FR_OK)
 	{
@@ -475,6 +493,10 @@ int main()
 	FATFS fs3;
 	FIL dump;
 	f_mount(&fs3, "SD:", 0);
+
+	FILE *f222 = fopen("SD:/dump2.cbc", "wb");
+	int res222 = fwrite(output_buffer2, 0x1FFFF * 16, 1, f222);
+	fclose(f222);
 	f_open(&dump, "SD:/dump.cbc", FA_WRITE | FA_READ  | FA_CREATE_ALWAYS);
 	int br;
 	f_write(&dump, output_buffer2, 0x1FFFF * 16, &br);

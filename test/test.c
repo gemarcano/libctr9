@@ -1,11 +1,7 @@
 #include "test.h"
 #include <string.h>
 #include <stdbool.h>
-#include <ctr/console.h>
-#include <ctr/printf.h>
-#include <ctr/draw.h>
-#include <ctr/headers.h>
-#include <ctr/hid.h>
+#include <stdio.h>
 
 bool ctr_execute_unit_test(ctr_unit_test *test)
 {

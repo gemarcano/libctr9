@@ -1,10 +1,10 @@
 .align 4
 
-.global _entry
+.global _start
 
 .section .text.start, "x"
 
-_entry:
+_start:
 	mrs r0, cpsr
 	bic r0, r0, #0x1F
 
@@ -62,54 +62,6 @@ _entry:
 	add r0, r1, r0
 	blx r0
 
-	adr r0, __got_start_offset
-	ldr r1, [r0]
-	add r0, r1, r0
-
-	@ check if relocation is needed
-	ldr r1, =__got_start
-	cmp r0, r1
-	beq reloc_end
-
-	adr r1, __got_end_offset
-	ldr r2, [r1]
-	add r1, r2, r1
-
-	adr r3, relocate_section_offset
-	ldr r4, [r3]
-	add r3, r3, r4
-	blx r3
-
-	@ data.rel.ro
-	adr r0, __data_rel_ro_start_offset
-	ldr r1, [r0]
-	add r0, r1, r0
-
-	adr r1, __data_rel_ro_end_offset
-	ldr r2, [r1]
-	add r1, r2, r1
-
-	adr r3, relocate_section_offset
-	ldr r4, [r3]
-	add r3, r3, r4
-	blx r3
-
-	@ data.rel.ro.local
-	adr r0, __data_rel_ro_local_start_offset
-	ldr r1, [r0]
-	add r0, r1, r0
-
-	adr r1, __data_rel_ro_local_end_offset
-	ldr r2, [r1]
-	add r1, r2, r1
-
-	adr r3, relocate_section_offset
-	ldr r4, [r3]
-	add r3, r3, r4
-	blx r3
-
-	reloc_end:
-
 	@clear bss
 	adr r0, __bss_start_offset
 	ldr r1, [r0]
@@ -154,6 +106,9 @@ _entry:
 	mcr p15, 0, r0, c2, c0, 1  @ instruction cacheable
 	mcr p15, 0, r0, c3, c0, 0  @ data bufferable
 
+	ldr r0, =__libc_init_array
+	blx r0
+
 	@ Enable caches and MPU
 	adr r0, enable_mpu_and_caching_offset
 	ldr r1, [r0]
@@ -165,37 +120,30 @@ _entry:
 	mov r1, #0x340
 	str r1, [r0]
 
+	ldr r0, =_fini
+	ldr r1, =atexit
+	blx r1
+
+	ldr r0, =_init
+	blx r0
+
 	mov r0, #0
 	mov r1, #0
 	adr r2, main_offset
 	ldr r3, [r2]
 	add r2, r3, r2
 	blx r2
+
+	ldr r0, =exit
+	blx r0
+
 	bx lr
-
-__got_start_offset:
-.word __got_start-.
-
-__got_end_offset:
-.word __got_end-.
 
 __bss_start_offset:
 .word __bss_start-.
 
 __bss_end_offset:
-.word __bss_end-.
-
-__data_rel_ro_start_offset:
-.word __data_rel_ro_start-.
-
-__data_rel_ro_end_offset:
-.word __data_rel_ro_end-.
-
-__data_rel_ro_local_start_offset:
-.word __data_rel_ro_local_start-.
-
-__data_rel_ro_local_end_offset:
-.word __data_rel_ro_local_end-.
+.word end-.
 
 disable_mpu_and_caching_offset:
 .word disable_mpu_and_caching-.
