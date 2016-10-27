@@ -64,7 +64,6 @@ static bool crypto_tests1(void *ctx)
 #include <ctr9/io/ctr_fatfs.h>
 #include <ctr9/sha.h>
 
-
 extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
 void abort_interrupt(uint32_t*);
 void prefetch_abort(uint32_t*);
@@ -156,28 +155,7 @@ int main()
 	FIL test_file = { 0 };
 
 	ctr_setup_disk_parameters params = {&nand_crypto_ctx.io, 0x0B930000/0x200, 0x2F5D0000/0x200};
-	disk_ioctl(0, CTR_SETUP_DISK, &params);
-
-	int res2 = 0;
-	printf("trying to mount\n");
-	if ((res2 = f_mount(&fs, "CTRNAND:", 1)) != FR_OK)
-	{
-		char tmp[0x1000];
-		sprintf(tmp, "WTF MOUNT FAILED; %d\n", res2);
-		puts(tmp);
-		//printf("WTF MOUNT FAILED; %d\n", res2);
-	}
-	else if ((res2 = f_open(&test_file, "CTRNAND:/rw/sys/SecureInfo_A", FA_READ)) != FR_OK)
-	{
-		printf("WTF READ OPEN FAILED; %d\n", res2);
-	}
-	else
-	{
-		printf("Size: %d\n", f_size(&test_file));
-	}
-
-	int res3 = ctr_fatfs_initialize(&(nand_ctx.nand_io), NULL, NULL, &(sd_ctx.io));
-	printf("ctr_fatfs_initialize result: %X\n", res3);
+	disk_ioctl_(0, CTR_SETUP_DISK, &params);
 
 	ctr_sd_interface_destroy(&sd_ctx.io);
 	ctr_nand_crypto_interface_destroy(&nand_crypto_ctx.io);
@@ -488,23 +466,13 @@ int main()
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
 	cbc_decrypt(output_buffer, output_buffer2, 0x1FFFF, AES_CNT_CBC_DECRYPT_MODE, iv);
 
-	ctr_sd_interface sd;
-	ctr_fatfs_initialize(NULL, NULL, NULL, &sd);
-	FATFS fs3;
-	FIL dump;
-	f_mount(&fs3, "SD:", 0);
+	FILE *dump = fopen("SD:/dump.cbc", "wb");
+	size_t res222 = fwrite(output_buffer2, 0x1FFFF * 16, 1, dump);
+	fclose(dump);
 
-	FILE *f222 = fopen("SD:/dump2.cbc", "wb");
-	int res222 = fwrite(output_buffer2, 0x1FFFF * 16, 1, f222);
-	fclose(f222);
-	f_open(&dump, "SD:/dump.cbc", FA_WRITE | FA_READ  | FA_CREATE_ALWAYS);
-	int br;
-	f_write(&dump, output_buffer2, 0x1FFFF * 16, &br);
-	f_close(&dump);
-
-	f_open(&dump, "SD:/sha.sha.sha", FA_WRITE | FA_READ | FA_CREATE_ALWAYS);
-	f_write(&dump, otp_sha, 32, &br);
-	f_close(&dump);
+	dump = fopen("SD:/sha.sha.sha", "wb");
+	fwrite(otp_sha, 32, 1, dump);
+	fclose(dump);
 
 	input_wait();
 	ctr_system_poweroff();

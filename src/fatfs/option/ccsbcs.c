@@ -272,7 +272,7 @@ const WCHAR Tbl[] = {	/*  CP869(0x80-0xFF) to Unicode conversion table */
 
 
 
-WCHAR ff_convert (	/* Converted character, Returns zero on error */
+WCHAR ff_convert_ (	/* Converted character, Returns zero on error */
 	WCHAR	chr,	/* Character code to be converted */
 	UINT	dir		/* 0: Unicode to OEM code, 1: OEM code to Unicode */
 )
@@ -300,7 +300,7 @@ WCHAR ff_convert (	/* Converted character, Returns zero on error */
 
 
 
-WCHAR ff_wtoupper (	/* Returns upper converted character */
+WCHAR ff_wtoupper_ (	/* Returns upper converted character */
 	WCHAR chr		/* Unicode character to be upper converted (BMP only) */
 )
 {

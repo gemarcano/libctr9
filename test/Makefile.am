@@ -20,4 +20,5 @@ clean-local:
 
 test.bin: test
 	cp test test.bin
+	arm-none-eabi-strip test.bin
 

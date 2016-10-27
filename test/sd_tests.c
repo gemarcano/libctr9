@@ -1,6 +1,8 @@
 #include "sd_tests.h"
 #include <ctr9/io.h>
 #include <string.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
 static bool sd_test1(void *ctx)
 {
@@ -31,19 +33,13 @@ static bool sd_test2(void *ctx)
 
 static bool sd_test3(void *ctx)
 {
-	FATFS fs = { 0 };
-	FIL test_file = { 0 };
-
-	sd_test_data *data = ctx;
-	ctr_setup_disk_parameters params = {&data->io, 0, ctr_io_disk_size(&data->io)};
-	disk_ioctl(3, CTR_SETUP_DISK, &params);
-
-	int res2 = 0;
-	if ((res2 = f_mount(&fs, "SD:", 1)) == FR_OK &&
-	(res2 = f_open(&test_file, "SD:/otp.bin", FA_READ)) == FR_OK)
+	FILE *otp = fopen("SD:/otp.bin", "rb");
+	if (otp)
 	{
-		size_t size = f_size(&test_file);
-		f_close(&test_file);
+		struct stat st;
+		fstat(fileno(otp), &st);
+		off_t size = st.st_size; //FIXME fstat not implemented
+		fclose(otp);
 		return size == 256;
 	}
 	return false;
@@ -51,23 +47,17 @@ static bool sd_test3(void *ctx)
 
 static bool sd_test4(void *ctx)
 {
-	FATFS fs = { 0 };
-	FIL test_file = { 0 };
-
-	sd_test_data *data = ctx;
-	ctr_setup_disk_parameters params = {&data->io, 0, ctr_io_disk_size(&data->io)};
-	disk_ioctl(3, CTR_SETUP_DISK, &params);
-
 	const char * string = "HELLO WORLD!!!";
 
-	int res2 = 0;
-	if ((res2 = f_mount(&fs, "SD:", 1)) == FR_OK &&
-	(res2 = f_open(&test_file, "SD:/test_data.txt", FA_WRITE | FA_READ  | FA_OPEN_ALWAYS)) == FR_OK)
+	FILE *file = fopen("SD:/test_data.txt", "wrb");
+	if (file)
 	{
-		UINT written;
-		f_write(&test_file, string, strlen(string), &written);
-		size_t size = f_size(&test_file);
-		f_close(&test_file);
+		struct stat st;
+		fwrite(string, strlen(string), 1, file);
+		fflush(file);
+		fstat(fileno(file), &st);
+		size_t size = (size_t)(st.st_size); //fstat not yet implemented FIXME
+		fclose(file);
 		return size == strlen(string);
 	}
 	return false;

@@ -148,12 +148,12 @@
 / Drive/Volume Configurations
 /---------------------------------------------------------------------------*/
 
-#define _VOLUMES	6
+#define _VOLUMES	10
 /* Number of volumes (logical drives) to be used. */
 
 
 #define _STR_VOLUME_ID	1
-#define _VOLUME_STRS	"CTRNAND","TWLN","TWLP","SD","DISK1","DISK2","DISK3"
+#define _VOLUME_STRS	"CTRNAND","TWLN","TWLP","SD","DISK0","DISK1","DISK2", "DISK3", "DISK4", "DISK5"
 /* _STR_VOLUME_ID switches string support of volume ID.
 /  When _STR_VOLUME_ID is set to 1, also pre-defined strings can be used as drive
 /  number in the path name. _VOLUME_STRS defines the drive ID strings for each

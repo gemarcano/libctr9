@@ -16,6 +16,9 @@
 #include <ctr9/ctr_system.h>
 #include <ctr9/io/fatfs/ctr_fatfs_disk.h>
 
+#include <ctr9/io/fatfs/ffconf.h>
+#include <assert.h>
+
 /* Definitions of physical drive number for each drive */
 #define CTRNAND	0
 #define TWL		1
@@ -29,13 +32,15 @@
 #define DISK5	9
 #define CTR_DISK_COUNT 10
 
+static_assert(CTR_DISK_COUNT >= _VOLUMES, "Not enough disk structures exist!");
+
 static ctr_fatfs_disk ctr_fatfs_disks[CTR_DISK_COUNT] = {0};
 
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
 /*-----------------------------------------------------------------------*/
 
-DSTATUS disk_status (
+DSTATUS disk_status_ (
 	BYTE pdrv		/* Physical drive number to identify the drive */
 )
 {
@@ -49,7 +54,7 @@ DSTATUS disk_status (
 /* Initialize a Drive                                                    */
 /*-----------------------------------------------------------------------*/
 
-DSTATUS disk_initialize (
+DSTATUS disk_initialize_ (
 	BYTE pdrv				/* Physical drive number to identify the drive */
 )
 {
@@ -70,7 +75,7 @@ DSTATUS disk_initialize (
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
 
-DRESULT disk_read (
+DRESULT disk_read_ (
 	BYTE pdrv,		/* Physical drive number to identify the drive */
 	BYTE *buff,		/* Data buffer to store read data */
 	DWORD sector,	/* Sector address in LBA */
@@ -98,7 +103,7 @@ DRESULT disk_read (
 /* Write Sector(s)                                                       */
 /*-----------------------------------------------------------------------*/
 
-DRESULT disk_write (
+DRESULT disk_write_ (
 	BYTE pdrv,			/* Physical drive number to identify the drive */
 	const BYTE *buff,	/* Data to be written */
 	DWORD sector,		/* Sector address in LBA */
@@ -127,7 +132,7 @@ DRESULT disk_write (
 /*-----------------------------------------------------------------------*/
 
 
-DRESULT disk_ioctl (
+DRESULT disk_ioctl_ (
 	BYTE pdrv,		/* Physical drive number (0..) */
 	BYTE cmd,		/* Control code */
 	void *buff		/* Buffer to send/receive control data */

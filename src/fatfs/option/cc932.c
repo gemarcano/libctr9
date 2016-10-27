@@ -3722,7 +3722,7 @@ const WCHAR sjis2uni[] = {
 
 
 
-WCHAR ff_convert (	/* Converted code, 0 means conversion error */
+WCHAR ff_convert_ (	/* Converted code, 0 means conversion error */
 	WCHAR	chr,	/* Character code to be converted */
 	UINT	dir		/* 0: Unicode to OEM code, 1: OEM code to Unicode */
 )
@@ -3782,7 +3782,7 @@ WCHAR ff_convert (	/* Converted code, 0 means conversion error */
 
 
 
-WCHAR ff_wtoupper (	/* Returns upper converted character */
+WCHAR ff_wtoupper_ (	/* Returns upper converted character */
 	WCHAR chr		/* Unicode character to be upper converted (BMP only) */
 )
 {
