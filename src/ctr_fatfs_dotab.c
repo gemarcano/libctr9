@@ -1,4 +1,5 @@
 #include <ctr9/io/ctr_fatfs_dotab.h>
+#include <ctr9/io/ctr_fatfs.h>
 
 #include <ctr9/io/fatfs/ff.h>
 #include <sys/iosupport.h>
@@ -56,11 +57,6 @@ static inline int process_error(struct _reent *r, int err)
 		return -1;
 	}
 	return 0;
-}
-
-static int dotab_initialize(const devoptab_t *tab)
-{
-	return -1 != AddDevice(tab);
 }
 
 static int ctr_fatfs_dotab_open_r(const char *drive, struct _reent *r, void *fileStruct, const char *path, int flags, int mode)
@@ -406,6 +402,53 @@ PREPARE_DOTAB(DISK2)
 PREPARE_DOTAB(DISK3)
 PREPARE_DOTAB(DISK4)
 PREPARE_DOTAB(DISK5)
+
+static int dotab_initialize(const devoptab_t *tab)
+{
+	return -1 == AddDevice(tab);
+}
+
+static const char *valid_drives[_VOLUMES] = {
+	"CTRNAND:",
+	"TWLN:",
+	"TWLP:",
+	"SD:",
+	"DISK0:",
+	"DISK1:",
+	"DISK2:",
+	"DISK3:",
+	"DISK4:",
+	"DISK5:"
+};
+
+int ctr_fatfs_dotab_check_ready(const char *drive)
+{
+	size_t index = _VOLUMES; //select an invalid index
+	for (size_t i = 0; i < _VOLUMES && index == _VOLUMES; ++i)
+	{
+		if (strcmp(drive, valid_drives[i]) == 0)
+			index = i;
+	}
+
+	if (index >= _VOLUMES) return -1;
+
+	return f_mount_(&fatfs[index], drive, 1);
+}
+
+int ctr_fatfs_dotab_chdrive(const char *drive)
+{
+	size_t index = _VOLUMES; //select an invalid index
+	for (size_t i = 0; i < _VOLUMES && index == _VOLUMES; ++i)
+	{
+		if (strcmp(drive, valid_drives[i]) == 0)
+			index = i;
+	}
+
+	if (index >= _VOLUMES) return -1;
+
+	setDefaultDevice(FindDevice(drive));
+	return 0;
+}
 
 int ctr_fatfs_dotab_initialize(void)
 {

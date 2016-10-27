@@ -7,7 +7,7 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
               "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_start)
-SEARCH_DIR("/opt/devkitpro/devkitARM/arm-none-eabi/lib");
+/* SEARCH_DIR("/opt/devkitpro/devkitARM/arm-none-eabi/lib"); */
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */

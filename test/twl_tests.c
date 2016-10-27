@@ -6,6 +6,7 @@
 #include <ctr9/ctr_system.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <ctr9/io/fatfs/diskio.h>
 
 static bool twl_test1(void *ctx)
 {

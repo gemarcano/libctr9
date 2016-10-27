@@ -38,7 +38,7 @@ stable. Breaking changes will be mentioned in commits at the very least.
 Dependencies
 --------------------------------------------------------------------------------
 
- - https://github.com/b1l1s/ctr - Used for unit tests
+ - https://github.com/gemarcano/ctr - Used for unit tests and console IO
     Make sure it is installed somewhere that the compiler can pick it up, or
 	use -L and -I to instruct the compiler where to find it.
 

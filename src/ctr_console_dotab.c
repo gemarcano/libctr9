@@ -50,7 +50,7 @@ int ctr_console_dotab_initialize(void)
 	devoptab_list[STD_ERR] = &tab;
 	setvbuf(stdout, NULL , _IONBF, 0);
 	setvbuf(stderr, NULL , _IONBF, 0);;
-	return 1;
+	return 0;
 }
 
 static ssize_t ctr_console_dotab_write_r(struct _reent *r, int fd, const char *ptr, size_t len)
