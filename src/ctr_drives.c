@@ -2,6 +2,7 @@
 #include <ctr9/io/fatfs/ctr_fatfs.h>
 
 #include <ctr9/io/fatfs/ff.h>
+#include <ctr9/io/fatfs/diskio.h>
 #include <sys/iosupport.h>
 #include <ctr9/io.h>
 #include <sys/types.h>
@@ -10,6 +11,8 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+
+#include <sys/statvfs.h>
 
 static int error_map[FR_INVALID_PARAMETER+1] = {
 	0, //OK
@@ -36,6 +39,28 @@ static int error_map[FR_INVALID_PARAMETER+1] = {
 
 static_assert(_VOLUMES == 10, "_VOLUMES in fatfs must be 10!");
 
+static const char *valid_drives[_VOLUMES] = {
+	"CTRNAND:",
+	"TWLN:",
+	"TWLP:",
+	"SD:",
+	"DISK0:",
+	"DISK1:",
+	"DISK2:",
+	"DISK3:",
+	"DISK4:",
+	"DISK5:"
+};
+
+static size_t drive_to_index(const char *drive)
+{
+	for (size_t i = 0; i < _VOLUMES; ++i)
+	{
+		if (strcmp(drive, valid_drives[i]) == 0)
+			return i;
+	}
+	return _VOLUMES;
+}
 static FATFS fatfs[_VOLUMES];
 static ctr_nand_interface nand;
 static ctr_sd_interface sd;
@@ -98,7 +123,7 @@ static int ctr_drives_open_r(const char *drive, struct _reent *r, void *fileStru
 	int err = f_open_(&file_ex->file, path, file_mode);
 	if (err != FR_OK)
 	{
-		r->_errno = error_map[err]; /*FIXME, map fatfs errors to whatever devoptabs use*/
+		r->_errno = error_map[err];
 		return -1;
 	}
 
@@ -220,7 +245,7 @@ static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *fi
 
 static int ctr_drives_link_r(struct _reent *r, const char *existing, const char  *newLink)
 {
-	r->_errno = ENOSYS;
+	r->_errno = EMLINK;
 	return -1;
 }
 
@@ -258,27 +283,57 @@ static int ctr_drives_mkdir_r(const char *drive, struct _reent *r, const char *p
 
 static DIR_ITER* ctr_drives_diropen_r(struct _reent *r, DIR_ITER *dirState, const char *path)
 {
+	r->_errno = ENOSYS;
 	return NULL;/*FIXME*/
 }
 
 static int ctr_drives_dirreset_r(struct _reent *r, DIR_ITER *dirState)
 {
+	r->_errno = ENOSYS;
 	return -1;/*FIXME*/
 }
 
 static int ctr_drives_dirnext_r(struct _reent *r, DIR_ITER *dirState, char *filename, struct stat *filestat)
 {
+	r->_errno = ENOSYS;
 	return -1; /*FIXME*/
 }
 
 static int ctr_drives_dirclose_r(struct _reent *r, DIR_ITER *dirState)
 {
+	r->_errno = ENOSYS;
 	return -1;/*FIXME*/
 }
 
-static int ctr_drives_statvfs_r(struct _reent *r, const char *path, struct statvfs *buf)
+static int ctr_drives_statvfs_r(const char *drive, struct _reent *r, const char *path, struct statvfs *buf)
 {
-	return -1;
+	struct statvfs st = {0};
+	size_t drive_index = drive_to_index(drive);
+	DWORD sector_count;
+	WORD sector_size;
+	DWORD block_size;
+	DWORD free_clusters;
+	DWORD free_sectors;
+	FATFS *fs;
+	int res = f_getfree_(drive, &free_clusters, &fs);
+	if (res) return process_error(r, res);
+
+	sector_count = (fs->n_fatent - 2) * fs->csize;
+	free_sectors = free_clusters * fs->csize;
+
+	res = disk_ioctl_(drive_index, GET_BLOCK_SIZE, &block_size);
+	if (res) return process_error(r, res);
+
+	res = disk_ioctl_(drive_index, GET_SECTOR_SIZE, &sector_size);
+	if (res) return process_error(r, res);
+
+	st.f_bsize = st.f_frsize = block_size;
+	st.f_blocks = sector_count;
+	st.f_bfree = st.f_bavail = free_sectors;
+
+	st.f_namemax = _MAX_LFN;
+
+	return 0;
 }
 
 static int ctr_drives_ftruncate_r(struct _reent *r, int fd, off_t len)
@@ -297,99 +352,95 @@ static int ctr_drives_fsync_r(struct _reent *r, int fd)
 	return process_error(r, err);
 }
 
-static int ctr_drives_chmod_r(struct _reent *r, const char *path, mode_t mode)
-{
-	return -1;
-}
-
-static int ctr_drives_fchmod_r(struct _reent *r, int fd, mode_t mode)
-{
-	return -1;
-}
-
 static int ctr_drives_rmdir_r(struct _reent *r, const char *name)
 {
+	r->_errno = ENOSYS;
 	return -1; /*FIXME this can be figure out*/
 }
 
 #define PREPARE_DOTAB(DEV) \
-static int DEV##_dotab_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode);\
-static ssize_t DEV##_dotab_write_r(struct _reent *r, int fd, const char *ptr, size_t len);\
-static ssize_t DEV##_dotab_read_r(struct _reent *r, int fd, char *ptr, size_t len);\
-static int DEV##_dotab_stat_r(struct _reent *r, const char *file, struct stat *st);\
-static int DEV##_dotab_unlink_r(struct _reent *r, const char *name);\
-static int DEV##_dotab_chdir_r(struct _reent *r, const char *name);\
-static int DEV##_dotab_rename_r(struct _reent *r, const char *oldName, const char *newName);\
-static int DEV##_dotab_mkdir_r(struct _reent *r, const char *path, int mode);\
+static int DEV##_drives_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode);\
+static ssize_t DEV##_drives_write_r(struct _reent *r, int fd, const char *ptr, size_t len);\
+static ssize_t DEV##_drives_read_r(struct _reent *r, int fd, char *ptr, size_t len);\
+static int DEV##_drives_stat_r(struct _reent *r, const char *file, struct stat *st);\
+static int DEV##_drives_unlink_r(struct _reent *r, const char *name);\
+static int DEV##_drives_chdir_r(struct _reent *r, const char *name);\
+static int DEV##_drives_rename_r(struct _reent *r, const char *oldName, const char *newName);\
+static int DEV##_drives_mkdir_r(struct _reent *r, const char *path, int mode);\
+static int DEV##_drives_statvfs_r(struct _reent *r, const char *path, struct statvfs *buf);\
 \
 static const devoptab_t DEV##_tab =\
 {\
 	#DEV,\
 	sizeof(FIL_extension),\
-	DEV##_dotab_open_r,\
+	DEV##_drives_open_r,\
 	ctr_drives_close_r,\
-	DEV##_dotab_write_r,\
-	DEV##_dotab_read_r,\
+	DEV##_drives_write_r,\
+	DEV##_drives_read_r,\
 	ctr_drives_seek_r,\
 	ctr_drives_fstat_r,\
-	DEV##_dotab_stat_r,\
+	DEV##_drives_stat_r,\
 	ctr_drives_link_r,\
-	DEV##_dotab_unlink_r,\
-	DEV##_dotab_chdir_r,\
-	DEV##_dotab_rename_r,\
-	DEV##_dotab_mkdir_r,\
+	DEV##_drives_unlink_r,\
+	DEV##_drives_chdir_r,\
+	DEV##_drives_rename_r,\
+	DEV##_drives_mkdir_r,\
 	sizeof(int), /*FIXME DIR element size, include FILINFO inside*/\
 	ctr_drives_diropen_r,\
 	ctr_drives_dirreset_r,\
 	ctr_drives_dirnext_r,\
 	ctr_drives_dirclose_r,\
-	ctr_drives_statvfs_r,\
+	DEV##_drives_statvfs_r,\
 	ctr_drives_ftruncate_r,\
 	ctr_drives_fsync_r,\
 	NULL,\
 	NULL,\
 	NULL,\
-	NULL\
+	ctr_drives_rmdir_r\
 };\
 \
-static int DEV##_dotab_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode)\
+static int DEV##_drives_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode)\
 {\
 	return ctr_drives_open_r(#DEV":", r, fileStruct, path, flags, mode);\
 }\
 \
-static ssize_t DEV##_dotab_write_r(struct _reent *r, int fd, const char *ptr, size_t len)\
+static ssize_t DEV##_drives_write_r(struct _reent *r, int fd, const char *ptr, size_t len)\
 {\
 	return ctr_drives_write_r(#DEV":", r, fd, ptr, len);\
 }\
 \
-static ssize_t DEV##_dotab_read_r(struct _reent *r, int fd, char *ptr, size_t len)\
+static ssize_t DEV##_drives_read_r(struct _reent *r, int fd, char *ptr, size_t len)\
 {\
 	return ctr_drives_read_r(#DEV":", r, fd, ptr, len);\
 }\
 \
-static int DEV##_dotab_stat_r(struct _reent *r, const char *file, struct stat *st)\
+static int DEV##_drives_stat_r(struct _reent *r, const char *file, struct stat *st)\
 {\
 	return ctr_drives_stat_r(#DEV":", r, file, st);\
 }\
 \
-static int DEV##_dotab_unlink_r(struct _reent *r, const char *name)\
+static int DEV##_drives_unlink_r(struct _reent *r, const char *name)\
 {\
 	return ctr_drives_unlink_r(#DEV":", r, name);\
 }\
 \
-static int DEV##_dotab_chdir_r(struct _reent *r, const char *name)\
+static int DEV##_drives_chdir_r(struct _reent *r, const char *name)\
 {\
 	return ctr_drives_chdir_r(#DEV":", r, name);\
 }\
 \
-static int DEV##_dotab_rename_r(struct _reent *r, const char *oldName, const char *newName)\
+static int DEV##_drives_rename_r(struct _reent *r, const char *oldName, const char *newName)\
 {\
 	return ctr_drives_rename_r(#DEV":", r, oldName, newName);\
 }\
 \
-static int DEV##_dotab_mkdir_r(struct _reent *r, const char *path, int mode)\
+static int DEV##_drives_mkdir_r(struct _reent *r, const char *path, int mode)\
 {\
 	return ctr_drives_mkdir_r(#DEV":", r, path, mode);\
+}\
+static int DEV##_drives_statvfs_r(struct _reent *r, const char *path, struct statvfs *buf)\
+{\
+	return ctr_drives_statvfs_r(#DEV":", r, path, buf);\
 }
 
 PREPARE_DOTAB(SD)
@@ -408,28 +459,9 @@ static int dotab_initialize(const devoptab_t *tab)
 	return -1 == AddDevice(tab);
 }
 
-static const char *valid_drives[_VOLUMES] = {
-	"CTRNAND:",
-	"TWLN:",
-	"TWLP:",
-	"SD:",
-	"DISK0:",
-	"DISK1:",
-	"DISK2:",
-	"DISK3:",
-	"DISK4:",
-	"DISK5:"
-};
-
 int ctr_drives_check_ready(const char *drive)
 {
-	size_t index = _VOLUMES; //select an invalid index
-	for (size_t i = 0; i < _VOLUMES && index == _VOLUMES; ++i)
-	{
-		if (strcmp(drive, valid_drives[i]) == 0)
-			index = i;
-	}
-
+	size_t index = drive_to_index(drive);
 	if (index >= _VOLUMES) return -1;
 
 	return f_mount_(&fatfs[index], drive, 1);

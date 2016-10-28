@@ -159,7 +159,8 @@ DRESULT disk_ioctl_ (
 			}
 			return RES_NOTRDY;
 		case GET_BLOCK_SIZE:
-			*(DWORD*)buff = 1; //Not sure what the block size for SD is...
+			//FIXME is this cluster size???
+			*(DWORD*)buff = ctr_io_sector_size(disk->io);; //Not sure what the block size for SD is...
 		case CTRL_TRIM:
 		case CTRL_SYNC:
 			return RES_OK;
