@@ -437,16 +437,11 @@ int ctr_fatfs_dotab_check_ready(const char *drive)
 
 int ctr_fatfs_dotab_chdrive(const char *drive)
 {
-	size_t index = _VOLUMES; //select an invalid index
-	for (size_t i = 0; i < _VOLUMES && index == _VOLUMES; ++i)
-	{
-		if (strcmp(drive, valid_drives[i]) == 0)
-			index = i;
-	}
+	//Check that the drive requested is in the devoptab table
+	int index = FindDevice(drive);
+	if (index == -1) return -1;
 
-	if (index >= _VOLUMES) return -1;
-
-	setDefaultDevice(FindDevice(drive));
+	setDefaultDevice(index);
 	return 0;
 }
 
