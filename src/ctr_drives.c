@@ -240,7 +240,7 @@ static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *fi
 	st->st_mtime = fatfs_time_to_time_t(info.ftime, info.fdate);
 	st->st_spare1 = info.fattrib;
 
-	return process_error(r, err);
+	return 0;
 }
 
 static int ctr_drives_link_r(struct _reent *r, const char *existing, const char  *newLink)
@@ -332,6 +332,7 @@ static int ctr_drives_statvfs_r(const char *drive, struct _reent *r, const char 
 	st.f_bfree = st.f_bavail = free_sectors;
 
 	st.f_namemax = _MAX_LFN;
+	*buf = st;
 
 	return 0;
 }
