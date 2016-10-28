@@ -42,11 +42,31 @@ Dependencies
     Make sure it is installed somewhere that the compiler can pick it up, or
 	use -L and -I to instruct the compiler where to find it.
 
+ - FreeType2 - Used for font handling. Make sure it is installed somewhere that
+    the compiler can pick it up, or use -L and -I to instruct the compiler where
+	to find it.
+
  - Autotools in general. These are used to create the build scripts.
+
 
 --------------------------------------------------------------------------------
 Compiling
 --------------------------------------------------------------------------------
+
+As a suggestion, it is recommended for one to set up a fixed prefix directory
+and to store a share/config.site under the prefix. For example, if the variable
+CTRARM9 holds the prefix path, then $CTRARM9/share/config.site is where this
+file would be located. Any variables defined here will be picked up by configure
+upon being run. At a minimum, if other libraries will be installed to the prefix
+path, the config.site should have the following:
+
+CPPFLAGS="-I$prefix/include -I$prefix/include/freetype2"
+LDFLAGS=-L$prefix/lib
+
+This example assumes that these directories exist, and in particular that
+FreeType2's include path exists in the folder shown above. Refer to:
+https://www.gnu.org/software/automake/manual/html_node/config_002esite.html
+for more information and details about config.site files.
 
 The Autotools setup assumes that devkitarm is already in the PATH.
 
