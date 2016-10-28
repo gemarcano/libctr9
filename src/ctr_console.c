@@ -1,4 +1,4 @@
-#include <ctr9/io/ctr_console_dotab.h>
+#include <ctr9/io/ctr_console.h>
 
 #include <sys/iosupport.h>
 #include <ctr9/io.h>
@@ -12,15 +12,15 @@
 #include <ctr/console.h>
 #include <ctr/printf.h>
 
-static ssize_t ctr_console_dotab_write_r(struct _reent *r, int fd, const char *ptr, size_t len);
+static ssize_t ctr_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len);
 
 static const devoptab_t tab =
 {
-	"con",
+	"console",
 	0,
 	NULL,
 	NULL,
-	ctr_console_dotab_write_r,
+	ctr_console_write_r,
 	NULL,
 	NULL,
 	NULL,
@@ -44,16 +44,16 @@ static const devoptab_t tab =
 	NULL
 };
 
-int ctr_console_dotab_initialize(void)
+int ctr_console_initialize(void)
 {
 	devoptab_list[STD_OUT] = &tab;
 	devoptab_list[STD_ERR] = &tab;
 	setvbuf(stdout, NULL , _IONBF, 0);
-	setvbuf(stderr, NULL , _IONBF, 0);;
+	setvbuf(stderr, NULL , _IONBF, 0);
 	return 0;
 }
 
-static ssize_t ctr_console_dotab_write_r(struct _reent *r, int fd, const char *ptr, size_t len)
+static ssize_t ctr_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len)
 {
 	for (size_t i = 0; i < len; ++i)
 	{
@@ -61,5 +61,4 @@ static ssize_t ctr_console_dotab_write_r(struct _reent *r, int fd, const char *p
 	}
 	return (ssize_t)len;
 }
-
 

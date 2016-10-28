@@ -23,7 +23,7 @@
 #include <ctr9/ctr_irq.h>
 #include <ctr9/ctr_gfx.h>
 #include <ctr9/ctr_cache.h>
-#include <ctr9/io/ctr_console_dotab.h>
+#include <ctr9/io/ctr_console.h>
 
 int DEBUG = 0;
 
@@ -61,7 +61,7 @@ static bool crypto_tests1(void *ctx)
 }
 
 
-#include <ctr9/io/ctr_fatfs.h>
+#include <ctr9/io/fatfs/ctr_fatfs.h>
 #include <ctr9/sha.h>
 
 extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
@@ -73,13 +73,13 @@ uint8_t otp_sha[32];
 
 #include <ctr9/ctr_freetype.h>
 #include <errno.h>
-#include <ctr9/io/ctr_fatfs_dotab.h>
+#include <ctr9/io/ctr_drives.h>
 
 int main()
 {
-	ctr_console_dotab_initialize();
+	ctr_console_initialize();
 	int asd = ctr_freetype_initialize();
-	ctr_fatfs_dotab_initialize();
+	ctr_drives_initialize();
 
 	memset(otp_sha, 0, 0x20);
 	memcpy(otp_sha, REG_SHAHASH, 0x20);

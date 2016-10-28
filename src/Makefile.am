@@ -11,7 +11,7 @@ libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	gamecart/protocol_ntr.c ctr_cart_interface.c gamecart/delay.s ctr_headers.c \
 	ctr_timer.c ctr_irq.c ctr_system_clock.c ctr_gfx.c ctr_cache.s \
 	ctr_crypto_interface.c ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
-	ctr_aeskeydb.c ctr_firm.c ctr_fatfs_dotab.c ctr_console_dotab.c \
+	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
 	ctr_file_interface.c ctr_freetype.c
 
 ctr_interrupt.o : AM_CFLAGS += -marm #Force ARM mode for ctr_interrupt
@@ -34,7 +34,7 @@ noinst_HEADERS = $(includedirectory)/ctr9/io/fatfs/ff.h \
 	$(includedirectory)/ctr9/io/fatfs/ctr_fatfs_disk.h \
 	$(includedirectory)/ctr9/io/fatfs/diskio.h \
 	$(includedirectory)/ctr9/io/fatfs/ffconf.h \
-	$(includedirectory)/ctr9/io/ctr_fatfs.h \
+	$(includedirectory)/ctr9/io/fatfs/ctr_fatfs.h \
 	$(includedirectory)/ctr9/io/fatfs/integer.h
 
 ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
@@ -74,8 +74,8 @@ ctrioinclude_HEADERS = \
 	$(includedirectory)/ctr9/io/ctr_io_implementation.c \
 	$(includedirectory)/ctr9/io/ctr_crypto_interface.h \
 	$(includedirectory)/ctr9/io/ctr_memory_interface.h \
-	$(includedirectory)/ctr9/io/ctr_fatfs_dotab.h \
-	$(includedirectory)/ctr9/io/ctr_console_dotab.h \
+	$(includedirectory)/ctr9/io/ctr_drives.h \
+	$(includedirectory)/ctr9/io/ctr_console.h \
 	$(includedirectory)/ctr9/io/ctr_file_interface.h
 
 ctrsdmmcinclude_HEADERS = $(includedirectory)/ctr9/io/sdmmc/sdmmc.h

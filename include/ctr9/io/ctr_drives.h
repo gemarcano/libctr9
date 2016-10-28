@@ -8,23 +8,22 @@
 
 /** @file */
 
-#ifndef CTR_FATFS_DOTAB_H_
-#define CTR_FATFS_DOTAB_H_
+#ifndef CTR_DRIVES_H_
+#define CTR_DRIVES_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int ctr_fatfs_dotab_initialize(void);
+int ctr_drives_initialize(void);
 
-int ctr_fatfs_dotab_check_ready(const char *drive);
+int ctr_drives_check_ready(const char *drive);
 
-int ctr_fatfs_dotab_chdrive(const char *drive);
+int ctr_drives_chdrive(const char *drive);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif//CTR_FATFS_DOTAB_H_
+#endif//CTR_DRIVES_H_
 

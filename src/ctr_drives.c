@@ -1,5 +1,5 @@
-#include <ctr9/io/ctr_fatfs_dotab.h>
-#include <ctr9/io/ctr_fatfs.h>
+#include <ctr9/io/ctr_drives.h>
+#include <ctr9/io/fatfs/ctr_fatfs.h>
 
 #include <ctr9/io/fatfs/ff.h>
 #include <sys/iosupport.h>
@@ -59,7 +59,7 @@ static inline int process_error(struct _reent *r, int err)
 	return 0;
 }
 
-static int ctr_fatfs_dotab_open_r(const char *drive, struct _reent *r, void *fileStruct, const char *path, int flags, int mode)
+static int ctr_drives_open_r(const char *drive, struct _reent *r, void *fileStruct, const char *path, int flags, int mode)
 {
 	FIL_extension *file_ex = fileStruct;
 	file_ex->drive = drive;
@@ -116,7 +116,7 @@ static int ctr_fatfs_dotab_open_r(const char *drive, struct _reent *r, void *fil
 	return (int)file_ex;
 }
 
-static int ctr_fatfs_dotab_close_r(struct _reent *r, int fd)
+static int ctr_drives_close_r(struct _reent *r, int fd)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	int err = f_close_(&file_ex->file);
@@ -124,7 +124,7 @@ static int ctr_fatfs_dotab_close_r(struct _reent *r, int fd)
 	return process_error(r, err);
 }
 
-static ssize_t ctr_fatfs_dotab_write_r(const char *drive, struct _reent *r, int fd, const char *ptr, size_t len)
+static ssize_t ctr_drives_write_r(const char *drive, struct _reent *r, int fd, const char *ptr, size_t len)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	UINT wb;
@@ -137,7 +137,7 @@ static ssize_t ctr_fatfs_dotab_write_r(const char *drive, struct _reent *r, int 
 	return (ssize_t)wb;
 }
 
-static ssize_t ctr_fatfs_dotab_read_r(const char *drive, struct _reent *r, int fd, char *ptr, size_t len)
+static ssize_t ctr_drives_read_r(const char *drive, struct _reent *r, int fd, char *ptr, size_t len)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	UINT rb;
@@ -149,7 +149,7 @@ static ssize_t ctr_fatfs_dotab_read_r(const char *drive, struct _reent *r, int f
 	return (ssize_t)rb;
 }
 
-static off_t ctr_fatfs_dotab_seek_r(struct _reent *r, int fd, off_t pos, int dir)
+static off_t ctr_drives_seek_r(struct _reent *r, int fd, off_t pos, int dir)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	size_t offset = 0;
@@ -177,11 +177,11 @@ static off_t ctr_fatfs_dotab_seek_r(struct _reent *r, int fd, off_t pos, int dir
 	return (off_t)f_tell_(&file_ex->file);
 }
 
-static int ctr_fatfs_dotab_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st);
-static int ctr_fatfs_dotab_fstat_r(struct _reent *r, int fd, struct stat *st)
+static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st);
+static int ctr_drives_fstat_r(struct _reent *r, int fd, struct stat *st)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
-	return ctr_fatfs_dotab_stat_r(file_ex->drive, r, file_ex->filename, st);
+	return ctr_drives_stat_r(file_ex->drive, r, file_ex->filename, st);
 }
 
 static time_t fatfs_time_to_time_t(uint16_t time, uint16_t date)
@@ -198,7 +198,7 @@ static time_t fatfs_time_to_time_t(uint16_t time, uint16_t date)
 	return mktime(&t);
 }
 
-static int ctr_fatfs_dotab_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st)
+static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st)
 {
 	FILINFO info;
 	f_chdrive_(drive);
@@ -218,13 +218,13 @@ static int ctr_fatfs_dotab_stat_r(const char *drive, struct _reent *r, const cha
 	return process_error(r, err);
 }
 
-static int ctr_fatfs_dotab_link_r(struct _reent *r, const char *existing, const char  *newLink)
+static int ctr_drives_link_r(struct _reent *r, const char *existing, const char  *newLink)
 {
 	r->_errno = ENOSYS;
 	return -1;
 }
 
-static int ctr_fatfs_dotab_unlink_r(const char *drive, struct _reent *r, const char *name)
+static int ctr_drives_unlink_r(const char *drive, struct _reent *r, const char *name)
 {
 	f_chdrive_(drive);
 	int err = f_unlink_(name);
@@ -232,7 +232,7 @@ static int ctr_fatfs_dotab_unlink_r(const char *drive, struct _reent *r, const c
 	return process_error(r, err);
 }
 
-static int ctr_fatfs_dotab_chdir_r(const char *drive, struct _reent *r, const char *name)
+static int ctr_drives_chdir_r(const char *drive, struct _reent *r, const char *name)
 {
 	f_chdrive_(drive);
 	int err = f_chdir_(name);
@@ -240,7 +240,7 @@ static int ctr_fatfs_dotab_chdir_r(const char *drive, struct _reent *r, const ch
 	return process_error(r, err);
 }
 
-static int ctr_fatfs_dotab_rename_r(const char *drive, struct _reent *r, const char *oldName, const char *newName)
+static int ctr_drives_rename_r(const char *drive, struct _reent *r, const char *oldName, const char *newName)
 {
 	f_chdrive_(drive);
 	int err = f_rename_(oldName, newName);
@@ -248,7 +248,7 @@ static int ctr_fatfs_dotab_rename_r(const char *drive, struct _reent *r, const c
 	return process_error(r, err);
 }
 
-static int ctr_fatfs_dotab_mkdir_r(const char *drive, struct _reent *r, const char *path, int mode)
+static int ctr_drives_mkdir_r(const char *drive, struct _reent *r, const char *path, int mode)
 {
 	f_chdrive_(drive);
 	int err = f_mkdir_(path);
@@ -256,32 +256,32 @@ static int ctr_fatfs_dotab_mkdir_r(const char *drive, struct _reent *r, const ch
 	return process_error(r, err);
 }
 
-static DIR_ITER* ctr_fatfs_dotab_diropen_r(struct _reent *r, DIR_ITER *dirState, const char *path)
+static DIR_ITER* ctr_drives_diropen_r(struct _reent *r, DIR_ITER *dirState, const char *path)
 {
 	return NULL;/*FIXME*/
 }
 
-static int ctr_fatfs_dotab_dirreset_r(struct _reent *r, DIR_ITER *dirState)
+static int ctr_drives_dirreset_r(struct _reent *r, DIR_ITER *dirState)
 {
 	return -1;/*FIXME*/
 }
 
-static int ctr_fatfs_dotab_dirnext_r(struct _reent *r, DIR_ITER *dirState, char *filename, struct stat *filestat)
+static int ctr_drives_dirnext_r(struct _reent *r, DIR_ITER *dirState, char *filename, struct stat *filestat)
 {
 	return -1; /*FIXME*/
 }
 
-static int ctr_fatfs_dotab_dirclose_r(struct _reent *r, DIR_ITER *dirState)
+static int ctr_drives_dirclose_r(struct _reent *r, DIR_ITER *dirState)
 {
 	return -1;/*FIXME*/
 }
 
-static int ctr_fatfs_dotab_statvfs_r(struct _reent *r, const char *path, struct statvfs *buf)
+static int ctr_drives_statvfs_r(struct _reent *r, const char *path, struct statvfs *buf)
 {
 	return -1;
 }
 
-static int ctr_fatfs_dotab_ftruncate_r(struct _reent *r, int fd, off_t len)
+static int ctr_drives_ftruncate_r(struct _reent *r, int fd, off_t len)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	int err = f_truncate_(&file_ex->file);
@@ -289,7 +289,7 @@ static int ctr_fatfs_dotab_ftruncate_r(struct _reent *r, int fd, off_t len)
 	return process_error(r, err);
 }
 
-static int ctr_fatfs_dotab_fsync_r(struct _reent *r, int fd)
+static int ctr_drives_fsync_r(struct _reent *r, int fd)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	int err = f_sync_(&file_ex->file);
@@ -297,17 +297,17 @@ static int ctr_fatfs_dotab_fsync_r(struct _reent *r, int fd)
 	return process_error(r, err);
 }
 
-static int ctr_fatfs_dotab_chmod_r(struct _reent *r, const char *path, mode_t mode)
+static int ctr_drives_chmod_r(struct _reent *r, const char *path, mode_t mode)
 {
 	return -1;
 }
 
-static int ctr_fatfs_dotab_fchmod_r(struct _reent *r, int fd, mode_t mode)
+static int ctr_drives_fchmod_r(struct _reent *r, int fd, mode_t mode)
 {
 	return -1;
 }
 
-static int ctr_fatfs_dotab_rmdir_r(struct _reent *r, const char *name)
+static int ctr_drives_rmdir_r(struct _reent *r, const char *name)
 {
 	return -1; /*FIXME this can be figure out*/
 }
@@ -327,25 +327,25 @@ static const devoptab_t DEV##_tab =\
 	#DEV,\
 	sizeof(FIL_extension),\
 	DEV##_dotab_open_r,\
-	ctr_fatfs_dotab_close_r,\
+	ctr_drives_close_r,\
 	DEV##_dotab_write_r,\
 	DEV##_dotab_read_r,\
-	ctr_fatfs_dotab_seek_r,\
-	ctr_fatfs_dotab_fstat_r,\
+	ctr_drives_seek_r,\
+	ctr_drives_fstat_r,\
 	DEV##_dotab_stat_r,\
-	ctr_fatfs_dotab_link_r,\
+	ctr_drives_link_r,\
 	DEV##_dotab_unlink_r,\
 	DEV##_dotab_chdir_r,\
 	DEV##_dotab_rename_r,\
 	DEV##_dotab_mkdir_r,\
 	sizeof(int), /*FIXME DIR element size, include FILINFO inside*/\
-	ctr_fatfs_dotab_diropen_r,\
-	ctr_fatfs_dotab_dirreset_r,\
-	ctr_fatfs_dotab_dirnext_r,\
-	ctr_fatfs_dotab_dirclose_r,\
-	ctr_fatfs_dotab_statvfs_r,\
-	ctr_fatfs_dotab_ftruncate_r,\
-	ctr_fatfs_dotab_fsync_r,\
+	ctr_drives_diropen_r,\
+	ctr_drives_dirreset_r,\
+	ctr_drives_dirnext_r,\
+	ctr_drives_dirclose_r,\
+	ctr_drives_statvfs_r,\
+	ctr_drives_ftruncate_r,\
+	ctr_drives_fsync_r,\
 	NULL,\
 	NULL,\
 	NULL,\
@@ -354,42 +354,42 @@ static const devoptab_t DEV##_tab =\
 \
 static int DEV##_dotab_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode)\
 {\
-	return ctr_fatfs_dotab_open_r(#DEV":", r, fileStruct, path, flags, mode);\
+	return ctr_drives_open_r(#DEV":", r, fileStruct, path, flags, mode);\
 }\
 \
 static ssize_t DEV##_dotab_write_r(struct _reent *r, int fd, const char *ptr, size_t len)\
 {\
-	return ctr_fatfs_dotab_write_r(#DEV":", r, fd, ptr, len);\
+	return ctr_drives_write_r(#DEV":", r, fd, ptr, len);\
 }\
 \
 static ssize_t DEV##_dotab_read_r(struct _reent *r, int fd, char *ptr, size_t len)\
 {\
-	return ctr_fatfs_dotab_read_r(#DEV":", r, fd, ptr, len);\
+	return ctr_drives_read_r(#DEV":", r, fd, ptr, len);\
 }\
 \
 static int DEV##_dotab_stat_r(struct _reent *r, const char *file, struct stat *st)\
 {\
-	return ctr_fatfs_dotab_stat_r(#DEV":", r, file, st);\
+	return ctr_drives_stat_r(#DEV":", r, file, st);\
 }\
 \
 static int DEV##_dotab_unlink_r(struct _reent *r, const char *name)\
 {\
-	return ctr_fatfs_dotab_unlink_r(#DEV":", r, name);\
+	return ctr_drives_unlink_r(#DEV":", r, name);\
 }\
 \
 static int DEV##_dotab_chdir_r(struct _reent *r, const char *name)\
 {\
-	return ctr_fatfs_dotab_chdir_r(#DEV":", r, name);\
+	return ctr_drives_chdir_r(#DEV":", r, name);\
 }\
 \
 static int DEV##_dotab_rename_r(struct _reent *r, const char *oldName, const char *newName)\
 {\
-	return ctr_fatfs_dotab_rename_r(#DEV":", r, oldName, newName);\
+	return ctr_drives_rename_r(#DEV":", r, oldName, newName);\
 }\
 \
 static int DEV##_dotab_mkdir_r(struct _reent *r, const char *path, int mode)\
 {\
-	return ctr_fatfs_dotab_mkdir_r(#DEV":", r, path, mode);\
+	return ctr_drives_mkdir_r(#DEV":", r, path, mode);\
 }
 
 PREPARE_DOTAB(SD)
@@ -421,7 +421,7 @@ static const char *valid_drives[_VOLUMES] = {
 	"DISK5:"
 };
 
-int ctr_fatfs_dotab_check_ready(const char *drive)
+int ctr_drives_check_ready(const char *drive)
 {
 	size_t index = _VOLUMES; //select an invalid index
 	for (size_t i = 0; i < _VOLUMES && index == _VOLUMES; ++i)
@@ -435,7 +435,7 @@ int ctr_fatfs_dotab_check_ready(const char *drive)
 	return f_mount_(&fatfs[index], drive, 1);
 }
 
-int ctr_fatfs_dotab_chdrive(const char *drive)
+int ctr_drives_chdrive(const char *drive)
 {
 	//Check that the drive requested is in the devoptab table
 	int index = FindDevice(drive);
@@ -445,7 +445,7 @@ int ctr_fatfs_dotab_chdrive(const char *drive)
 	return 0;
 }
 
-int ctr_fatfs_dotab_initialize(void)
+int ctr_drives_initialize(void)
 {
 	//FIXME allow for mounting as needed at f_open
 	//Specifically, this is to allow for SD removal and such...
