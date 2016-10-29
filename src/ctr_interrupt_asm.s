@@ -28,23 +28,21 @@
 
 @FIXME this code is not generally position independent
 
-prev_sp:
-.word 0
-prev_lr:
-.word 0
-tmp_stack_end:
-.word 0
-.word 0
-.word 0
-tmp_stack:
+@I'm aware this choice of canary is not secure-- the idea behind this is to
+@prevent program execution from continuing in the case of an accidental
+@overflow
+exception_canary:
+.word exception_stack_end
+exception_stack_end:
+.skip 8192
+exception_stack:
 
 .macro CTR_INTERRUPT_VENEER table_offset=0
-	@temporary stack...
-	ldr sp, =tmp_stack
-	push {r0, r1, r2}
+	@Exceptions stack. Currently we don't support nested exceptions
+	ldr sp, =exception_stack
+	push {r0-r12,r14} @push "normal" registers
 
-	@switch to previous mode to previous stack pointer, then switch back
-	@previous stack pointer will be used for current mode
+	@switch to previous mode to get previous sp and lr, then switch back
 	mrs r1, cpsr @interrupt mode
 	mrs r0, spsr @previous mode
 	orr r0, #0xC0 @make sure interrupts are disabled in mode to be switched to
@@ -60,39 +58,16 @@ tmp_stack:
 
 	@change mode
 	msr cpsr_c, r0
-	mov r0, sp
-	mov r2, lr
-	@switch back, to finish setting up the stack for the interrupt
+	mov r2, sp
+	mov r3, lr
+	@switch back
 	msr cpsr_c, r1
-
-	@store the retreived sp and lr and restore r0-r2 original state
-	ldr r1, =prev_sp
-	str r0, [r1]
-
-	ldr r1, =prev_lr
-	str r2, [r1]
-
-	pop {r0, r1, r2}
-
-	@finally finish setting up the stack
-	ldr sp, =prev_sp
-	ldr sp, [sp]
-
-	push {r0-r12,r14} @push "normal" registers
-
-	@load the saved sp and lr to push onto the stack to pass to the registered
-	@interrupt handler
-	ldr r0, =prev_sp
-	ldr r3, [r0]
-
-	ldr r0, =prev_lr
-	ldr r4, [r0]
 
 	mrs r0, spsr
 
 	@push "special" registers, placing them in the front of the array to be
 	@passed
-	push {r0, r3, r4, r14}
+	push {r0, r2, r3, r14}
 
 	adr r1, ctr_interrupt_handlers_location
 	ldr r2, [r1]
@@ -103,6 +78,17 @@ tmp_stack:
 	@Parameters: r0 - pointer to array on stack:
 	@    cpsr, sp, lr, return, r0-r12
 	blx r2
+
+	@determine if the simple canary was damaged
+	ldr r0, =exception_canary
+	ldr r0, [r0]
+	ldr r1, =exception_stack_end
+	cmp r0, r1
+
+	beq 2f
+	@Who knows what was overwritten, just forcibly hang.
+	b .
+	2:
 
 	@now determine the mode we were in previously
 	@if Thumb, make sure LR is updated
