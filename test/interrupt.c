@@ -36,12 +36,12 @@ void abort_interrupt(uint32_t *registers)
 	if (cpsr & 0x20)
 	{
 		registers[3] -= 6;
-		printf("Ret. Thumb: 0x%08X\n", registers[2]);
+		printf("Ret. Thumb: 0x%08X\n", registers[3]);
 	}
 	else
 	{
 		registers[3] -= 4;
-		printf("Ret. ARM: 0x%08X\n", registers[2]);
+		printf("Ret. ARM: 0x%08X\n", registers[3]);
 	}
 }
 

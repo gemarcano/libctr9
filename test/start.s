@@ -9,29 +9,29 @@ _start:
 	bic r0, r0, #0x1F
 
 	@system mode
-	orr r1, r0, #0x1F
-	msr cpsr_c, r1
-	ldr sp, =0x10000
+	@orr r1, r0, #0x1F
+	@msr cpsr_c, r1
+	@ldr sp, =0x10000
 
 	@abort mode
-	orr r1, r0, #0x17
-	msr cpsr_c, r1
-	ldr sp, =0x10000
+	@orr r1, r0, #0x17
+	@msr cpsr_c, r1
+	@ldr sp, =0x10000
 
 	@IRQ mode
-	orr r1, r0, #0x12
-	msr cpsr_c, r1
-	ldr sp, =0x10000
+	@orr r1, r0, #0x12
+	@msr cpsr_c, r1
+	@ldr sp, =0x10000
 
 	@FIQ mode
-	orr r1, r0, #0x11
-	msr cpsr_c, r1
-	ldr sp, =0x10000
+	@orr r1, r0, #0x11
+	@msr cpsr_c, r1
+	@ldr sp, =0x10000
 
 	@supervisor mode
-	orr r1, r0, #0x13
-	msr cpsr_c, r1
-	ldr sp, =0x10000
+	@orr r1, r0, #0x13
+	@msr cpsr_c, r1
+	@ldr sp, =0x10000
 
 	@system mode
 	orr r1, r0, #0x1F
@@ -201,7 +201,7 @@ relocate_section:
 	bx lr
 
 relocation_base_offset:
-.word _entry-.
+.word _start-.
 
 flush_all_caches:
 	push {lr}

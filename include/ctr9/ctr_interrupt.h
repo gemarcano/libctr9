@@ -8,10 +8,6 @@
 
 /** @file */
 
-//FIXME Document the fact that exception setup requires MPU to be setup so that
-//ITCM is accessible from 0x0000 to 0x10000. Also, stacks must be setup (should
-//I do that when I install the exceptions...?)
-
 #ifndef CTR_INTERRUPT_H_
 #define CTR_INTERRUPT_H_
 
@@ -40,10 +36,7 @@ typedef enum
 /**	@brief Sets up the exception vectors in ITCM.
  *
  *	For this function to work, ITCM must be enabled and MPU must allow for
- *	writing and reading from 0x0000 to 0x8000. In addition, the stacks for the
- *	exception modes must be set up, else when trying to jump to the exception
- *	handling code, the stacks will be setup randomly and will most likely lead
- *	to a crash.
+ *	writing and reading from 0x0000 to 0x8000.
  */
 void ctr_interrupt_prepare(void);
 
