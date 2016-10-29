@@ -11,8 +11,10 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include <sys/statvfs.h>
+#include <sys/syslimits.h>
 
 static int error_map[FR_INVALID_PARAMETER+1] = {
 	0, //OK
@@ -73,6 +75,13 @@ typedef struct
 	char filename[_MAX_LFN + 1];
 	FIL file;
 } FIL_extension;
+
+typedef struct
+{
+	DIR directory;
+	size_t name_size;
+	char *name;
+} DIR_extension;
 
 static inline int process_error(struct _reent *r, int err)
 {
@@ -223,6 +232,19 @@ static time_t fatfs_time_to_time_t(uint16_t time, uint16_t date)
 	return mktime(&t);
 }
 
+static void filinfo_to_stat(const FILINFO *info, struct stat *st)
+{
+	memset(st, 0, sizeof(*st));
+	st->st_mode = (info->fattrib & AM_DIR) ? S_IFDIR : 0;
+	st->st_nlink = 1;
+	st->st_uid = 1;
+	st->st_gid = 1;
+	st->st_rdev = st->st_dev;
+	st->st_size = (off_t)info->fsize;
+	st->st_mtime = fatfs_time_to_time_t(info->ftime, info->fdate);
+	st->st_spare1 = info->fattrib;
+}
+
 static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st)
 {
 	FILINFO info;
@@ -230,15 +252,7 @@ static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *fi
 	int err = f_stat_(file, &info);
 	if (process_error(r, err)) return -1;
 
-	memset(st, 0, sizeof(*st));
-	st->st_mode = (info.fattrib & AM_DIR) ? S_IFDIR : 0;
-	st->st_nlink = 1;
-	st->st_uid = 1;
-	st->st_gid = 1;
-	st->st_rdev = st->st_dev;
-	st->st_size = (off_t)info.fsize;
-	st->st_mtime = fatfs_time_to_time_t(info.ftime, info.fdate);
-	st->st_spare1 = info.fattrib;
+	filinfo_to_stat(&info, st);
 
 	return 0;
 }
@@ -281,28 +295,70 @@ static int ctr_drives_mkdir_r(const char *drive, struct _reent *r, const char *p
 	return process_error(r, err);
 }
 
+
 static DIR_ITER* ctr_drives_diropen_r(struct _reent *r, DIR_ITER *dirState, const char *path)
 {
-	r->_errno = ENOSYS;
-	return NULL;/*FIXME*/
+	DIR_extension *dir = (DIR_extension*)dirState;
+	*dir = (DIR_extension){0};
+
+	int err = f_opendir_(&dir->directory, path);
+	if (err)
+	{
+		process_error(r, err);
+		return NULL;
+	}
+
+	err = f_readdir_(&dir->directory, NULL);
+	if (err)
+	{
+		process_error(r, err);
+		return NULL;
+	}
+
+	dir->name_size = strlen(path)+1;
+	memcpy(dir->name, path, dir->name_size);
+	dir->name = malloc(dir->name_size);
+	return dirState;
 }
 
 static int ctr_drives_dirreset_r(struct _reent *r, DIR_ITER *dirState)
 {
-	r->_errno = ENOSYS;
-	return -1;/*FIXME*/
+	DIR_extension *dir = (DIR_extension*)dirState;
+	int err = f_readdir_(&dir->directory, NULL);
+	return process_error(r, err);
 }
 
 static int ctr_drives_dirnext_r(struct _reent *r, DIR_ITER *dirState, char *filename, struct stat *filestat)
 {
-	r->_errno = ENOSYS;
-	return -1; /*FIXME*/
+	DIR_extension *dir = (DIR_extension*)dirState;
+	FILINFO info;
+	int err = f_readdir_(&dir->directory, &info);
+	if (err) return process_error(r, err);
+
+	//For filename we can't copy more than NAME_MAX, else we overflow the memory
+	//allocated by libsysbase
+	size_t len = strlen(info.fname);
+	if (len > NAME_MAX-1)
+	{
+		r->_errno = EOVERFLOW;
+		return -1;
+	}
+
+	strcpy(filename, info.fname);
+
+	if (filestat)
+	{
+		filinfo_to_stat(&info, filestat);
+	}
+
+	return 0;
 }
 
 static int ctr_drives_dirclose_r(struct _reent *r, DIR_ITER *dirState)
 {
-	r->_errno = ENOSYS;
-	return -1;/*FIXME*/
+	DIR_extension *dir = (DIR_extension*)dirState;
+	free(dir->name);
+	return 0;
 }
 
 static int ctr_drives_statvfs_r(const char *drive, struct _reent *r, const char *path, struct statvfs *buf)
@@ -386,7 +442,7 @@ static const devoptab_t DEV##_tab =\
 	DEV##_drives_chdir_r,\
 	DEV##_drives_rename_r,\
 	DEV##_drives_mkdir_r,\
-	sizeof(int), /*FIXME DIR element size, include FILINFO inside*/\
+	sizeof(DIR_extension),\
 	ctr_drives_diropen_r,\
 	ctr_drives_dirreset_r,\
 	ctr_drives_dirnext_r,\

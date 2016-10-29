@@ -57,7 +57,7 @@ static bool crypto_tests1(void *ctx)
 {
 	crypto_test_data *data = ctx;
 	int res = ctr_crypto_interface_initialize(&(data->io), 0x04, 1, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, data->ctr, data->lower_io);
-	return false;
+	return !res;
 }
 
 
@@ -95,13 +95,9 @@ int main()
 	printf("UNIT TESTING\n");
 	printf("freetype: %d\n", asd);
 
-	int d;
 	for (int i = 0; i < 32; ++i)
 	{
-		char tmp[0x1000];
-		iprintf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
-		//puts(tmp);
-		//d = printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
+		printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
 	}
 	printf("\n");
 
@@ -150,9 +146,7 @@ int main()
 	res |= ctr_execute_unit_tests(&twl_crypto_tests);
 	res |= ctr_execute_unit_tests(&memory_tests);
 	res |= ctr_execute_unit_tests(&crypto_memory_tests);
-
-	FATFS fs = { 0 };
-	FIL test_file = { 0 };
+	printf("Test status: %d\n", res);
 
 	ctr_setup_disk_parameters params = {&nand_crypto_ctx.io, 0x0B930000/0x200, 0x2F5D0000/0x200};
 	disk_ioctl_(0, CTR_SETUP_DISK, &params);
@@ -247,8 +241,8 @@ int main()
 */
 	mmcdevice dev1= *getMMCDevice(1);
 	mmcdevice dev0= *getMMCDevice(0);
-	printf("SDHandle: %d\n", dev0.isSDHC);
-	printf("SDHandle: %d\n", dev1.isSDHC);
+	printf("SDHandle: %u\n", dev0.isSDHC);
+	printf("SDHandle: %u\n", dev1.isSDHC);
 
 	printf("Trying timer stuff\n");
 	ctr_timer_disable_irq(CTR_TIMER0);
@@ -316,7 +310,7 @@ int main()
 		{
 			ms = ctr_system_clock_get_ms(&clock);
 		}
-		printf("second: %d\n", i);
+		printf("second: %zu\n", i);
 	}
 
 
@@ -467,7 +461,7 @@ int main()
 	cbc_decrypt(output_buffer, output_buffer2, 0x1FFFF, AES_CNT_CBC_DECRYPT_MODE, iv);
 
 	FILE *dump = fopen("SD:/dump.cbc", "wb");
-	size_t res222 = fwrite(output_buffer2, 0x1FFFF * 16, 1, dump);
+	fwrite(output_buffer2, 0x1FFFF * 16, 1, dump);
 	fclose(dump);
 
 	dump = fopen("SD:/sha.sha.sha", "wb");

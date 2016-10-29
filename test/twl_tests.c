@@ -12,7 +12,6 @@ static bool twl_test1(void *ctx)
 {
 	nand_crypto_test_data *data = ctx;
 	char *buffer = data->buffer;
-	size_t buffer_size = data->buffer_size;
 
 	ctr_twl_keyslot_setup();
 
@@ -23,8 +22,6 @@ static bool twl_test1(void *ctx)
 
 static bool twl_test2(void *ctx)
 {
-	nand_crypto_test_data *data = ctx;
-
 	bool test1 = false, test2 = false;
 	int res2 = 0;
 
@@ -51,8 +48,6 @@ static bool twl_test2(void *ctx)
 
 static bool twl_test3(void *ctx)
 {
-	nand_crypto_test_data *data = ctx;
-
 	bool test1 = false;
 	int res2 = 0;
 	FILE *file;
@@ -66,10 +61,14 @@ static bool twl_test3(void *ctx)
 
 		FILE *file2 = fopen("DISK0:/foobar.txt", "wb");
 		printf("Did it open: %d\n", file2 != NULL);
-		size_t written = fwrite("FOOBAR\nhello world!!!", sizeof("FOOBAR\nhello world!!!")-1, 1, file2);
-		printf("this many elements got written: %d\n", written);
-		test1 = file2 != NULL && written == 1;
-		fclose(file2);
+		if (file2)
+		{
+			size_t written = fwrite("FOOBAR\nhello world!!!", sizeof("FOOBAR\nhello world!!!")-1, 1, file2);
+			printf("this many elements got written: %zu\n", written);
+			test1 = written == 1;
+			fclose(file2);
+		}
+		
 	}
 
 	return !res2 && test1;

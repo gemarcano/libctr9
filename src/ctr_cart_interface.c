@@ -44,7 +44,7 @@ bool ctr_cart_interface_initialize(ctr_cart_interface *cart)
 	Cart_Secure_Init(buffer, cart->sec_keys);
 	//this function doesn't care about alignment. it optimizes if it is aligned,
 	//else it does the right thing for unaligned access
-	CTR_CmdReadData(0, 0x200, 0x200 / 0x200, (uint8_t*)buffer);
+	CTR_CmdReadData(0, 0x200, 1, (uint8_t*)buffer);
 	ctr_ncsd_header_load(&cart->ncsd_header, (uint8_t*)buffer, 0x200);
 
 	cart->media_unit_size = 0x200 * (1u << cart->ncsd_header.partition_flags[6]);

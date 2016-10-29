@@ -38,7 +38,7 @@ static bool sd_test3(void *ctx)
 	{
 		struct stat st;
 		fstat(fileno(otp), &st);
-		off_t size = st.st_size; //FIXME fstat not implemented
+		off_t size = st.st_size;
 		fclose(otp);
 		return size == 256;
 	}
@@ -47,16 +47,15 @@ static bool sd_test3(void *ctx)
 
 static bool sd_test4(void *ctx)
 {
-	const char * string = "HELLO WORLD!!!";
-
 	FILE *file = fopen("SD:/test_data.txt", "wrb");
 	if (file)
 	{
+		const char * string = "HELLO WORLD!!!";
 		struct stat st;
 		fwrite(string, strlen(string), 1, file);
 		fflush(file);
 		fstat(fileno(file), &st);
-		size_t size = (size_t)(st.st_size); //fstat not yet implemented FIXME
+		size_t size = (size_t)(st.st_size);
 		fclose(file);
 		return size == strlen(string);
 	}

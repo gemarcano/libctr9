@@ -177,7 +177,7 @@ static uint8_t card_aes(uint32_t *out, uint32_t *buff, size_t size) { // note si
 
 void Cart_Secure_Init(uint32_t *buf, uint32_t *out)
 {
-    uint8_t mac_valid = card_aes(out, buf, 0x200);
+//    uint8_t mac_valid = card_aes(out, buf, 0x200);
 
 //    if (!mac_valid)
 //        ClearScreen(bottomScreen, RGB(255, 0, 0));

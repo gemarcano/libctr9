@@ -128,7 +128,6 @@ static inline void load_key15(const ctr_arm9bin_header *a9_header)
 {
 	uint8_t key15x_enc[16];
 	uint8_t key15x[16];
-	uint8_t key15y[16];
 	uint8_t ctr[16];
 	memcpy(key15x_enc, a9_header->enc_keyx, sizeof(key15x_enc));
 	ctr_memory_interface mem_io;
@@ -173,7 +172,7 @@ static uint32_t slide_forward(uint32_t hash, const uint8_t *data)
 
 static size_t hash_search(const void *data, size_t data_size, uint32_t target_hash, const uint8_t *target_sha256)
 {
-	bool found = false;
+	bool found;
 	const uint8_t *d = data;
 	uint32_t current = hash((const uint8_t *)data);
 	size_t i;

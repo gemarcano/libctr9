@@ -300,7 +300,6 @@ static inline int get_misaligned_block(ctr_crypto_interface *io, size_t sector, 
 	uint64_t block_pos = get_chunk_position(current_block, block_size);
 	uint64_t block_start_offset = block_pos - get_chunk_position(sector - sectors_to_copy_prior, sector_size);
 	uint8_t *pos = buf + block_start_offset;
-	size_t sector_pos = get_chunk_position(sector, sector_size);
 
 	block_function(io, pos, current_block, 1);
 	memcpy(buffer, pos, block_size);
@@ -457,7 +456,6 @@ static inline void update_window(write_window *window, size_t sectors_processed)
 {
 	size_t sector_size = window->sector_size;
 	size_t block_size = window->block_size;
-	size_t window_size = window->window_size;
 	size_t bytes_processed = sectors_processed * sector_size;
 
 	//Copy sector that contain part of next block
@@ -467,7 +465,6 @@ static inline void update_window(write_window *window, size_t sectors_processed)
 	window->current_sector += sectors_processed;
 	window->sector += sectors_processed - remaining_bytes / sector_size;
 
-	size_t sectors_ = get_chunks_to_complete_relative_chunk_backwards(window->current_sector, sector_size, block_size);
 	window->block = get_prev_relative_chunk(window->current_sector, sector_size, block_size);
 	window->block_offset = remaining_bytes;
 	window->window_offset = remaining_bytes;

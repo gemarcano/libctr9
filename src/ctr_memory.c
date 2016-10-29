@@ -118,7 +118,7 @@ void ctr_memory_set_itcm_state(bool state)
 	}
 	else
 	{
-		ctr_memory_enable_itcm_();
+		ctr_memory_disable_itcm_();
 	}
 }
 

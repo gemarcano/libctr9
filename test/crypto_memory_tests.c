@@ -30,8 +30,7 @@ static bool crypto_memory_test2(void *ctx)
 
 	int res = ctr_nand_crypto_interface_read_sector(&data->io, buffer, buffer_size, 55, 55);
 
-
-	return memcmp(buffer, buffer2 + 55, 55) == 0;
+	return !res && memcmp(buffer, buffer2 + 55, 55) == 0;
 }
 
 static bool crypto_memory_test3(void *ctx)
@@ -41,7 +40,7 @@ static bool crypto_memory_test3(void *ctx)
 	size_t buffer_size = data->buffer_size;
 	int res = ctr_nand_crypto_interface_read(&data->io, buffer, buffer_size, 55, 55);
 
-	return true;
+	return !res;
 }
 
 static bool crypto_memory_test4(void *ctx)
@@ -53,10 +52,10 @@ static bool crypto_memory_test4(void *ctx)
 
 	int res = ctr_nand_crypto_interface_write_sector(&data->io, stuff, sizeof(stuff), 0x0);
 	uint8_t stuff2[sizeof(stuff)];
-	res = ctr_nand_crypto_interface_read_sector(&data->io, stuff2, sizeof(stuff2), 0x0, sizeof(stuff2));
+	res |= ctr_nand_crypto_interface_read_sector(&data->io, stuff2, sizeof(stuff2), 0x0, sizeof(stuff2));
 
 	bool result = !memcmp(stuff, stuff2, sizeof(stuff));
-	return result;
+	return !res && result;
 }
 
 static bool crypto_memory_test5(void *ctx)
@@ -68,10 +67,10 @@ static bool crypto_memory_test5(void *ctx)
 
 	int res = ctr_nand_crypto_interface_write(&data->io, stuff, 5, 10);
 	uint8_t stuff2[sizeof(stuff)];
-	res = ctr_nand_crypto_interface_read(&data->io, stuff2, sizeof(stuff2), 10, sizeof(stuff2)-5);
+	res |= ctr_nand_crypto_interface_read(&data->io, stuff2, sizeof(stuff2), 10, sizeof(stuff2)-5);
 
 	bool result = !memcmp(stuff, stuff2, 5);
-	return result;
+	return !res && result;
 }
 
 void crypto_memory_tests_initialize(ctr_unit_tests *crypto_memory_tests, ctr_unit_test *funcs, size_t number_of_funcs, void *crypto_memory_ctx)

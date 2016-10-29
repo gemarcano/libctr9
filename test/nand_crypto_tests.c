@@ -21,7 +21,7 @@ static bool nand_ctrnand_test2(void *ctx)
 	uint32_t loc = 0x0B95CA00/ 0x200; //CTRNAND
 	int res = ctr_io_read_sector(&data->io, buffer, buffer_size, loc, 1);
 
-	return strncmp("CTR", buffer+3, 3) == 0;
+	return !res && strncmp("CTR", buffer+3, 3) == 0;
 }
 
 static bool nand_ctrnand_test3(void *ctx)
@@ -33,7 +33,7 @@ static bool nand_ctrnand_test3(void *ctx)
 	uint32_t loc = 0x0B95CA00; //CTRNAND
 	int res = ctr_io_read(&data->io, buffer, buffer_size, loc + 3, 3);
 
-	return strncmp("CTR", buffer, 3) == 0;
+	return !res && strncmp("CTR", buffer, 3) == 0;
 }
 
 static bool nand_ctrnand_test4(void *ctx)
