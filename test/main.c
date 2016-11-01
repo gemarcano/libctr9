@@ -120,9 +120,9 @@ int main()
 	ctr_unit_tests nand_tests;
 	nand_tests_initialize(&nand_tests, nand_tests_f, 11, &nand_ctx);
 
-	ctr_unit_test nand_crypto_tests_f[6];
+	ctr_unit_test nand_crypto_tests_f[7];
 	ctr_unit_tests nand_crypto_tests;
-	nand_crypto_tests_initialize(&nand_crypto_tests, nand_crypto_tests_f, 6, &nand_crypto_ctx);
+	nand_crypto_tests_initialize(&nand_crypto_tests, nand_crypto_tests_f, 7, &nand_crypto_ctx);
 
 	ctr_unit_test sd_tests_f[4];
 	ctr_unit_tests sd_tests;

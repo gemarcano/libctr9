@@ -551,10 +551,10 @@ int ctr_drives_initialize(void)
 	f_mount_(&fatfs[8], "DISK4:", 0);
 	f_mount_(&fatfs[9], "DISK5:", 0);
 
-	return dotab_initialize(&SD_tab)
+	return dotab_initialize(&CTRNAND_tab)
 		| dotab_initialize(&TWLN_tab)
-		| dotab_initialize(&SD_tab)
 		| dotab_initialize(&TWLP_tab)
+		| dotab_initialize(&SD_tab)
 		| dotab_initialize(&DISK0_tab)
 		| dotab_initialize(&DISK1_tab)
 		| dotab_initialize(&DISK2_tab)

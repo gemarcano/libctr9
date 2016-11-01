@@ -120,15 +120,25 @@ static bool nand_ctrnand_test6(void *ctx)
 	return !res && test1 && test2;
 }
 
+#include <stdio.h>
+
+static bool nand_ctrnand_test7(void *ctx)
+{
+	FILE *file = fopen("CTRNAND:/arm9loaderhax.bin", "rb");
+	if (!file) return false;
+
+	return true;
+}
 #include "test.h"
 
 void nand_crypto_tests_initialize(ctr_unit_tests *nand_crypto_tests, ctr_unit_test *funcs, size_t number_of_funcs, void *nand_crypto_ctx)
 {
-	ctr_unit_tests_initialize(nand_crypto_tests, "NAND crypto tests", funcs, 6);
+	ctr_unit_tests_initialize(nand_crypto_tests, "NAND crypto tests", funcs, 7);
 	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_initialize", nand_crypto_ctx, nand_ctrnand_test1 });
 	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_read", nand_crypto_ctx, nand_ctrnand_test3 });
 	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_read_sector", nand_crypto_ctx, nand_ctrnand_test2 });
 	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_read compare", nand_crypto_ctx, nand_ctrnand_test4 });
 	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_write", nand_crypto_ctx, nand_ctrnand_test5 });
 	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_write_sector", nand_crypto_ctx, nand_ctrnand_test6 });
+	ctr_unit_tests_add_test(nand_crypto_tests, (ctr_unit_test){ "ctr_nand_crypto_mount_file", nand_crypto_ctx, nand_ctrnand_test7 });
 }

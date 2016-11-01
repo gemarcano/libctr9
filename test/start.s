@@ -9,31 +9,6 @@ _start:
 	bic r0, r0, #0x1F
 
 	@system mode
-	@orr r1, r0, #0x1F
-	@msr cpsr_c, r1
-	@ldr sp, =0x10000
-
-	@abort mode
-	@orr r1, r0, #0x17
-	@msr cpsr_c, r1
-	@ldr sp, =0x10000
-
-	@IRQ mode
-	@orr r1, r0, #0x12
-	@msr cpsr_c, r1
-	@ldr sp, =0x10000
-
-	@FIQ mode
-	@orr r1, r0, #0x11
-	@msr cpsr_c, r1
-	@ldr sp, =0x10000
-
-	@supervisor mode
-	@orr r1, r0, #0x13
-	@msr cpsr_c, r1
-	@ldr sp, =0x10000
-
-	@system mode
 	orr r1, r0, #0x1F
 	msr cpsr_c, r1
 
@@ -43,7 +18,7 @@ _start:
 	msr cpsr_c, r0
 
 	@ Change the stack pointer
-	ldr sp, =0x27F00000
+	ldr sp, =_stack
 
 	@ make sure ITCM is accessible
 	mrc p15, 0, r0, c1, c0, 0
