@@ -1,7 +1,7 @@
 include $(top_srcdir)/common.mk
 
 EXTRA_PROGRAMS = test
-test_CFLAGS=$(AM_CFLAGS) -v  -Wl,--verbose -T$(srcdir)/arm9loaderhax.ld -L${CTRARM9}/lib -I${CTRARM9}/include/freetype2 #-nostartfiles
+test_CFLAGS=$(AM_CFLAGS) -v  -Wl,--verbose -T$(srcdir)/arm9loaderhax.ld -L${prefix}/lib -I${prefix}/include/freetype2 #-nostartfiles
 test_SOURCES = main.c start.s test.c test.h interrupt.c nand_tests.h nand_tests.c nand_crypto_tests.h nand_crypto_tests.c sd_tests.h sd_tests.c twl_tests.c twl_tests.h memory_tests.h memory_tests.c crypto_memory_tests.h crypto_memory_tests.c
 test_LDADD = $(AM_LDADD) $(top_builddir)/src/libctr9.a -lfreetype -lctr -lm
 
