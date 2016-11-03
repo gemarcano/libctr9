@@ -7,13 +7,21 @@
  ******************************************************************************/
 
 #include <ctr9/io/fatfs/ctr_fatfs_disk.h>
+#include <ctr9/ctr_system.h>
 
 void ctr_fatfs_default_setup(ctr_nand_crypto_interface *ctr_io, ctr_nand_crypto_interface *twl_io, ctr_sd_interface *sd_io)
 {
 	ctr_setup_disk_parameters params;
 	if (ctr_io)
 	{
-		params = (ctr_setup_disk_parameters){ctr_io, 0x0B930000/0x200, 0x2F5D0000/0x200};
+		if (ctr_get_system_type() == SYSTEM_O3DS)
+		{
+			params = (ctr_setup_disk_parameters){ctr_io, 0x0B930000/0x200, 0x2F5D0000/0x200};
+		}
+		else
+		{
+			params = (ctr_setup_disk_parameters){ctr_io, 0x0B930000/0x200, 0x41ED0000/0x200};
+		}
 		disk_ioctl_(0, CTR_SETUP_DISK, &params);
 	}
 

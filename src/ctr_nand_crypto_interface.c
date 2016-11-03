@@ -55,7 +55,6 @@ int ctr_nand_crypto_interface_initialize(ctr_nand_crypto_interface *crypto_io, u
 {
 	crypto_io->base = nand_crypto_base;
 
-
 	//Get the nonces for CTRNAND and TWL decryption
 	uint32_t mode;
 	uint32_t NandCid[4];
