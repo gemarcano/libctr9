@@ -10,9 +10,14 @@ AC_PROG_CC
 AM_PROG_AS
 AC_CHECK_TOOL([OBJCOPY],objcopy)
 
-AC_CHECK_HEADER(ft2build.h, , [AC_MSG_ERROR(
+AC_CHECK_HEADERS([ft2build.h freetype2/ft2build.h], [break], [FT_FOUND=1])
+
+if test $FT_FOUND == 1
+then
+AC_MSG_ERROR(
 [unable to find ft2build.h, make sure FreeType2 is installed and\
- that the right -I flag is set.] )])
+ that the right -I flag is set.])
+fi
 
 AC_CHECK_HEADERS([ctr/draw.h ctr/console.h], ,[AC_MSG_ERROR(
 [unable to find a ctr header, make sure ctr is installed and\

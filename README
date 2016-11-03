@@ -60,8 +60,8 @@ file would be located. Any variables defined here will be picked up by configure
 upon being run. At a minimum, if other libraries will be installed to the prefix
 path, the config.site should have the following:
 
-CPPFLAGS="-I$prefix/include -I$prefix/include/freetype2"
-LDFLAGS=-L$prefix/lib
+CPPFLAGS="$CPPFLAGS -I$prefix/include -I$prefix/include/freetype2"
+LDFLAGS="-L$prefix/lib $LDFLAGS"
 
 This example assumes that these directories exist, and in particular that
 FreeType2's include path exists in the folder shown above. Refer to:
