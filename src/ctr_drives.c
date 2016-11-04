@@ -521,6 +521,8 @@ int ctr_drives_check_ready(const char *drive)
 	size_t index = drive_to_index(drive);
 	if (index >= _VOLUMES) return -1;
 
+	//FIXME this doesn't check that the underlying drive is ready... For example, if SD errors out during initialization, there is currently no way to track that this happened. This check will fail, but there is no easy way for a developer to know that the SD failed, specifically.
+
 	return f_mount_(&fatfs[index], drive, 1);
 }
 
@@ -538,7 +540,8 @@ int ctr_drives_initialize(void)
 {
 	//FIXME allow for mounting as needed at f_open
 	//Specifically, this is to allow for SD removal and such...
-	ctr_fatfs_initialize(&nand, &ctr, &twl, &sd);
+	ctr_fatfs_internal_initialize(&nand, &ctr, &twl);
+	ctr_fatfs_sd_initialize(&sd);
 
 	f_mount_(&fatfs[0], "CTRNAND:", 0);
 	f_mount_(&fatfs[1], "TWLN:", 0);
