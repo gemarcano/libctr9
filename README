@@ -40,11 +40,11 @@ Dependencies
 
  - https://github.com/gemarcano/ctr - Used for unit tests and console IO
     Make sure it is installed somewhere that the compiler can pick it up, or
-	use -L and -I to instruct the compiler where to find it.
+    use -L and -I to instruct the compiler where to find it.
 
  - FreeType2 - Used for font handling. Make sure it is installed somewhere that
     the compiler can pick it up, or use -L and -I to instruct the compiler where
-	to find it.
+    to find it.
 
  - Autotools in general. These are used to create the build scripts.
 
@@ -97,6 +97,10 @@ Example (after having compiled):
   #prefix isn't defined (most likely)!
   make install
 
+Among the files installed is an example linker script, in $prefix/share/libctr9.
+It is recommended to use this linker script to link programs that use libctr9,
+since it will make sure that libctr9's built-in crt0.o is loaded in the correct
+location and that it initializes IO.
 
 --------------------------------------------------------------------------------
 Usage
@@ -108,12 +112,20 @@ the linker to link in the static library.
 
 Example:
   arm-none-eabi-gcc -I$HOME/.local/usr/arm-none-eabi-9/include \
-    -L$HOME/.local/usr/arm-none-eabi-9/lib -Os -Wall -Wextra -Wpedantic hello.c
+    -L$HOME/.local/usr/arm-none-eabi-9/lib -Os -Wall -Wextra -Wpedantic hello.c\
+    -lctr9
 
 One setup that is recommended is to export a variable such as, CTRARM9, to point
 to the root of the prefix where libctr9 is installed. This way, it is easier to
 point to the lib and include directories (such as by using $CTRARM9/include and
 $CTRARM9/lib).
+
+No start.s or _start.s files are necessary, libctr9 has its own crt0.o built in.
+It initializes the 3DS ARM9 MPU allowing full rwx access to all normal 3DS
+memory regions (ITCM is mapped, DTCM is not), resets the stack, and then calls
+libc initialization functions and then libctr9, then it jumps to main. It is
+recommended that any modifications to the environment be done early in main.
+FIXME what about saving the OTP hash? Initializing libctr9 thrashes it.
 
 
 --------------------------------------------------------------------------------
@@ -126,7 +138,7 @@ header in the include/ directory should also be well documented and can be used
 as reference for programming.
 
 In addition, some documentation is hosted in GitHub pages:
-	https://gemarcano.github.io/libctr9/
+    https://gemarcano.github.io/libctr9/
 
 
 --------------------------------------------------------------------------------

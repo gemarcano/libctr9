@@ -12,10 +12,13 @@ libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	ctr_timer.c ctr_irq.c ctr_system_clock.c ctr_gfx.c ctr_cache.s \
 	ctr_crypto_interface.c ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
-	ctr_file_interface.c ctr_freetype.c
+	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c
 
 ctr_interrupt.o : AM_CFLAGS += -marm #Force ARM mode for ctr_interrupt
 ctr_irq.o : AM_CFLAGS += -marm #Force ARM mode for ctr_system_ARM
+
+libctr9dir = $(pkgdatadir)
+libctr9_DATA=linker.ld
 
 EXTRA_libctr9_a_SOURCES = fatfs/option/cc932.c fatfs/option/cc936.c \
 	fatfs/option/cc949.c fatfs/option/cc950.c fatfs/option/ccsbcs.c \
