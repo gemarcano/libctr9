@@ -140,12 +140,17 @@ int main()
 	ctr_unit_tests crypto_memory_tests;
 	crypto_memory_tests_initialize(&crypto_memory_tests, crypto_memory_tests_f, 5, &crypto_memory_ctx);
 
+	ctr_unit_test memory_control_tests_f[5];
+	ctr_unit_tests memory_control_tests;
+	memory_control_tests_initialize(&memory_control_tests, memory_control_tests_f, 5, NULL);
+
 	int res = ctr_execute_unit_tests(&nand_tests);
 	res |= ctr_execute_unit_tests(&nand_crypto_tests);
 	res |= ctr_execute_unit_tests(&sd_tests);
 	res |= ctr_execute_unit_tests(&twl_crypto_tests);
 	res |= ctr_execute_unit_tests(&memory_tests);
 	res |= ctr_execute_unit_tests(&crypto_memory_tests);
+	res |= ctr_execute_unit_tests(&memory_control_tests);
 	printf("Test status: %d\n", res);
 
 	ctr_setup_disk_parameters params = {&nand_crypto_ctx.io, 0x0B930000/0x200, 0x2F5D0000/0x200};

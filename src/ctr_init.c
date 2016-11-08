@@ -4,9 +4,9 @@
 #include <ctr/console.h>
 #include <ctr/draw.h>
 
-void ctr_libctr9_init(void);
+void __attribute__((weak)) ctr_libctr9_init(void);
 
-void ctr_libctr9_init(void)
+void __attribute__((weak)) ctr_libctr9_init(void)
 {
 	draw_init((draw_s*)0x23FFFE00);
 	console_init(0xFFFFFF, 0);

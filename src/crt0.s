@@ -106,7 +106,7 @@ _start:
 	add r0, r1, r0
 	blx r0
 
-	@Initialize
+	@Initialize libctr9 (weak symbol)
 	adr r0, ctr_libctr9_init_offset
 	ldr r1, [r0]
 	add r0, r1, r0
@@ -123,12 +123,13 @@ _start:
 	blx r2
 	bx lr
 
+	@if we do return, make sure to call exit functions.
 	adr r1, exit_offset
 	ldr r2, [r1]
 	add r1, r2, r1
 	blx r1
 
-	b . @die if we return, just forcibly hang (should we attempt to call the reset vector???)
+	b . @die if we return, just forcibly hang
 
 disable_mpu_and_caching_offset:
 .word disable_mpu_and_caching-.
@@ -208,7 +209,6 @@ enable_mpu_and_caching:
 	bx lr
 
 flush_all_caches:
-
 	@ flush instruction cache, it's not flushed by Nintendo's function
 	mov r0, #0
 	mcr p15, 0, r0, c7, c5, 0

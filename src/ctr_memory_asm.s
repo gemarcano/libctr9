@@ -16,26 +16,26 @@
 .type ctr_memory_itcm_state_, %function
 .type ctr_memory_dtcm_state_, %function
 
-.global ctr_memory_get_itcm_register, ctr_memory_get_dtcm_register
-.global ctr_memory_set_itcm_register, ctr_memory_set_itcm_register
+.global ctr_memory_get_itcm_register_, ctr_memory_get_dtcm_register_
+.global ctr_memory_set_itcm_register_, ctr_memory_set_itcm_register_
 .global ctr_memory_itcm_state_, ctr_memory_dtcm_state_
 .global ctr_memory_enable_itcm_, ctr_memory_disable_itcm_
 .global ctr_memory_enable_dtcm_, ctr_memory_disable_dtcm_
 
 ctr_memory_get_itcm_register_:
-	mrc p15, 0, r0, c9, c1, 0
+	mrc p15, 0, r0, c9, c1, 1
 	bx lr
 	
 ctr_memory_get_dtcm_register_:
-	mrc p15, 0, r0, c9, c1, 1
+	mrc p15, 0, r0, c9, c1, 0
 	bx lr
 
 ctr_memory_set_itcm_register_:
-	mcr p15, 0, r0,  c9, c1, 0
+	mcr p15, 0, r0,  c9, c1, 1
 	bx lr
 	
 ctr_memory_set_dtcm_register_:
-	mcr p15, 0, r0,  c9, c1, 1
+	mcr p15, 0, r0,  c9, c1, 0
 	bx lr
 
 ctr_memory_itcm_state_:
