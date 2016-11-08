@@ -27,6 +27,8 @@
 
 int DEBUG = 0;
 
+void __attribute__((section("screeninit"))) foo(void) {};
+
 #include "test.h"
 
 void scribble_screen(void);

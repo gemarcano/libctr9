@@ -68,7 +68,11 @@ SECTIONS
   /* Make sure the start.o entry is at the beginning since that's the default alh entry */
   arm9loaderhax_entry :
   {
-    *(.text.start)
+    KEEP (*(.text.start))
+  }
+  arm9loaderhax_screeninit (INFO):
+  {
+	KEEP (*(screeninit))
   }
   .init           :
   {
