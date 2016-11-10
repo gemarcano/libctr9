@@ -170,7 +170,7 @@ int main()
 	printf("testing abort\n");
 
 	//Cause a data abort :P
-	*(volatile u32*)0xFFFFFFF0;
+	*(volatile u32*)0x4FFFFFF0;
 	printf("Returned from the abort.\n");
 
 	printf("Trying to turn off top screen\n");

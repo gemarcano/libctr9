@@ -40,13 +40,6 @@ ctr_memory_tcm_size ctr_memory_dtcm_size(void)
 	return (ctr_memory_tcm_size)reg;
 }
 
-uintptr_t ctr_memory_dtcm_base_address(void)
-{
-	uint32_t reg = ctr_memory_get_itcm_register_();
-	reg &= 0xFFFFFFC0u;
-	return reg;
-}
-
 #define CFG_EXTMEMCNT9 0x10000200u
 
 uintptr_t ctr_memory_arm9_size(void)
@@ -59,6 +52,7 @@ uintptr_t ctr_memory_arm9_size(void)
 
 uintptr_t ctr_memory_fcram_size(void)
 {
+	//FIXME doesn't this depend on a register also?
 	switch (ctr_get_system_type())
 	{
 		case SYSTEM_N3DS:
@@ -72,29 +66,29 @@ uintptr_t ctr_memory_fcram_size(void)
 void ctr_memory_set_itcm_size(ctr_memory_tcm_size size)
 {
 	uint32_t reg = ctr_memory_get_itcm_register_();
-	reg &= (0x1F << 1);
-
-	size >>= 9;
+	reg &= ~(0x1F << 1);
 	reg |= 0x3E & (size << 1);
-
 	ctr_memory_set_itcm_register_(reg);
 }
 
 void ctr_memory_set_dtcm_size(ctr_memory_tcm_size size)
 {
 	uint32_t reg = ctr_memory_get_dtcm_register_();
-	reg &= (0x1F << 1);
-
-	size >>= 9;
+	reg &= ~(0x1F << 1);
 	reg |= 0x3E & (size << 1);
-
 	ctr_memory_set_dtcm_register_(reg);
 }
 
-void ctr_memory_set_dtcm_base_address(uintptr_t base_address)
+uintptr_t ctr_memory_dtcm_address(void)
 {
 	uint32_t reg = ctr_memory_get_dtcm_register_();
-	reg &= 0x30u;
+	return reg & ~(uintptr_t)0xFFFu;
+}
+
+void ctr_memory_set_dtcm_address(uintptr_t base_address)
+{
+	uint32_t reg = ctr_memory_get_dtcm_register_();
+	reg &= 0x3Fu;
 	base_address &= 0xFFFFFFC0;
 	reg |= base_address;
 	ctr_memory_set_dtcm_register_(reg);
@@ -136,11 +130,45 @@ void ctr_memory_set_dtcm_state(bool state)
 
 #define CHECK_REGION(LOC, START, SIZE, REG) \
 	region_start = START;\
-	region_end = region_start + SIZE;\
-	if (LOC >= region_start && LOC < region_end)\
+	region_end = region_start + (SIZE - 1);\
+	if (LOC >= region_start && LOC <= region_end)\
 	{\
 		return REG;\
 	}
+
+#define CHECK_TCM_REGION(LOC, START, SIZE_1, REG) \
+	region_start = START;\
+	region_end = 0xFFFFFFFF - START >= SIZE_1 ? START + SIZE_1 : 0xFFFFFFFF;\
+	if (LOC >= region_start && LOC <= region_end)\
+	{\
+		return REG;\
+	}
+
+static uintptr_t tcm_size_map[] ={
+	0xFFF,
+	0x1FFF,
+	0x3FFF,
+	0x7FFF,
+	0xFFFF,
+	0x1FFFF,
+	0x3FFFF,
+	0x7FFFF,
+	0xFFFFF,
+	0x1FFFFF,
+	0x3FFFFF,
+	0x7FFFFF,
+	0xFFFFFF,
+	0x1FFFFFF,
+	0x3FFFFFF,
+	0x7FFFFFF,
+	0xFFFFFFF,
+	0x1FFFFFFF,
+	0x3FFFFFFF,
+	0x7FFFFFFF,
+	0xFFFFFFFF
+};
+
+#include <stdio.h>
 
 ctr_memory_region ctr_memory_get_region(uintptr_t location)
 {
@@ -148,12 +176,12 @@ ctr_memory_region ctr_memory_get_region(uintptr_t location)
 
 	if (ctr_memory_itcm_state())
 	{
-		CHECK_REGION(location, CTR_ITCM_ADDRESS, ctr_memory_itcm_size(), CTR_MEMORY_ITCM_REGION);
+		CHECK_TCM_REGION(location, CTR_ITCM_ADDRESS, tcm_size_map[ctr_memory_itcm_size()-3], CTR_MEMORY_ITCM_REGION);
 	}
 
 	if (ctr_memory_dtcm_state())
 	{
-		CHECK_REGION(location, ctr_memory_dtcm_base_address(), ctr_memory_dtcm_size(), CTR_MEMORY_DTCM_REGION);
+		CHECK_TCM_REGION(location, ctr_memory_dtcm_address(), tcm_size_map[ctr_memory_dtcm_size()-3], CTR_MEMORY_DTCM_REGION);
 	}
 
 	CHECK_REGION(location, CTR_ARM9_MEM_ADDRESS, ctr_memory_arm9_size(), CTR_MEMORY_ARM9_REGION);

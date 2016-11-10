@@ -139,13 +139,7 @@ void ctr_memory_set_dtcm_size(ctr_memory_tcm_size size);
  *	@post The DTCM base address is set to the value specified, with the lower 12
  *		bits of the given value ignored.
  */
-void ctr_memory_set_dtcm_base_address(uintptr_t base_address);
-
-/**	@brief Returns the DTCM base address.
- *
- *	@returns The DTCM base address.
- */
-uintptr_t ctr_memory_dtcm_base_address(void);
+void ctr_memory_set_dtcm_address(uintptr_t base_address);
 
 /**	@brief Returns whether ITCM is enabled or not.
  *
