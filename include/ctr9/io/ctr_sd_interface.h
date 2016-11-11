@@ -27,7 +27,6 @@ typedef struct
 	ctr_io_interface base;
 } ctr_sd_interface;
 
-//FIXME is it safe to have multiple SD card objects be initialized at the same time?
 /** @brief Initialize the given SD io interface object.
  *
  *  @param[out] io SD io interface to initialize.

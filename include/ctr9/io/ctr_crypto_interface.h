@@ -20,11 +20,24 @@
 extern "C" {
 #endif
 
+/**	@brief Represent the types of cryptographic AES modes that can be used with
+ *		ctr_crypto_inteface.
+ */
 typedef enum
 {
 	CRYPTO_CCM, CRYPTO_CTR, CRYPTO_CBC, CRYPTO_ECB
 } ctr_crypto_type;
 
+/**	@brief Represent the mode of the underlying storage in a
+ *		ctr_crypto_interface.
+ *
+ *	Encrypted means that the underlying storage is encrypted, while plaintext
+ *	means that the underlying storage is stored plaintext. This affects what
+ *	happens to the data with read and write functions. If the underlying storage
+ *	is encrypted, reading decrypts it and writing encrypts the incoming data. If
+ *	the underlying storage is plaintext, reading encrypts the outgoing data and
+ *	writing decrypts it.
+ */
 typedef enum
 {
 	CTR_CRYPTO_ENCRYPTED, CTR_CRYPTO_PLAINTEXT
@@ -58,6 +71,8 @@ struct ctr_crypto_interface
  *	@param[out] io IO crypto interface to initialize.
  *	@param[in] key_slot Nintendo 3DS AES key slot to use for CTR.
  *	@param[in] mode AES mode flags to use.
+ *	@param[in] disk_type Encryption state of the underlying disk.
+ *	@param[in] type AES mode to use for this interface.
  *	@param[in] ctr 16 byte array containing the initialization value/vector for
  *		the CTR or IV value to use with the selected AES mode.
  *	@param[in,out] lower_io io interface to use as NAND. The filter does not
@@ -65,7 +80,8 @@ struct ctr_crypto_interface
  *		pointer must remain valid while the crypto io interface object is in
  *		use.
  *
- *	@post The io interface has been initialized and can be used for decrypting.
+ *	@post The io interface has been initialized and can be used for decrypting
+ *		and encrypting.
  */
 int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, ctr_io_interface *lower_io);
 

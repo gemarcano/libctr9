@@ -54,7 +54,7 @@ void ctr_interrupt_prepare(void);
  *	of the values in the input array WILL be written back to the corresponding
  *	registers when the exception returns, if the handler returns. This can be
  *	used to skip the instruction that caused a data abort, for example, by
- *	editing the reutnr address to skip it. Note that for return address
+ *	editing the return address to skip it. Note that for return address
  *	adjustments, the mode of execution when the exception was triggered is
  *	important. Check the T bit of cpsr in the input array to determine the mode
  *	of execution when the exception was thrown.

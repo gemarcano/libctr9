@@ -15,10 +15,41 @@
 extern "C" {
 #endif
 
+/**	@brief Initializes the standard library IO FILE subsystem.
+ *
+ *	@returns 0 on success, anything else on an error.
+ */
 int ctr_drives_initialize(void);
 
+/**	@brief Checks whether the given drive is ready.
+ *
+ *	Possible drives are:
+ *		"CTRNAND:"
+ *		"SD:"
+ *		"TWLN:"
+ *		"TWLP:"
+ *		"DISK0:"
+ *		"DISK1:"
+ *		"DISK2:"
+ *		"DISK3:"
+ *		"DISK4:"
+ *		"DISK5:"
+ *
+ *	@param[in] Drive path to check if it is ready or not.
+ *
+ *	@returns 0 on success, anything else for an error indicating the drive is
+ *		not ready for access via FILE functions.
+ */
 int ctr_drives_check_ready(const char *drive);
 
+/**	@brief Changes the default drive used when no drive is specified in the
+ *		path.
+ *
+ *	@param[in] drive Drive path to set as the default. See
+ *		ctr_drives_check_ready for a list of drives supported.
+ *
+ *	@returns 0 on success, anything else on an error.
+ */
 int ctr_drives_chdrive(const char *drive);
 
 #ifdef __cplusplus

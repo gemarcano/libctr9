@@ -25,7 +25,6 @@ typedef struct
 	ctr_io_interface base;
 } ctr_nand_interface;
 
-//FIXME is it safe to call this function multiple times? as in, if we have multiple NAND objects, is it safe?
 /**	@brief Initialize the given NAND io interface object.
  *
  *	@param[out] io NAND io interface to initialize.

@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+/**	@brief Represents the RTC data returned by the RTC hardware.
+ */
 typedef struct
 {
 	uint8_t seconds, minutes, hours, pad_, day, month, year;

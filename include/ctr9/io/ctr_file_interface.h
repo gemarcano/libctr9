@@ -26,15 +26,14 @@ typedef struct
 	FILE *file;
 } ctr_file_interface;
 
-//FIXME is it safe to call this function multiple times?
 /**	@brief Initialize the given file io interface object.
  *
  *	Note that any size file greater or equal than a single sector will be
  *	accepted by the constructor, but the io operations will ignore the trailing
  *	data on the file if the file size isn't divisible by the sector size. In
- *	other words, the effective size of the disk is f_size(file)/0x200, using
- *	integer arithmetic. In order for reads to work the file must have been
- *	opened using FA_READ, and for writes to work both FA_READ and FA_WRITE.
+ *	other words, the effective size of the disk is fsize(file)/0x200,
+ *	using integer arithmetic. In order for reads to work the file must have been
+ *	opened using "rb", and for writes to work "r+b".
  *
  *	@param[out] io file io interface to initialize.
  *	@param[in,out] file File to set up as a disk.
@@ -116,7 +115,7 @@ uint64_t ctr_file_interface_disk_size(void *io);
 /** @brief Returns the size of the sectors used by the io interface, which is
  *		512 bytes for file due to how it is configured.
  *
- *  @returns 512 bytes as the sector size for NAND.
+ *  @returns 512 bytes as the sector size.
  */
 size_t ctr_file_interface_sector_size(void *io);
 

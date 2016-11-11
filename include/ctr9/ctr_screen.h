@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-/**	@brief Enum describing screen configurations
+/**	@brief Enum describing screen configurations.
  */
 typedef enum
 {

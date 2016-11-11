@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+/**	@brief Represents the type of underlying partitions to access in NAND.
+ */
 typedef enum
 {
 	NAND_CTR, NAND_TWL

@@ -59,7 +59,7 @@ void ctr_irq_critical_exit(void);
  */
 typedef enum
 {
-	CTR_IRQ_DMAC_1_0 = 1,
+	CTR_IRQ_DMAC_1_0 = 0,
 	CTR_IRQ_DMAC_1_1 = 1,
 	CTR_IRQ_DMAC_1_2 = 2,
 	CTR_IRQ_DMAC_1_3 = 3,
