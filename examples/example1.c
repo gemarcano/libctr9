@@ -17,7 +17,7 @@ int main()
 	//All of the IO subsystem is built around the idea of IO objects that hold
 	//the state of the IO subsystems, and IO functions that act on these
 	//objects.
-	//In this case, since this is ust for raw NAND access, only the nand io
+	//In this case, since this is used for raw NAND access, only the nand io
 	//interface is needed. Make sure to initialize the object before calling any
 	//ctr_io_* functions with it.
 	ctr_nand_interface nand_io;

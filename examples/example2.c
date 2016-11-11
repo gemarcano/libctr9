@@ -25,11 +25,8 @@ int main()
 	ctr_nand_interface_initialize(&nand_io);
 
 	//To initialize io crypto layer objects, they require knowing which keyslot
-	//to use for en/decryption as well as which mode of operation. Also, since
-	//these are mere layers they need an io interface object to wrap. Note that
-	//these functions merely use the keyslots, but do not set them up. These
-	//must be setup prior to using the crypto layer objects in ctr_io_*
-	//functions.
+	//to use for en/decryption as well as which mode of operation. The layer
+	//used here tries to set up the keys for TWL and CTRNAND on its own.
 	
 	//For CTRNAND decryption, use keyslot 0x04, used for the o3DS, set the
 	//mode for CTR, and pass in the nand object as the object to wrap in the
@@ -51,6 +48,10 @@ int main()
 
 	//Read the beginning of TWLN
 	ctr_io_read(&twl_io, twl_buffer, sizeof(twl_buffer), 0x00012E00, sizeof(twl_buffer));
+
+	ctr_nand_crypto_interface_destroy(&twl_io);
+	ctr_nand_crypto_interface_destroy(&ctr_io);
+	ctr_nand_interface_destroy(&nand_io);
 
 	return 0;
 }

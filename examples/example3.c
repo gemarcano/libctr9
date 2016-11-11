@@ -7,53 +7,46 @@
  ******************************************************************************/
 
 #include <ctr9/io.h>
+#include <ctr9/io/ctr_drives.h>
 
-/*	This example goes over how to manually setup fatfs.
+#include <stdio.h>
+
+/*	This example goes over how to use file and console IO.
  */
 
 int main()
 {
-	//Declare the io interface objects that will be used, and initialize them.
-	ctr_nand_interface nand_io;
-	ctr_nand_crypto_interface ctr_io;
-	
-	ctr_nand_interface_initialize(&nand_io);
+	//using ctr_libctr9_init(), which a developer can override since it is a
+	//weakly linked symbol, by default libctr9 initializes the IO and console
+	//subsystems. FILE operations and printf should just work unless libctr9
+	//encountered an error.
 
-	//For CTRNAND decryption, use keyslot 0x04, used for the o3DS, set the
-	//mode for CTR, and pass in the nand object as the object to wrap in the
-	//crypto layer.
-	ctr_nand_crypto_interface_initialize(&ctr_io, 0x04, NAND_CTR, (ctr_io_interface*)&nand_io);
+	//ctr_drives_check_ready checks to see that the given drive is working
+	//properly. Returns true if the drive is ready and can be used.
+	bool sd = ctr_drives_check_ready("SD:");
+	bool ctrnand = ctr_drives_check_ready("CTRNAND:");
+	bool twln = ctr_drives_check_ready("TWLN:");
+	bool twlp = ctr_drives_check_ready("TWLP:");
 
-	//fatfs uses the io interface subsystem to handle disks. By default, no
-	//disks registed with fatfs. These need to be manually registered via a
-	//custom IOCTL, CTR_SETUP_DISK. This IOCTL uses a special structure to tell
-	//fatfs how to register the disk and where to find the fat partition.
-	//ctr_setup_disk_parameters takes 3 fields:
-	//	- A pointer to the ctr_* interface to use as a disk
-	//	- The location, in sectors, of where the fatfs partition begins
-	//	- The size, in sectors, of the fatfs partition.
-	ctr_setup_disk_parameters params;
-	params = (ctr_setup_disk_parameters){&ctr_io, 0x0B930000/0x200, 0x2F5D0000/0x200};
+	printf("SD: %d, CTRNAND: %d, TWLN: %d, TWLP: %d\n", sd, ctrnand, twln, twlp);
 
-	//Tell fatfs to register this particular disk as disk 0.
-	disk_ioctl(0, CTR_SETUP_DISK, &params);
+	//To open a file, use fopen, using the drive as the prefix for the path.
+	FILE *file = fopen("SD:/tmp.txt", "r+b");
+	if (file)
+	{
+		printf("File did open, now closing...\n");
+		fclose(file);
+	}
 
-	//At this point, it should be safe to use f_mount with disk 0
-	FATFS fs;
-	FIL file;
+	//ctr_drives_chdrive can be used to change the default drive used
+	ctr_drives_chdrive("CTRNAND:");
 
-	f_mount(&fs, "0:", 0);
-	//result should be FR_OK if everything worked as it should have.
-	int result = f_open(&file, "0:/rw/sys/SecureInfo_A", FA_OPEN_EXISTING | FA_READ);
-
-	//Note that it is safe to do reads with the ctr_io object even while it is
-	//mounted.
-	unsigned char buffer[0x200] = { 0 };
-	//Result should also be zero
-	result = ctr_io_read(&ctr_io, buffer, sizeof(buffer), 0x0B930000, sizeof(buffer));
-
-	//unmount the filesystem
-	f_mount(NULL, "0:", 1);
+	file = fopen("/rw/sys/SecureInfo_A", "rb");
+	if (file)
+	{
+		printf("SecureInfo_A was found, now closing...\n");
+		fclose(file);
+	}
 
 	return 0;
 }
