@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctr/console.h>
-//#include <ctr/printf.h>
 #include <stdio.h>
 #include <ctr/draw.h>
 #include <ctr/headers.h>
@@ -102,6 +101,15 @@ int main()
 		printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
 	}
 	printf("\n");
+
+	printf("\033[A");
+	printf("WHERE AM I");
+	printf("\033[5B");
+
+	printf("\033[31m\033[7mWHERE AM I");
+	printf("\033[32mWHERE AM I");
+	printf("\033[33m\033[27mWHERE AM I");
+	printf("\033[B\033[6D\033[0m");
 
 	ctr_n3ds_ctrnand_keyslot_setup();
 
