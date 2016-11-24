@@ -7,7 +7,7 @@
 static bool crypto_memory_test1(void *ctx)
 {
 	nand_crypto_test_data *data = ctx;
-	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, &data->lower_io->base);
+	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, data->lower_io);
 
 	return !res;
 }

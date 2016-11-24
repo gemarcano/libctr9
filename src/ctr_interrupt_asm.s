@@ -34,7 +34,7 @@
 exception_canary:
 .word exception_stack_end
 exception_stack_end:
-.skip 8192
+.skip 8192 * 4
 exception_stack:
 
 .macro CTR_INTERRUPT_VENEER table_offset=0

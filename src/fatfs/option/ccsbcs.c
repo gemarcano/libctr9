@@ -377,6 +377,8 @@ WCHAR ff_wtoupper_ (	/* Returns upper converted character */
 			case 6:	chr += 8; break;				/* Shift +8 */
 			case 7: chr -= 80; break;				/* Shift -80 */
 			case 8:	chr -= 0x1C60; break;			/* Shift -0x1C60 */
+			default:
+			break; //FIXME Do nothing?
 			}
 			break;
 		}

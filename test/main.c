@@ -1,13 +1,5 @@
 #include <ctr9/io.h>
 
-#include <string.h>
-#include <stdbool.h>
-#include <ctr/console.h>
-#include <stdio.h>
-#include <ctr/draw.h>
-#include <ctr/headers.h>
-#include <ctr/hid.h>
-
 #include <ctr9/i2c.h>
 #include <ctr9/io/fatfs/ff.h>
 #include <ctr9/io/fatfs/diskio.h>
@@ -20,13 +12,18 @@
 #include <ctr9/ctr_timer.h>
 #include <ctr9/ctr_system_clock.h>
 #include <ctr9/ctr_irq.h>
-#include <ctr9/ctr_gfx.h>
 #include <ctr9/ctr_cache.h>
+#include <ctr9/ctr_hid.h>
 #include <ctr9/io/ctr_console.h>
+
+#include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <inttypes.h>
 
 int DEBUG = 0;
 
-void __attribute__((section("screeninit"))) foo(void) {};
+static void __attribute__((section("screeninit"))) foo(void) {}
 
 #include "test.h"
 
@@ -37,6 +34,7 @@ void scribble_screen(void);
 #include "sd_tests.h"
 #include "twl_tests.h"
 #include "memory_tests.h"
+#include "memory_control_tests.h"
 #include "crypto_memory_tests.h"
 
 
@@ -57,7 +55,7 @@ typedef struct
 static bool crypto_tests1(void *ctx)
 {
 	crypto_test_data *data = ctx;
-	int res = ctr_crypto_interface_initialize(&(data->io), 0x04, 1, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, data->ctr, data->lower_io);
+	int res = ctr_crypto_interface_initialize(&(data->io), 0x04, 1, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, (uint8_t*)data->ctr, data->lower_io);
 	return !res;
 }
 
@@ -76,29 +74,38 @@ uint8_t otp_sha[32];
 #include <errno.h>
 #include <ctr9/io/ctr_drives.h>
 
+typedef struct draw_s
+{
+	void* top_left;
+	void* top_right;
+	void* sub;
+} draw_s;
+
+inline static void vol_memcpy(volatile void *dest, volatile void *sorc, size_t size)
+{
+	volatile uint8_t *dst = dest;
+	volatile uint8_t *src = sorc;
+	while(size--)
+	dst[size] = src[size];
+}
+
 int main()
 {
-	ctr_console_initialize();
-	int asd = ctr_freetype_initialize();
-	ctr_drives_initialize();
-
 	memset(otp_sha, 0, 0x20);
-	memcpy(otp_sha, REG_SHAHASH, 0x20);
+	vol_memcpy(otp_sha, REG_SHAHASH, 0x20);
+
+	ctr_freetype_initialize();
 
 	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
-	ctr_gfx_screen top_screen, bottom_screen;
-	ctr_gfx_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
-	ctr_gfx_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
+	ctr_screen top_screen, bottom_screen;
+	ctr_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
+	ctr_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
 
-	draw_init(cakehax_fbs);
-	console_init(0xFFFFFF, 0);
-	draw_clear_screen(SCREEN_TOP, 0x111111);
 	printf("UNIT TESTING\n");
-	printf("freetype: %d\n", asd);
 
 	for (int i = 0; i < 32; ++i)
 	{
-		printf("%02X", ((uint8_t*)REG_SHAHASH)[i]);
+		printf("%02X", ((volatile uint8_t*)REG_SHAHASH)[i]);
 	}
 	printf("\n");
 
@@ -120,11 +127,11 @@ int main()
 
 	char buffer[0x1000] = {0};
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
-	nand_crypto_test_data nand_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
-	nand_crypto_test_data twl_crypto_ctx = {buffer, sizeof(buffer), {{0}}, &nand_ctx.nand_io};
+	nand_crypto_test_data nand_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &nand_ctx.nand_io.base);
+	nand_crypto_test_data twl_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &nand_ctx.nand_io.base);
 	sd_test_data sd_ctx = {buffer, sizeof(buffer), {{0}}};
-	memory_test_data memory_ctx = {buffer, sizeof(buffer), {0}, {{0}}};
-	nand_crypto_test_data crypto_memory_ctx = {buffer, sizeof(buffer), {{0}}, &memory_ctx.mem_io};
+	memory_test_data memory_ctx = memory_test_data_initialize(buffer, sizeof(buffer));
+	nand_crypto_test_data crypto_memory_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &memory_ctx.mem_io.base);
 
 	ctr_unit_test nand_tests_f[11];
 	ctr_unit_tests nand_tests;
@@ -174,11 +181,11 @@ int main()
 	input_wait();
 
 	printf("Preparing interrupts\n");
-		printf("abort handler: %X\n", ctr_interrupt_handlers[4]);
+	printf("abort handler: %X\n", (uintptr_t)ctr_interrupt_handlers[4]);
 	printf("testing abort\n");
 
 	//Cause a data abort :P
-	*(volatile u32*)0x4FFFFFF0;
+	*(volatile uint32_t*)0x4FFFFFF0;
 	printf("Returned from the abort.\n");
 
 	printf("Trying to turn off top screen\n");
@@ -256,8 +263,8 @@ int main()
 */
 	mmcdevice dev1= *getMMCDevice(1);
 	mmcdevice dev0= *getMMCDevice(0);
-	printf("SDHandle: %u\n", dev0.isSDHC);
-	printf("SDHandle: %u\n", dev1.isSDHC);
+	printf("SDHandle: %"PRIu32"\n", dev0.isSDHC);
+	printf("SDHandle: %"PRIu32"\n", dev1.isSDHC);
 
 	printf("Trying timer stuff\n");
 	ctr_timer_disable_irq(CTR_TIMER0);
@@ -268,35 +275,35 @@ int main()
 	ctr_timer_set_value(CTR_TIMER0, 0);
 
 	printf("Timer value: %u\n", starting_timer);
-	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_enable(CTR_TIMER0);
 
-	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV64);
 
-	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV256);
 
-	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV1024);
 
-	printf("Timer effective fq: %u\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
-	printf("Timer reg: %08X\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
@@ -307,15 +314,15 @@ int main()
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
-	ctr_gfx_screen_set_pixel(&top_screen, 0 + 100, 0, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 2 + 100, 0, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 4 + 100, 0, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 0 + 100, 2, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 0 + 100, 4, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 2 + 100, 2, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 4 + 100, 2, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 2 + 100, 4, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&top_screen, 4 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 0 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 2 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 4 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 0 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 0 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 2 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 4 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 2 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&top_screen, 4 + 100, 4, 0xFF00FFu);
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -329,25 +336,25 @@ int main()
 	}
 
 
-	ctr_gfx_screen_set_pixel(&bottom_screen, 0 + 100, 0, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 2 + 100, 0, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 4 + 100, 0, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 0 + 100, 2, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 0 + 100, 4, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 2 + 100, 2, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 4 + 100, 2, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 2 + 100, 4, 0xFF00FFu);
-	ctr_gfx_screen_set_pixel(&bottom_screen, 4 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 4, 0xFF00FFu);
 
 
 	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
-	ctr_gfx_bitmap bitmap = { 20, 4, bitmap_data };
-	ctr_gfx_screen_draw_bitmap(&top_screen, 0, 0, 0xFF00FF, &bitmap);
-	ctr_gfx_screen_draw_bitmap(&top_screen, 20, 4, 0x00FFFF, &bitmap);
-	ctr_gfx_screen_draw_bitmap(&top_screen, 40, 8, 0x0000FF, &bitmap);
-	ctr_gfx_screen_draw_bitmap(&top_screen, 20, 14, 0x00FF00, &bitmap);
-	ctr_gfx_screen_draw_bitmap(&top_screen, 0, 20, 0xFF0000, &bitmap);
-	ctr_gfx_screen_draw_bitmap(&bottom_screen, 200, 200, 0xFF0000, &bitmap);
+	ctr_screen_bitmap bitmap = { 20, 4, bitmap_data };
+	ctr_screen_draw_bitmap(&top_screen, 0, 0, 0xFF00FF, &bitmap);
+	ctr_screen_draw_bitmap(&top_screen, 20, 4, 0x00FFFF, &bitmap);
+	ctr_screen_draw_bitmap(&top_screen, 40, 8, 0x0000FF, &bitmap);
+	ctr_screen_draw_bitmap(&top_screen, 20, 14, 0x00FF00, &bitmap);
+	ctr_screen_draw_bitmap(&top_screen, 0, 20, 0xFF0000, &bitmap);
+	ctr_screen_draw_bitmap(&bottom_screen, 200, 200, 0xFF0000, &bitmap);
 
 	printf("Testing aes\n");
 
@@ -428,7 +435,7 @@ int main()
 	ctr_memory_interface mem_io;
 	ctr_memory_interface_initialize(&mem_io, cipher_cbc, sizeof(cipher_cbc));
 	ctr_crypto_interface test1;
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io);
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io.base);
 	memset(output_buffer, 0xFF, sizeof(output_buffer));
 	ctr_io_read(&test1, output_buffer, sizeof(output_buffer), 0, 32);
 	for (size_t i = 0; i < 32; ++i)
@@ -444,7 +451,7 @@ int main()
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
 
 	ctr_memory_interface_initialize(&mem_io, cipher_ecb, sizeof(cipher_ecb));
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io);
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io.base);
 	memset(output_buffer, 0xFF, sizeof(output_buffer));
 	ctr_io_read(&test1, output_buffer, sizeof(output_buffer), 0, 32);
 	printf("Comparing ctr_crypto ecb results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
@@ -456,13 +463,13 @@ int main()
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
 	memset(output_buffer, 0xFF, sizeof(output_buffer));
 	ctr_memory_interface_initialize(&mem_io, output_buffer, sizeof(output_buffer));
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io);
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io.base);
 	ctr_io_write(&test1, plaintext, sizeof(plaintext), 0);
 	ctr_io_read(&mem_io, output_buffer2, sizeof(output_buffer2), 0, 32);
 
 	printf("Comparing ctr_crypto cbc results: %d\n", memcmp(output_buffer2, cipher_cbc, AES_BLOCK_SIZE * 2));
 	ctr_memory_interface_initialize(&mem_io, cipher_ecb, sizeof(cipher_ecb));
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io);
+	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io.base);
 
 	aes_decrypt(plaintext, output_buffer, 0x2, AES_CNT_ECB_ENCRYPT_MODE);
 	printf("Comparing ecb results: %d\n", memcmp(output_buffer, cipher_ecb, AES_BLOCK_SIZE * 2));

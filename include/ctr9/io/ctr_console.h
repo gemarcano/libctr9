@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <ctr9/ctr_screen.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +25,7 @@ extern "C" {
  *		suceed. If it does not, this means that the underling libc and graphics
  *		handling for libctr9 is broken.
  */
-int ctr_console_initialize(void);
+int ctr_console_initialize(const ctr_screen *screen);
 
 typedef struct
 {
@@ -47,11 +48,13 @@ typedef struct
 
 	bool negative;
 
+	ctr_screen screen;
+
 } ctr_console;
 
 void ctr_console_draw(char c);
-uint16_t ctr_console_get_char_width(void);
-uint16_t ctr_console_get_char_height(void);
+short ctr_console_get_char_width(char c);
+unsigned int ctr_console_get_char_height(void);
 
 #ifdef __cplusplus
 }

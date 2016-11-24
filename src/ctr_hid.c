@@ -19,3 +19,39 @@ ctr_hid_button_type ctr_hid_get_buttons(void)
 	return ~(*CTR_HID_REG) & 0xFFF;
 }
 
+#define HID_ALL_RELEASED 0xFFF
+
+void input_wait(void)
+{
+	uint32_t prev = *CTR_HID_REG;
+	uint32_t key;
+	do
+	{
+		// Wait for state change
+		while((key = *CTR_HID_REG) == prev);
+
+		// Ignore key releases
+		if(key > prev)
+		{
+			prev = key;
+			continue;
+		}
+
+		// Simple debounce
+		uint32_t deb = 0x7FFF;
+		while(--deb)
+		{
+			if(key != *CTR_HID_REG)
+			{
+				// State changed, redo
+				key = prev;
+				break;
+			}
+		}
+	} while(key == prev);
+
+	// Flip the bits
+	//return key ^ HID_ALL_RELEASED;
+}
+
+

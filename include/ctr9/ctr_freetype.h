@@ -11,6 +11,13 @@
 #ifndef CTR_FREETYPE_H_
 #define CTR_FREETYPE_H_
 
+#include <ctr9/ctr_screen.h>
+#include <stdint.h>
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_CACHE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,6 +25,10 @@ extern "C" {
 /**	@brief Initializes the freetype subsystem.
  */
 int ctr_freetype_initialize(void);
+
+FT_Face ctr_freetype_get_face(void);
+FTC_SBit ctr_freetype_prepare_character(char c);
+void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel);
 
 #ifdef __cplusplus
 }

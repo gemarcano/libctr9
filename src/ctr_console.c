@@ -11,8 +11,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-#include <ctr/console.h>
-#include <ctr/printf.h>
+//FIXME Freetype interactions are wonky. I'm not handling the cases where metrics can be negative due to changes in text orientation
+
+#include <ctr9/ctr_freetype.h>
 
 static ssize_t ctr_console_write_r(struct _reent *r, int fd, const char *ptr, size_t len);
 
@@ -48,56 +49,91 @@ static const devoptab_t tab =
 
 static ctr_console console;
 
-int ctr_console_initialize(void)
+int ctr_console_initialize(const ctr_screen *screen)
 {
 	devoptab_list[STD_OUT] = &tab;
 	devoptab_list[STD_ERR] = &tab;
 	setvbuf(stdout, NULL , _IONBF, 0);
 	setvbuf(stderr, NULL , _IONBF, 0);
+
 	memset(&console, 0, sizeof(console));
 	console.font_pt = 14;
-	console.width = 320;
-	console.height = 240;
+	console.width = screen->width;
+	console.height = screen->height;
 	console.default_fg = console.fg = 0xFFFFFF;
 	console.default_bg = console.bg = 0x000000;
+
+	console.screen = *screen;
+
 	return 0;
 }
 
-uint16_t ctr_console_get_char_width(void)
+short ctr_console_get_char_width(char c)
 {
-	return 8;
+	FTC_SBit bit = ctr_freetype_prepare_character(c);
+	return bit->xadvance;
 }
 
-uint16_t ctr_console_get_char_height(void)
+unsigned int ctr_console_get_char_height(void)
+{//FIXME currently char height == line height... will this always be the case?
+	FT_Face face = ctr_freetype_get_face();
+	//This should always be positive...
+	return (unsigned int)(face->size->metrics.height >> 6);
+}
+
+static void pixel_set(void *buffer, uint32_t pixel, size_t pixel_size, size_t count)
 {
-	return 8;
+	for (size_t i = 0; i < count; ++i)
+	{
+		for (size_t j = 0; j < pixel_size; ++j)
+			((char*)buffer)[i*pixel_size + j] = pixel >> (j*CHAR_BIT);
+	}
+}
+
+static void draw_shift_up(void)
+{
+	// Buffer is bottom to top, left to right
+	size_t pixel_size = console.screen.pixel_size;
+	unsigned int line_height = ctr_console_get_char_height();
+	size_t copy_col = (console.height - line_height) * pixel_size;
+
+	for (size_t i = 0; i < console.width; ++i)
+	{
+		uint8_t *col = console.screen.framebuffer + i*console.screen.height*pixel_size;
+		memmove(col + line_height*pixel_size, col, copy_col);
+		pixel_set(col, console.bg, pixel_size, line_height);
+	}
 }
 
 void ctr_console_draw(char c)
 {
-	uint16_t cwidth = ctr_console_get_char_width();
-	uint16_t cheight = ctr_console_get_char_height();
+	//This console implementation assumes horizontal layout, always... at least for now
+	//This means the xadvance should always be positive
+	unsigned int cwidth = (unsigned int)ctr_console_get_char_width(c);
+	unsigned int cheight = ctr_console_get_char_height();
+
+	FTC_SBit bit = ctr_freetype_prepare_character(c);
+
 	if (c == '\n' || (console.xpos + cwidth) > console.width)
 	{
 		console.xpos = 0;
 		console.ypos += cheight;
 	}
 
-	if (console.ypos >= console.height)
+	if (console.ypos + cheight >= console.height)
 	{
-		//draw_shift_up(SCREEN_SUB);
-		console.ypos -= console.height;
-
-		//draw_rect(SCREEN_SUB, 0, console.y, SUB_WIDTH, 8, console.bg);
+		draw_shift_up();
+		console.ypos -= cheight;
 	}
 
 	if (!(c == '\r' || c == '\n'))
+	{
+		//Can I assume bit->top is always positive for horizontal layouts?
+		size_t off = (ctr_console_get_char_height() - (unsigned int)(bit->top));
+		ctr_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg);
 		console.xpos += cwidth;
+	}
 
-	//draw_rect(SCREEN_SUB, console.xpos, console.ypos, cwidth, cheight, console.bg);
-	//draw_char(SCREEN_SUB, console.x, console.y, console.fg, c);
-
-	console_putc(NULL, c);
 }
 
 typedef enum
@@ -206,8 +242,6 @@ static void csi_sgm(const csi_data *data)
 		{
 			console.fg = console.default_fg;
 			console.bg = console.default_bg;
-			console_fg_color(console.fg);
-			console_bg_color(console.bg);
 		}
 		break;
 
@@ -219,8 +253,6 @@ static void csi_sgm(const csi_data *data)
 				console.fg = console.bg;
 				console.bg = tmp;
 
-				console_fg_color(console.fg);
-				console_bg_color(console.bg);
 				console.negative = true;
 			}
 		}
@@ -233,20 +265,16 @@ static void csi_sgm(const csi_data *data)
 				console.fg = console.bg;
 				console.bg = tmp;
 
-				console_fg_color(console.fg);
-				console_bg_color(console.bg);
 				console.negative = false;
 			}
 		break;
 
 		case 30: case 31: case 32: case 33: case 34: case 35: case 36: case 37:
 			console.fg = colors[param1 - 30];
-			console_fg_color(console.fg);
 		break;
 
 		case 40: case 41: case 42: case 43: case 44: case 45: case 46: case 47:
 			console.bg = colors[param1 - 40];
-			console_bg_color(console.bg);
 		break;
 
 		default:
@@ -260,11 +288,11 @@ static void execute_command(const csi_data *data)
 	{
 		case 'A':
 		{
-			uint16_t cheight = ctr_console_get_char_height();
+			uint16_t cheight = (size_t)ctr_console_get_char_height();
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos > (param*cheight) ? console.ypos-(param*cheight) : 0;
-			console_adjust_cursor(console.xpos, pos);
+			//console_adjust_cursor(console.xpos, pos);
 
 		}
 		break;
@@ -275,27 +303,27 @@ static void execute_command(const csi_data *data)
 
 			size_t pos = console.ypos + param * cheight;
 			if (pos > console.height) pos = console.height - cheight;
-			console_adjust_cursor(console.xpos, pos);
+			//console_adjust_cursor(console.xpos, pos);
 		}
 		break;
 		case 'C':
 		{
-			uint16_t cwidth = ctr_console_get_char_width();
+			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.xpos + param*cwidth;
 			if (pos > console.width) pos = console.width - cwidth;
-			console_adjust_cursor(pos, console.ypos);
+			//console_adjust_cursor(pos, console.ypos);
 		}
 		break;
 
 		case 'D':
 		{
-			uint16_t cwidth = ctr_console_get_char_width();
+			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.xpos > (param*cwidth) ? console.xpos-(param*cwidth) : 0;
-			console_adjust_cursor(pos, console.ypos);
+			//console_adjust_cursor(pos, console.ypos);
 		}
 		break;
 
@@ -306,7 +334,7 @@ static void execute_command(const csi_data *data)
 
 			size_t pos = console.ypos + param*cheight;
 			if (pos > console.height) pos = console.height - cheight;
-			console_adjust_cursor(0, pos);
+			//console_adjust_cursor(0, pos);
 		}
 		break;
 
@@ -316,18 +344,18 @@ static void execute_command(const csi_data *data)
 			size_t param = extract_param(data->params[0], 1);
 
 			size_t pos = console.ypos > param*cheight ? console.ypos - param*cheight : 0;
-			console_adjust_cursor(0, pos);
+			//console_adjust_cursor(0, pos);
 		}
 		break;
 
 		case 'G':
 		{
-			uint16_t cwidth = ctr_console_get_char_width();
+			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 			param -= 1; //Is this indexed 0 or 1 (currently assuming 1)
 
 			size_t pos = param * cwidth < console.width  ? param*cwidth : console.width;
-			console_adjust_cursor(pos, 0);
+			//console_adjust_cursor(pos, 0);
 
 		}
 		break;
@@ -337,12 +365,12 @@ static void execute_command(const csi_data *data)
 		{
 			size_t param1 = extract_param(data->params[0], 1);
 			size_t param2 = extract_param(data->params[1], 1);
-			uint16_t cwidth = ctr_console_get_char_width();
+			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			uint16_t cheight = ctr_console_get_char_height();
 
 			size_t posx = param1*cwidth < console.width ? param1*cwidth : console.width;
 			size_t posy = param2*cheight < console.height ? param2*cheight : console.height;
-			console_adjust_cursor(posx, posy);
+			//console_adjust_cursor(posx, posy);
 		}
 		break;
 
@@ -360,7 +388,7 @@ static void execute_command(const csi_data *data)
 			}
 			else if (param == 2)
 			{
-				console_clear();
+				//console_clear();
 			}
 		}
 		break;

@@ -15,7 +15,7 @@ static bool twl_test1(void *ctx)
 
 	ctr_twl_keyslot_setup();
 
-	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x03, NAND_TWL, &data->lower_io->base);
+	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x03, NAND_TWL, data->lower_io);
 
 	return !res;
 }

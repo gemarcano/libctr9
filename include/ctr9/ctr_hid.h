@@ -54,6 +54,8 @@ bool ctr_hid_button_status(ctr_hid_button_type buttons);
  */
 ctr_hid_button_type ctr_hid_get_buttons(void);
 
+void input_wait(void);
+
 #ifdef __cplusplus
 }
 #endif

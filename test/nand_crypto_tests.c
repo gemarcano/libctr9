@@ -3,11 +3,20 @@
 
 #include <string.h>
 
+nand_crypto_test_data nand_crypto_test_data_initialize(char *buffer, size_t buffer_size, ctr_io_interface *lower_io)
+{
+	nand_crypto_test_data data;
+	data.buffer = buffer;
+	data.buffer_size = buffer_size;
+	data.lower_io = lower_io;
+	return data;
+}
+
 static bool nand_ctrnand_test1(void *ctx)
 {
 	nand_crypto_test_data *data = ctx;
 
-	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, &data->lower_io->base);
+	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, data->lower_io);
 
 	return !res;
 }

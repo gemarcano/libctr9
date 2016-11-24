@@ -66,7 +66,7 @@ uintptr_t ctr_memory_fcram_size(void)
 void ctr_memory_set_itcm_size(ctr_memory_tcm_size size)
 {
 	uint32_t reg = ctr_memory_get_itcm_register_();
-	reg &= ~(0x1F << 1);
+	reg &= ~(0x1Fu << 1);
 	reg |= 0x3E & (size << 1);
 	ctr_memory_set_itcm_register_(reg);
 }
@@ -74,7 +74,7 @@ void ctr_memory_set_itcm_size(ctr_memory_tcm_size size)
 void ctr_memory_set_dtcm_size(ctr_memory_tcm_size size)
 {
 	uint32_t reg = ctr_memory_get_dtcm_register_();
-	reg &= ~(0x1F << 1);
+	reg &= ~(0x1Fu << 1);
 	reg |= 0x3E & (size << 1);
 	ctr_memory_set_dtcm_register_(reg);
 }

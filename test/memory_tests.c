@@ -1,6 +1,13 @@
 #include "memory_tests.h"
 #include <string.h>
 
+memory_test_data memory_test_data_initialize(char *buffer, size_t buffer_size)
+{
+	memory_test_data data;
+	data.buffer = buffer;
+	data.buffer_size = buffer_size;
+	return data;
+}
 
 static bool memory_test1(void *ctx)
 {

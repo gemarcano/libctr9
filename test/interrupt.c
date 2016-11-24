@@ -1,7 +1,11 @@
-#include <ctr/printf.h>
+#include "interrupt.h"
+
 #include <ctr9/ctr_system.h>
 #include <ctr9/ctr_interrupt.h>
-#include <ctr/hid.h>
+#include <ctr9/ctr_hid.h>
+
+#include <inttypes.h>
+#include <stdio.h>
 
 #ifdef __thumb__
 //#error
@@ -15,13 +19,13 @@ static void print_all_registers(uint32_t *registers)
 	uint32_t ret = registers[3];
 	const uint32_t *r = registers+4;
 
-	printf("CPSR: 0x%08X\n", cpsr);
-	printf("SP: 0x%08X\n", sp);
-	printf("LR: 0x%08X\n", lr);
-	printf("Abort address: 0x%08X\n", ret - 8);
+	printf("CPSR: 0x%08"PRIX32"\n", cpsr);
+	printf("SP: 0x%08"PRIX32"\n", sp);
+	printf("LR: 0x%08"PRIX32"\n", lr);
+	printf("Abort address: 0x%08"PRIXPTR"\n", (uintptr_t)(ret - 8));
 	for (size_t i = 0; i < 13; ++i)
 	{
-		printf("r%d: 0x%08X\n", i, r[i]);
+		printf("r%d: 0x%08"PRIX32"\n", i, r[i]);
 	}
 }
 
@@ -36,12 +40,12 @@ void abort_interrupt(uint32_t *registers)
 	if (cpsr & 0x20)
 	{
 		registers[3] -= 6;
-		printf("Ret. Thumb: 0x%08X\n", registers[3]);
+		printf("Ret. Thumb: 0x%08"PRIX32"\n", registers[3]);
 	}
 	else
 	{
 		registers[3] -= 4;
-		printf("Ret. ARM: 0x%08X\n", registers[3]);
+		printf("Ret. ARM: 0x%08"PRIX32"\n", registers[3]);
 	}
 }
 
