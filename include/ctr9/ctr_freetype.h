@@ -28,7 +28,7 @@ int ctr_freetype_initialize(void);
 
 FT_Face ctr_freetype_get_face(void);
 FTC_SBit ctr_freetype_prepare_character(char c);
-void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel);
+void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg);
 
 #ifdef __cplusplus
 }

@@ -130,7 +130,7 @@ void ctr_console_draw(char c)
 	{
 		//Can I assume bit->top is always positive for horizontal layouts?
 		size_t off = (ctr_console_get_char_height() - (unsigned int)(bit->top));
-		ctr_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg);
+		ctr_freetype_draw(&console.screen, console.xpos, console.ypos + off, c, console.fg, console.bg);
 		console.xpos += cwidth;
 	}
 

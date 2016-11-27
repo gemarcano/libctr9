@@ -88,7 +88,7 @@ FTC_SBit ctr_freetype_prepare_character(char c)
 	return bit;
 }
 
-void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel)
+void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t pixel, uint32_t bg)
 {
 	FTC_SBit bit = ctr_freetype_prepare_character(c);
 	for (size_t yy = 0; yy < bit->height; ++yy)
@@ -103,6 +103,10 @@ void ctr_freetype_draw(ctr_screen *screen, size_t x, size_t y, char c, uint32_t 
 				if (buf[(size_t)bit->pitch * yy + bytes] & (0x80u >> i))
 				{
 					ctr_screen_set_pixel(screen, x+bytes*8+i, y+yy, pixel);
+				}
+				else
+				{
+					ctr_screen_set_pixel(screen, x+bytes*8+i, y+yy, bg);
 				}
 			}
 		}
