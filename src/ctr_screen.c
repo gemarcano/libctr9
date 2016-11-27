@@ -1,6 +1,9 @@
 #include <ctr9/ctr_screen.h>
 #include <ctr9/i2c.h>
 
+ctr_screen ctr_screen_top;
+ctr_screen ctr_screen_bottom;
+
 void ctr_screen_enable_backlight(ctr_screen_enum aScreens)
 {
 	int data = 0;

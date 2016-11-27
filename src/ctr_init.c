@@ -1,6 +1,7 @@
 #include <ctr9/io/ctr_console.h>
 #include <ctr9/io/ctr_drives.h>
 #include <ctr9/ctr_screen.h>
+#include <ctr9/ctr_freetype.h>
 
 typedef struct draw_s
 {
@@ -14,11 +15,11 @@ void __attribute__((weak)) ctr_libctr9_init(void);
 void __attribute__((weak)) ctr_libctr9_init(void)
 {
 	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
-	ctr_screen top_screen, bottom_screen;
-	ctr_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
-	//ctr_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
+	ctr_screen_initialize(&ctr_screen_top, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
+	ctr_screen_initialize(&ctr_screen_bottom, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
 
 	ctr_drives_initialize();
-	ctr_console_initialize(&top_screen);
+	ctr_console_initialize(&ctr_screen_top);
+	ctr_freetype_initialize();
 }
 

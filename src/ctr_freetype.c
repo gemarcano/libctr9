@@ -23,10 +23,16 @@ typedef struct
 
 static ctr_face faceid;
 
+extern uint8_t ctr_font_data_begin;
+extern long int ctr_font_data_size;
+
 static FT_Error face_requester(FTC_FaceID face_id, FT_Library lib, FT_Pointer data, FT_Face *aface)
 {
 	ctr_face *face = (ctr_face*)face_id;
-	return FT_New_Face(library, face->filepath, face->index, aface);
+	if (face->filepath)
+		return FT_New_Face(library, face->filepath, face->index, aface);
+	else
+		return FT_New_Memory_Face(library, &ctr_font_data_begin, ctr_font_data_size, face->index, aface);
 }
 
 int ctr_freetype_initialize(void)
@@ -40,7 +46,7 @@ int ctr_freetype_initialize(void)
 	err = FTC_ImageCache_New(manager, &icache);
 
 	//FIXME hard-coded path
-	faceid.filepath = "SD:/font.otf";
+	faceid.filepath = NULL;
 	faceid.index = 0;
 
 	err = FTC_Manager_LookupFace(manager, (FTC_FaceID)&faceid, &faceid.face);

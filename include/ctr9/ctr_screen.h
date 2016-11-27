@@ -76,6 +76,8 @@ typedef struct
 	void *data;
 } ctr_screen_bitmap;
 
+extern ctr_screen ctr_screen_top, ctr_screen_bottom;
+
 /**	@brief Initializes the given screen.
  *
  *	@param[out] screen Screen structure to initialize.

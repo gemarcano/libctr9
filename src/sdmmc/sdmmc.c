@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <ctr9/io/sdmmc/sdmmc.h>
 
@@ -42,8 +43,8 @@ extern "C" {
 };
 #endif
 
-struct mmcdevice handelNAND;
-struct mmcdevice handelSD;
+static struct mmcdevice handelNAND;
+static struct mmcdevice handelSD;
 
 mmcdevice *getMMCDevice(int drive)
 {
@@ -72,12 +73,17 @@ static void inittarget(struct mmcdevice *ctx)
 
 }
 
+//
+//cmd: 0xFFFF -- command. 1 << 16 getSDRESP, 1 << 17 readdata. 1 << 18 writedata. 
 static void NO_INLINE sdmmc_send_command(struct mmcdevice *ctx, uint32_t cmd, uint32_t args)
 {
-	uint32_t getSDRESP = (cmd << 15) >> 31;
-	uint16_t flags = (cmd << 15) >> 31;
-	const int readdata = cmd & 0x20000;
-	const int writedata = cmd & 0x40000;
+	//cmd & 0xFFFF is the actual command. Anything beyond is Normmatt's extra data
+	bool getSDRESP = cmd & (1u << 16); //check 0x100 bit
+	//flags is used to check against SD_IRQ_STATUS0. bit 0 is CMDRESPSEND
+	uint16_t flags = (cmd << 16) >> 31; //GM: Why is this the same as getSDRESP? Is the status0 related?
+	//Answer is yes: flags is related to status0
+	const bool readdata = cmd & 0x20000;
+	const bool writedata = cmd & 0x40000;
 
 	if(readdata || writedata)
 	{
@@ -210,7 +216,7 @@ static void NO_INLINE sdmmc_send_command(struct mmcdevice *ctx, uint32_t cmd, ui
 	sdmmc_write16(REG_SDSTATUS0,0);
 	sdmmc_write16(REG_SDSTATUS1,0);
 
-	if(getSDRESP != 0)
+	if(getSDRESP)
 	{
 		ctx->ret[0] = (uint32_t)(sdmmc_read16(REG_SDRESP0) | (sdmmc_read16(REG_SDRESP1) << 16));
 		ctx->ret[1] = (uint32_t)(sdmmc_read16(REG_SDRESP2) | (sdmmc_read16(REG_SDRESP3) << 16));

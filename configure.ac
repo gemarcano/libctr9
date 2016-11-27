@@ -12,7 +12,7 @@ AC_CHECK_TOOL([OBJCOPY],objcopy)
 
 AC_CHECK_HEADERS([ft2build.h freetype2/ft2build.h], [break], [FT_FOUND=1])
 
-if test $FT_FOUND == 1
+if test "$FT_FOUND" == "1"
 then
 AC_MSG_ERROR(
 [unable to find ft2build.h, make sure FreeType2 is installed and\
