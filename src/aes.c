@@ -5,9 +5,12 @@
 
 //FIXME some things make assumptions about alignemnts!
 
+//FIXME There is no mention of endian stuff impacting REG_AES_KEY*INFO access, but d0k3 and I noticed that adding the explicit flags in the setup functions following made some bugs go away under G9, where if TWL was used, then another key slot y was set and switched to that one, things would malfunction
+
 void setup_aeskeyX(uint8_t keyslot, const void* keyx)
 {
     const uint32_t * _keyx = (const uint32_t*)keyx;
+	*REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYXFIFO = _keyx[0];
@@ -27,6 +30,7 @@ void setup_aeskeyX(uint8_t keyslot, const void* keyx)
 void setup_aeskeyY(uint8_t keyslot, const void* keyy)
 {
     const uint32_t * _keyy = (const uint32_t*)keyy;
+	*REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYYFIFO = _keyy[0];
@@ -46,6 +50,7 @@ void setup_aeskeyY(uint8_t keyslot, const void* keyy)
 void setup_aeskey(uint8_t keyslot, const void* key)
 {
     const uint32_t * _key = (const uint32_t*)key;
+	*REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYFIFO = _key[0];
