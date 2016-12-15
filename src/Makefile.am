@@ -13,7 +13,7 @@ libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	ctr_timer.c ctr_irq.c ctr_system_clock.c ctr_cache.s \
 	ctr_crypto_interface.c ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
-	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c \
+	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
 	$(top_srcdir)/data/ctr_font_data.s
 
 
@@ -58,7 +58,8 @@ ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
 	$(includedirectory)/ctr9/ctr_memory.h \
 	$(includedirectory)/ctr9/ctr_aeskeydb.h \
 	$(includedirectory)/ctr9/ctr_firm.h \
-	$(includedirectory)/ctr9/ctr_freetype.h
+	$(includedirectory)/ctr9/ctr_freetype.h \
+	$(includedirectory)/ctr9/ctr_circular_buffer.h
 
 ctrgamecartinclude_HEADERS = $(includedirectory)/ctr9/gamecart/protocol.h \
 	$(includedirectory)/ctr9/gamecart/command_ctr.h \

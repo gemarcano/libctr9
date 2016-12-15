@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <ctr9/ctr_screen.h>
+#include <ctr9/ctr_circular_buffer.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +50,9 @@ typedef struct
 	bool negative;
 
 	ctr_screen screen;
+
+	size_t buffer_ptr; //Points to the character where the cursor is at
+	ctr_circular_buffer buffer;
 
 } ctr_console;
 

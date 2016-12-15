@@ -64,6 +64,7 @@ int ctr_console_initialize(const ctr_screen *screen)
 	console.default_bg = console.bg = 0x000000;
 
 	console.screen = *screen;
+	ctr_circular_buffer_initialize(&console.buffer, 17 * 1024u);
 
 	return 0;
 }
@@ -134,6 +135,11 @@ void ctr_console_draw(char c)
 		console.xpos += cwidth;
 	}
 
+	if (ctr_circular_buffer_count(&console.buffer) == ctr_circular_buffer_size(&console.buffer))
+	{
+		ctr_circular_buffer_pop_front(&console.buffer, NULL);
+	}
+	ctr_circular_buffer_push_back(&console.buffer, c);
 }
 
 typedef enum
@@ -308,6 +314,7 @@ static void execute_command(const csi_data *data)
 		break;
 		case 'C':
 		{
+			//The problem here is that cwidth may not be constant
 			unsigned int cwidth = (unsigned int)ctr_console_get_char_width('T'); //uh,FIXME, I need to keep track of the text contents...
 			size_t param = extract_param(data->params[0], 1);
 
