@@ -1,0 +1,14 @@
+--------------------------------------------------------------------------------
+Documentation
+--------------------------------------------------------------------------------
+
+This project uses Doxygen markup in order to facilitate the generation of
+documentation, which should be found when generated in the doc/ folder. Each
+header in the include/ directory should also be well documented and can be used
+as reference for programming.
+
+In addition, some documentation is hosted in GitHub pages:
+    https://gemarcano.github.io/libctr9/
+
+In this folder there are explanations about the general design decisions taken.
+

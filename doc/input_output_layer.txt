@@ -1,0 +1,35 @@
+--------------------------------------------------------------------------------
+Design: IO subsystem/framework
+--------------------------------------------------------------------------------
+
+The IO framework is based on the idea of IO interfaces that can be layered. The
+implementation of each IO interface layer depends on a function table that is
+embedded into the IO interface context object. It is via this function table
+that the generic IO interface functions determine what function to call, acting
+as a virtual table for the IO interface functionality. Refer to
+ctr_io_interface.h for the definition of this function table.
+
+One of the advantages of the framework is that it lends itself well to layering
+IO interfaces. For example, after implementing a NAND IO interface, it is
+possible to develop an IO interface layer that takes as an input at
+initialization a NAND IO interface and transforms the input/output of the NAND
+IO interface layer as necessary. An example of this is the crypto IO interface
+layer included in this library, which takes as an input any IO interface layer
+(most likely NAND) and then applies crypto to the input/output to/from the
+NAND IO layer, based on the initialization parameters of the crypto layer. This
+allows for the encrypted NAND to be read and written transparently, for example.
+
+The IO subsystem was designed with extensibility in mind. In order to create a
+new IO interface layer, all one needs to do is implement six functions and
+load a function table at the beginning of the new IO interface object with those
+functions. Instead of calling the function pointers directly, use the ctr_io_*
+functions supplied by the framework. These will make sure to call the right
+functions.
+
+For examples of how IO interfaces are implemented refer to the source code for
+this library. Some example IO interfaces are ctr_nand_interface (the actual
+implementation for this one was abstracted to ctr_sdmmc_implementation),
+ctr_nand_crypto_interface, and ctr_fatfs_interface. It is feasible to make a
+ctr_xorpad_interface to generate xorpads, for example, taking two IO interface
+layers, one providing the raw encrypted ouput and another the plaintext.
+

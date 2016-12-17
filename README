@@ -38,13 +38,10 @@ stable. Breaking changes will be mentioned in commits at the very least.
 Dependencies
 --------------------------------------------------------------------------------
 
- - https://github.com/gemarcano/ctr - Used for unit tests and console IO
-    Make sure it is installed somewhere that the compiler can pick it up, or
-    use -L and -I to instruct the compiler where to find it.
-
  - FreeType2 - Used for font handling. Make sure it is installed somewhere that
     the compiler can pick it up, or use -L and -I to instruct the compiler where
-    to find it.
+    to find it. The build tools will attempt to find it within the prefix where
+    libctr9 was configured to be installed in.
 
  - Autotools in general. These are used to create the build scripts.
 
@@ -122,10 +119,16 @@ $CTRARM9/lib).
 
 No start.s or _start.s files are necessary, libctr9 has its own crt0.o built in.
 It initializes the 3DS ARM9 MPU allowing full rwx access to all normal 3DS
-memory regions (ITCM is mapped, DTCM is not), resets the stack, and then calls
-libc initialization functions and then libctr9, then it jumps to main. It is
+memory regions (ITCM and DTCM are mapped, resets the stack, and then calls libc
+initialization functions and then libctr9, then it jumps to main. It is
 recommended that any modifications to the environment be done early in main.
-FIXME what about saving the OTP hash? Initializing libctr9 thrashes it.
+
+In addition, if using libctr9's included crt0 functionality, it does support
+the __constructor__ attribute for functions. Functions with this attribute will
+be executed before the main initialization function for libctr9 is called. This
+allows for certain things, like caching the OTP hash value when launching from
+a/k9lh before the hash register is used by libctr9 during its initialization. Do
+note that no disk nor console subsystems are initialized at this point.
 
 
 --------------------------------------------------------------------------------
@@ -139,42 +142,6 @@ as reference for programming.
 
 In addition, some documentation is hosted in GitHub pages:
     https://gemarcano.github.io/libctr9/
-
-
---------------------------------------------------------------------------------
-Design: IO subsystem/framework
---------------------------------------------------------------------------------
-
-The IO framework is based on the idea of IO interfaces that can be layered. The
-implementation of each IO interface layer depends on a function table that is
-embedded into the IO interface context object. It is via this function table
-that the generic IO interface functions determine what function to call, acting
-as a virtual table for the IO interface functionality. Refer to
-ctr_io_interface.h for the definition of this function table.
-
-One of the advantages of the framework is that it lends itself well to layering
-IO interfaces. For example, after implementing a NAND IO interface, it is
-possible to develop an IO interface layer that takes as an input at
-initialization a NAND IO interface and transforms the input/output of the NAND
-IO interface layer as necessary. An example of this is the crypto IO interface
-layer included in this library, which takes as an input any IO interface layer
-(most likely NAND) and then applies crypto to the input/output to/from the
-NAND IO layer, based on the initialization parameters of the crypto layer. This
-allows for the encrypted NAND to be read and written transparently, for example.
-
-The IO subsystem was designed with extensibility in mind. In order to create a
-new IO interface layer, all one needs to do is implement six functions and
-load a function table at the beginning of the new IO interface object with those
-functions. Instead of calling the function pointers directly, use the ctr_io_*
-functions supplied by the framework. These will make sure to call the right
-functions.
-
-For examples of how IO interfaces are implemented refer to the source code for
-this library. Some example IO interfaces are ctr_nand_interface (the actual
-implementation for this one was abstracted to ctr_sdmmc_implementation),
-ctr_nand_crypto_interface, and ctr_fatfs_interface. It is feasible to make a
-ctr_xorpad_interface to generate xorpads, for example, taking two IO interface
-layers, one providing the raw encrypted ouput and another the plaintext.
 
 
 --------------------------------------------------------------------------------
