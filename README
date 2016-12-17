@@ -203,6 +203,8 @@ Credits
     help and brainstorming
  - Normmatt for yelling at me for screwing up his sdmmc code :) Also a lot of
     other general 3DS development stuff
+ - bilis for his ctr library (a small amount of code from that is used) and for
+    his QEMU implementation of the 3DS ARM9 environment.
 
  - See COPYING for details about code usage from other sources
 
