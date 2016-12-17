@@ -17,9 +17,9 @@ void __attribute__((weak)) ctr_libctr9_init(void)
 	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
 	ctr_screen_initialize(&ctr_screen_top, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
 	ctr_screen_initialize(&ctr_screen_bottom, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
-
-	ctr_drives_initialize();
 	ctr_console_initialize(&ctr_screen_top);
+
 	ctr_freetype_initialize();
+	ctr_drives_initialize();
 }
 

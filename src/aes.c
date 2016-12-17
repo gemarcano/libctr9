@@ -10,7 +10,8 @@
 void setup_aeskeyX(uint8_t keyslot, const void* keyx)
 {
     const uint32_t * _keyx = (const uint32_t*)keyx;
-	*REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
+    uint32_t old_aescnt = *REG_AESCNT;
+    *REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYXFIFO = _keyx[0];
@@ -18,19 +19,19 @@ void setup_aeskeyX(uint8_t keyslot, const void* keyx)
         *REG_AESKEYXFIFO = _keyx[2];
         *REG_AESKEYXFIFO = _keyx[3];
     } else {
-        uint32_t old_aescnt = *REG_AESCNT;
         volatile uint32_t* reg_aeskeyx = REG_AESKEY0123 + (((0x30u * keyslot) + 0x10u)/4u);
         *REG_AESCNT = (*REG_AESCNT & ~(AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER));
         for (uint32_t i = 0; i < 4u; i++)
             reg_aeskeyx[i] = _keyx[i];
-        *REG_AESCNT = old_aescnt;
     }
+    *REG_AESCNT = old_aescnt;
 }
 
 void setup_aeskeyY(uint8_t keyslot, const void* keyy)
 {
     const uint32_t * _keyy = (const uint32_t*)keyy;
-	*REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
+    uint32_t old_aescnt = *REG_AESCNT;
+    *REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYYFIFO = _keyy[0];
@@ -38,19 +39,19 @@ void setup_aeskeyY(uint8_t keyslot, const void* keyy)
         *REG_AESKEYYFIFO = _keyy[2];
         *REG_AESKEYYFIFO = _keyy[3];
     } else {
-        uint32_t old_aescnt = *REG_AESCNT;
         volatile uint32_t* reg_aeskeyy = REG_AESKEY0123 + (((0x30u * keyslot) + 0x20u)/4u);
         *REG_AESCNT = (*REG_AESCNT & ~(AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER));
         for (uint32_t i = 0; i < 4u; i++)
             reg_aeskeyy[i] = _keyy[i];
-        *REG_AESCNT = old_aescnt;
     }
+    *REG_AESCNT = old_aescnt;
 }
 
 void setup_aeskey(uint8_t keyslot, const void* key)
 {
     const uint32_t * _key = (const uint32_t*)key;
-	*REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
+    uint32_t old_aescnt = *REG_AESCNT;
+    *REG_AESCNT |= AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER;
     *REG_AESKEYCNT = (*REG_AESKEYCNT >> 6 << 6) | keyslot | 0x80;
     if (keyslot > 3) {
         *REG_AESKEYFIFO = _key[0];
@@ -58,13 +59,12 @@ void setup_aeskey(uint8_t keyslot, const void* key)
         *REG_AESKEYFIFO = _key[2];
         *REG_AESKEYFIFO = _key[3];
     } else {
-        uint32_t old_aescnt = *REG_AESCNT;
         volatile uint32_t* reg_aeskey = REG_AESKEY0123 + ((0x30u * keyslot)/4u);
         *REG_AESCNT = (*REG_AESCNT & ~(AES_CNT_INPUT_ENDIAN | AES_CNT_INPUT_ORDER));
         for (uint32_t i = 0; i < 4u; i++)
             reg_aeskey[i] = _key[i];
-        *REG_AESCNT = old_aescnt;
     }
+    *REG_AESCNT = old_aescnt;
 }
 
 void use_aeskey(uint32_t keyno)
@@ -93,7 +93,7 @@ void add_ctr(void* ctr, uint32_t carry)
     int32_t i;
 
     for(i = 0; i < 4; i++) {
-		//FIXME this assumes alignment...
+        //FIXME this assumes alignment...
         counter[i] = ((uint32_t)outctr[i*4+0]<<24) | ((uint32_t)outctr[i*4+1]<<16) | ((uint32_t)outctr[i*4+2]<<8) | ((uint32_t)outctr[i*4+3]<<0);
     }
 

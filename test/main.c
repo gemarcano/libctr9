@@ -415,7 +415,7 @@ int main()
 	alignas(4) uint8_t zero[16] = { 0 };
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
 
-	setup_aeskey(0x11, test_key_i);
+	setup_aeskey(0x11, test_key);
 	use_aeskey(0x11);
 
 	cbc_decrypt(cipher_cbc, output_buffer, 0x2, AES_CNT_CBC_DECRYPT_MODE, iv);
