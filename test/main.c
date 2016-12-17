@@ -178,7 +178,7 @@ int main()
 	ctr_nand_interface_destroy(&nand_ctx.nand_io);
 
 	printf("Press any key to continue...\n");
-	input_wait();
+	ctr_input_wait();
 
 	printf("Preparing interrupts\n");
 	printf("abort handler: %X\n", (uintptr_t)ctr_interrupt_handlers[4]);
@@ -189,46 +189,46 @@ int main()
 	printf("Returned from the abort.\n");
 
 	printf("Trying to turn off top screen\n");
-	input_wait();
+	ctr_input_wait();
 	ctr_screen_disable_backlight(CTR_SCREEN_TOP);
-	input_wait();
+	ctr_input_wait();
 	ctr_screen_enable_backlight(CTR_SCREEN_TOP);
 	printf("done: Trying to turn off top screen\n");
 
 	printf("Trying to turn off bottom screen\n");
-	input_wait();
+	ctr_input_wait();
 	ctr_screen_disable_backlight(CTR_SCREEN_BOTTOM);
-	input_wait();
+	ctr_input_wait();
 	ctr_screen_enable_backlight(CTR_SCREEN_BOTTOM);
 	printf("done: Trying to turn off bottom screen\n");
 
 	printf("Trying to turn off both screens\n");
-	input_wait();
+	ctr_input_wait();
 	ctr_screen_disable_backlight(CTR_SCREEN_BOTH);
-	input_wait();
+	ctr_input_wait();
 	ctr_screen_enable_backlight(CTR_SCREEN_BOTTOM | CTR_SCREEN_TOP);
 	printf("Trying to turn off both screens\n");
-	input_wait();
+	ctr_input_wait();
 
 	printf("Testing i2c write crap\n");
 
 	ctr_rtc_data rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 	printf("Testing a single write\n");
-	input_wait();
+	ctr_input_wait();
 	i2cWriteRegister(I2C_DEV_MCU, 0x30, 0x11);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 
 	printf("Testing a single write from buffer\n");
-	input_wait();
+	ctr_input_wait();
 	uint8_t temp_rtc[8] = { 11, 22, 33, 44, 0xBB, 0xAA,  0x99, 0x88};
 	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 1);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 
 	printf("Testing a multiple write from buffer\n");
-	input_wait();
+	ctr_input_wait();
 	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 8);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
@@ -307,7 +307,7 @@ int main()
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
-	input_wait();
+	ctr_input_wait();
 	printf("Testing clock\n");
 	ctr_irq_initialize();
 	ctr_system_clock clock;
@@ -490,7 +490,7 @@ int main()
 	fwrite(otp_sha, 32, 1, dump);
 	fclose(dump);
 
-	input_wait();
+	ctr_input_wait();
 	ctr_system_poweroff();
 	return 0;
 }

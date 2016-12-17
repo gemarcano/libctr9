@@ -19,9 +19,8 @@ ctr_hid_button_type ctr_hid_get_buttons(void)
 	return ~(*CTR_HID_REG) & 0xFFF;
 }
 
-#define HID_ALL_RELEASED 0xFFF
-
-void input_wait(void)
+//This was taken and adapted from b1l1s's hid.c
+void ctr_input_wait(void)
 {
 	uint32_t prev = *CTR_HID_REG;
 	uint32_t key;
@@ -49,9 +48,5 @@ void input_wait(void)
 			}
 		}
 	} while(key == prev);
-
-	// Flip the bits
-	//return key ^ HID_ALL_RELEASED;
 }
-
 

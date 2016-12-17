@@ -34,7 +34,7 @@ void abort_interrupt(uint32_t *registers)
 	printf("\n\nDATA ABORT:\n");
 
 	print_all_registers(registers);
-	input_wait();
+	ctr_input_wait();
 
 	uint32_t cpsr = registers[0];
 	if (cpsr & 0x20)
@@ -54,7 +54,7 @@ void undefined_instruction(uint32_t *registers)
 	printf("\n\nUNDEFINED INSTRUCTION:\n");
 
 	print_all_registers(registers);
-	input_wait();
+	ctr_input_wait();
 	ctr_system_poweroff();
 }
 
@@ -63,7 +63,7 @@ void prefetch_abort(uint32_t *registers)
 	printf("\n\nPREFETCH ABORT:\n");
 
 	print_all_registers(registers);
-	input_wait();
+	ctr_input_wait();
 	ctr_system_poweroff();
 }
 
