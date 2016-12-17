@@ -89,7 +89,6 @@ void add_ctr(void* ctr, uint32_t carry)
 {
     uint32_t counter[4];
     uint8_t *outctr = (uint8_t *) ctr;
-    uint32_t sum;
     int32_t i;
 
     for(i = 0; i < 4; i++) {
@@ -99,7 +98,7 @@ void add_ctr(void* ctr, uint32_t carry)
 
     for(i=3; i>=0; i--)
     {
-        sum = counter[i] + carry;
+        uint32_t sum = counter[i] + carry;
         if (sum < counter[i]) {
             carry = 1;
         }
@@ -157,14 +156,13 @@ void ecb_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode)
 void cbc_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
 {
     size_t blocks_left = size;
-    size_t blocks;
     uint8_t *in  = inbuf;
     uint8_t *out = outbuf;
 
     while (blocks_left)
     {
         set_ctr(ctr);
-        blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
+        size_t blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
         memcpy(ctr, in + (blocks - 1) * AES_BLOCK_SIZE, AES_BLOCK_SIZE);
         aes_decrypt(in, out, blocks, mode);
         in += blocks * AES_BLOCK_SIZE;
@@ -176,14 +174,13 @@ void cbc_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t 
 void ctr_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
 {
     size_t blocks_left = size;
-    size_t blocks;
     uint8_t *in  = inbuf;
     uint8_t *out = outbuf;
 
     while (blocks_left)
     {
         set_ctr(ctr);
-        blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
+        size_t blocks = (blocks_left >= 0xFFFF) ? 0xFFFF : blocks_left;
         aes_decrypt(in, out, blocks, mode);
         add_ctr(ctr, blocks);
         in += blocks * AES_BLOCK_SIZE;
@@ -197,10 +194,9 @@ void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode)
     uint8_t *in  = inbuf;
     uint8_t *out = outbuf;
     size_t block_count = size;
-    size_t blocks;
     while (block_count != 0)
     {
-        blocks = (block_count >= 0xFFFF) ? 0xFFFF : block_count;
+        size_t blocks = (block_count >= 0xFFFF) ? 0xFFFF : block_count;
         *REG_AESCNT = 0;
         *REG_AESBLKCNT = blocks << 16;
         *REG_AESCNT = mode |

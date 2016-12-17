@@ -135,6 +135,7 @@ static bool nand_ctrnand_test7(void *ctx)
 {
 	FILE *file = fopen("CTRNAND:/arm9loaderhax.bin", "rb");
 	if (!file) return false;
+	fclose(file);
 
 	return true;
 }

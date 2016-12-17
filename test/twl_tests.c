@@ -23,7 +23,6 @@ static bool twl_test1(void *ctx)
 static bool twl_test2(void *ctx)
 {
 	bool test1 = false, test2 = false;
-	int res2 = 0;
 
 	FILE *file = fopen("TWLN:/sys/TWLFontTable.dat", "rb");
 	if (file)
@@ -43,13 +42,12 @@ static bool twl_test2(void *ctx)
 		fclose(file);
 		test2 = size == 8032;
 	}
-	return !res2 && test1 && test2;
+	return test1 && test2;
 }
 
 static bool twl_test3(void *ctx)
 {
 	bool test1 = false;
-	int res2 = 0;
 	FILE *file;
 	if ((file = fopen("TWLN:/shared2/0000", "r+b")))
 	{
@@ -71,7 +69,7 @@ static bool twl_test3(void *ctx)
 		
 	}
 
-	return !res2 && test1;
+	return test1;
 }
 
 void twl_tests_initialize(ctr_unit_tests *twl_crypto_tests, ctr_unit_test *funcs, size_t number_of_funcs, void *twl_crypto_ctx)

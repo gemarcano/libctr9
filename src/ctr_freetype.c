@@ -80,7 +80,6 @@ int ctr_freetype_initialize(void)
 
 FTC_SBit ctr_freetype_prepare_character(char c)
 {
-	FT_Size size;
 	size_t glyphIndex = FTC_CMapCache_Lookup(ccache, (FTC_FaceID)&faceid, 0, c);
 
 	FTC_SBit bit;
