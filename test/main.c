@@ -328,11 +328,15 @@ int main()
 	{
 		uint64_t start = ctr_system_clock_get_ms(&clock);
 		uint64_t ms = start;
+		ctr_clock_time time;
 		while (ms - start < 1000)
 		{
 			ms = ctr_system_clock_get_ms(&clock);
+			time = ctr_system_clock_get_time(&clock);
 		}
-		printf("second: %zu\n", i);
+		printf("second: %zu ", i);
+		printf("time: %"PRId64" %"PRId32"\n", time.seconds, time.nanoseconds);
+
 	}
 
 

@@ -69,6 +69,7 @@ ctr_clock_time ctr_system_clock_get_time(ctr_system_clock *clock)
 {
 	ctr_irq_critical_enter();
 	uint64_t timestamp = clock->count;
+	uint32_t reg = ctr_timer_get_value(clock->timer);
 	ctr_irq_critical_exit();
 
 	uint32_t freq = ctr_timer_get_effective_frequency(clock->timer);
@@ -76,6 +77,7 @@ ctr_clock_time ctr_system_clock_get_time(ctr_system_clock *clock)
 	uint32_t period = freq / (1u << 16);
 	result.seconds = (int64_t)timestamp / period ;
 	result.nanoseconds = ((uint64_t)timestamp - (uint64_t)result.seconds * period) * 1000000000u / period;
+	result.nanoseconds += (int64_t)reg * 1000000000u / freq;
 	return result;
 }
 
