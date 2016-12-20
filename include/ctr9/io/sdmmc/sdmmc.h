@@ -158,4 +158,7 @@ static inline void setckl(uint32_t data)
 	sdmmc_mask16(REG_SDCLKCTL,0x0,0x100);
 }
 
+bool sdmmc_sd_inserted(void);
+
 #endif
+

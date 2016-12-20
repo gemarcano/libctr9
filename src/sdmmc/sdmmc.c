@@ -30,9 +30,6 @@
 
 #define DATA32_SUPPORT
 
-#define TRUE 1
-#define FALSE 0
-
 #define NO_INLINE __attribute__ ((noinline))
 
 #ifdef __cplusplus
@@ -257,8 +254,6 @@ int NO_INLINE sdmmc_sdcard_readsectors(uint32_t sector_no, uint32_t numsectors, 
 	return geterror(&handelSD);
 }
 
-
-
 int NO_INLINE sdmmc_nand_readsectors(uint32_t sector_no, uint32_t numsectors, uint8_t *out)
 {
 	if(handelNAND.isSDHC == 0) sector_no <<= 9;
@@ -458,10 +453,8 @@ int SD_Init()
 
 	inittarget(&handelSD);
 
-	waitcycles(1u << 22); //Card needs a little bit of time to be detected, it seems FIXME test again to see what a good number is for the delay
-
-	//If not inserted
-	if (!(*((volatile uint16_t*)(SDMMC_BASE + REG_SDSTATUS0)) & TMIO_STAT0_SIGSTATE)) return 5;
+	if (!sdmmc_sd_inserted())
+		return 5;
 
 	sdmmc_send_command(&handelSD,0,0);
 	sdmmc_send_command(&handelSD,0x10408,0x1AA);
@@ -562,3 +555,16 @@ int sdmmc_sdcard_init()
 	int sd_res = SD_Init();
 	return nand_res | sd_res;
 }
+
+#define EMMC_STATUS0 (*((volatile uint16_t*)(SDMMC_BASE + REG_SDSTATUS0)))
+bool sdmmc_sd_inserted(void)
+{
+	if (EMMC_STATUS0 & TMIO_STAT0_SIGSTATE)
+		return true;
+
+	//Card needs a little bit of time to be detected, 250 ms according to profi200
+	waitcycles(1u << 22);
+
+	return EMMC_STATUS0 & TMIO_STAT0_SIGSTATE;
+}
+

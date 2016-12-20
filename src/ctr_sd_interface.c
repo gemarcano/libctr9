@@ -64,11 +64,8 @@ size_t ctr_sd_interface_sector_size(void *io)
 	return 512u;
 }
 
-#define EMMC_STATUS0 (*((volatile uint16_t*)0x1000601c))
-
 bool ctr_sd_interface_inserted(void)
 {
-	// FIXME Wait some time to make sure the SD card is detected
-	return (EMMC_STATUS0 & (1 << 5));
+	return sdmmc_sd_inserted();
 }
 
