@@ -133,7 +133,7 @@ static bool nand_ctrnand_test6(void *ctx)
 
 static bool nand_ctrnand_test7(void *ctx)
 {
-	FILE *file = fopen("CTRNAND:/arm9loaderhax.bin", "rb");
+	FILE *file = fopen("CTRNAND:/dbs/certs.db", "rb");
 	if (!file) return false;
 	fclose(file);
 
