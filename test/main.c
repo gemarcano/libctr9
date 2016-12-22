@@ -89,8 +89,11 @@ inline static void vol_memcpy(volatile void *dest, volatile void *sorc, size_t s
 	dst[size] = src[size];
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+	printf("argc: %i\n", argc);
+	printf("argv: %s\n", argv[0]);
+	ctr_input_wait();
 	memset(otp_sha, 0, 0x20);
 	vol_memcpy(otp_sha, REG_SHAHASH, 0x20);
 

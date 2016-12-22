@@ -5,6 +5,20 @@
 .section .text.start, "x"
 
 _start:
+	@ Preserve argc and argv
+	mov r2, r0
+	mov r3, r1
+
+	adr r0, argc_offset
+	ldr r1, [r0]
+	add r0, r1
+	str r2, [r0]
+
+	adr r0, argv_offset
+	ldr r1, [r0]
+	add r0, r1
+	str r3, [r0]
+
 	@ Disable IRQ
 	mrs r0, cpsr
 	orr r0, r0, #0x80
@@ -38,13 +52,6 @@ _start:
 	@ Change the stack pointer
 	ldr sp, =_stack
 
-	@ Enable both ITCM and DTCM
-	mrc p15, 0, r0, c1, c0, 0
-	orr r0, r0, #(1<<18)
-	bic r0, r0, #(1<<17)
-	orr r0, r0, #(1<<16)
-	mcr p15, 0, r0, c1, c0, 0
-
 	@ Configure ITCM to have a size of 64MB
 	mrc p15, 0, r0, c9, c1, 1
 	bic r0, #0b111110
@@ -62,6 +69,13 @@ _start:
 	orr r0, r1
 	mcr p15, 0, r0, c9, c1, 0
 
+	@ Enable both ITCM and DTCM
+	mrc p15, 0, r0, c1, c0, 0
+	orr r0, r0, #(1<<18)
+	bic r0, r0, #(1<<17)
+	orr r0, r0, #(1<<16)
+	mcr p15, 0, r0, c1, c0, 0
+
 	@ clear bss
 	adr r0, clear_bss_offset
 	ldr r1, [r0]
@@ -75,7 +89,7 @@ _start:
 
 	@ Set MPU permissions and cache settings
 	ldr r0, =0xFFFF001F @ ffff0000 64k   | bootrom
-	ldr r1, =0x3000801B @ 30000000 16k   | dtcm
+	ldr r1, =0x3000001B @ 30000000 16k   | dtcm
 	ldr r2, =0x00000035 @ 00000000 128MB | itcm
 	ldr r3, =0x08000029 @ 08000000 2M	| arm9 mem
 	ldr r4, =0x10000029 @ 10000000 2M	| io mem
@@ -131,11 +145,24 @@ _start:
 	add r0, r1, r0
 	blx r0
 
-	@ Make sure to pass in argc as 0 and argv as NULL
-	mov r0, #0
-	mov r1, #0
+	@ Restore argc and argv
+	mov r2, r0
+	mov r3, r0
+	adr r0, argc_offset
+	ldr r1, [r0]
+	add r0, r1
+	ldr r2, [r0]
 
-	@ Launch main(0, NULL)
+	adr r0, argv_offset
+	ldr r1, [r0]
+	add r0, r1
+	ldr r3, [r0]
+
+	mov r0, r2
+	mov r1, r3
+
+	@ Launch main(argc, argv)
+
 	adr r2, main_offset
 	ldr r3, [r2]
 	add r2, r3, r2
@@ -188,6 +215,18 @@ main_offset:
 
 exit_offset:
 .word exit-.
+
+argc_offset:
+.word argc-.
+
+argv_offset:
+.word argv-.
+
+argc:
+.skip 4
+
+argv:
+.skip 4
 
 clear_bss:
 	@clear bss
