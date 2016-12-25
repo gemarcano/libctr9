@@ -116,11 +116,13 @@ void ctr_irq_initialize(void);
  *
  *	@param[in] irq IRQ to register.
  *	@param[in] handler Function to call to handle the IRQ.
+ *	@param[in] data Generic, user provided data to pass to irq handler when it
+ *		is invoked.
  *
  *	@post Handler is registered and will be called when an IRQ is raised and the
  *		specified IRQ bit in the 3DS IRQ registers is set.
  */
-void ctr_irq_register(ctr_irq_enum irq, void (*handler)(void));
+void ctr_irq_register(ctr_irq_enum irq, void (*handler)(void*), void *data);
 
 /**	@brief Acknowledges an IRQ.
  *

@@ -29,7 +29,7 @@ static void print_all_registers(uint32_t *registers)
 	}
 }
 
-void abort_interrupt(uint32_t *registers)
+void abort_interrupt(uint32_t *registers, void *data)
 {
 	printf("\n\nDATA ABORT:\n");
 
@@ -49,7 +49,7 @@ void abort_interrupt(uint32_t *registers)
 	}
 }
 
-void undefined_instruction(uint32_t *registers)
+void undefined_instruction(uint32_t *registers, void *data)
 {
 	printf("\n\nUNDEFINED INSTRUCTION:\n");
 
@@ -58,7 +58,7 @@ void undefined_instruction(uint32_t *registers)
 	ctr_system_poweroff();
 }
 
-void prefetch_abort(uint32_t *registers)
+void prefetch_abort(uint32_t *registers, void *data)
 {
 	printf("\n\nPREFETCH ABORT:\n");
 

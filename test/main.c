@@ -36,6 +36,7 @@ void scribble_screen(void);
 #include "memory_tests.h"
 #include "memory_control_tests.h"
 #include "crypto_memory_tests.h"
+#include "interrupt.h"
 
 
 typedef struct
@@ -63,10 +64,7 @@ static bool crypto_tests1(void *ctx)
 #include <ctr9/io/fatfs/ctr_fatfs.h>
 #include <ctr9/sha.h>
 
-extern void(*ctr_interrupt_handlers[7])(const uint32_t*);
-void abort_interrupt(uint32_t*);
-void prefetch_abort(uint32_t*);
-void undefined_instruction(uint32_t*);
+extern void(*ctr_interrupt_handlers[7])(const uint32_t*, void*);
 
 uint8_t otp_sha[32];
 
@@ -124,9 +122,9 @@ int main(int argc, char *argv[])
 	ctr_n3ds_ctrnand_keyslot_setup();
 
 	ctr_interrupt_prepare();
-	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt);
-	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, undefined_instruction);
-	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, prefetch_abort);
+	ctr_interrupt_set(CTR_INTERRUPT_DATABRT, abort_interrupt, (void*)0x1);
+	ctr_interrupt_set(CTR_INTERRUPT_UNDEF, undefined_instruction, (void*)0x2);
+	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, prefetch_abort, (void*)0x3);
 
 	char buffer[0x1000] = {0};
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };

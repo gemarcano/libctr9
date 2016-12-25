@@ -73,11 +73,12 @@ void ctr_irq_critical_exit(void)
 
 }
 
-typedef void (*ctr_interrupt_handler)(uint32_t *register_array);
+typedef void (*ctr_interrupt_handler)(uint32_t *register_array, void *data);
 
-static void (*ctr_irq_handlers[29])(void) = { NULL };
+static void (*ctr_irq_handlers[29])(void*) = { NULL };
+static void *ctr_irq_data[29] = { NULL };
 
-static void ctr_irq_handler(uint32_t *register_array)
+static void ctr_irq_handler(uint32_t *register_array, void *data)
 {
 	//Check IRQ_IF
 	uint32_t pending = IRQ_IF_REG;
@@ -85,7 +86,7 @@ static void ctr_irq_handler(uint32_t *register_array)
 	{
 		if (pending & (1u << i) && ctr_irq_handlers[i])
 		{
-			ctr_irq_handlers[i]();
+			ctr_irq_handlers[i](ctr_irq_data[i]);
 		}
 	}
 	register_array[3] -= 4;
@@ -93,10 +94,10 @@ static void ctr_irq_handler(uint32_t *register_array)
 
 void ctr_irq_initialize(void)
 {
-	ctr_interrupt_set(CTR_INTERRUPT_IRQ, ctr_irq_handler);
+	ctr_interrupt_set(CTR_INTERRUPT_IRQ, ctr_irq_handler, NULL);
 }
 
-void ctr_irq_register(ctr_irq_enum irq, void (*handler)(void))
+void ctr_irq_register(ctr_irq_enum irq, void (*handler)(void*), void *data)
 {
 	if (irq < 29u)
 	{

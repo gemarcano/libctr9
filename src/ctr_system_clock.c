@@ -12,18 +12,7 @@
 
 #include <stddef.h>
 
-void ctr_system_clock_interrupt_0(void);
-void ctr_system_clock_interrupt_1(void);
-void ctr_system_clock_interrupt_2(void);
-void ctr_system_clock_interrupt_3(void);
-
-static void (*interrupts[4])(void) =
-{
-	ctr_system_clock_interrupt_0,
-	ctr_system_clock_interrupt_1,
-	ctr_system_clock_interrupt_2,
-	ctr_system_clock_interrupt_3
-};
+static void ctr_system_clock_interrupt_handler(void *data);
 
 static unsigned int active_clocks = 0;
 
@@ -43,7 +32,7 @@ void ctr_system_clock_initialize(ctr_system_clock *clock, ctr_timer timer)
 		ctr_timer_set_value(timer, 0);
 		ctr_timer_set_prescaler(timer, CTR_TIMER_DIV1);
 		clocks[timer] = clock;
-		ctr_irq_register(CTR_IRQ_TIMER_0 + timer, interrupts[timer]);
+		ctr_irq_register(CTR_IRQ_TIMER_0 + timer, ctr_system_clock_interrupt_handler, (void*)timer);
 		clock->timer = timer;
 		clock->count = 0;
 
@@ -90,14 +79,9 @@ static inline void ctr_system_clock_interrupt(ctr_timer timer)
 	ctr_irq_acknowledge(CTR_IRQ_TIMER_0 + timer);
 }
 
-#define DEFINE_CTR_SYSTEM_CLOCK_INTERRUPT(N) \
-void ctr_system_clock_interrupt_##N(void) \
-{ \
-	ctr_system_clock_interrupt(N); \
+static void ctr_system_clock_interrupt_handler(void *data)
+{
+	ctr_timer timer = (ctr_timer)data;
+	ctr_system_clock_interrupt(timer);
 }
-
-DEFINE_CTR_SYSTEM_CLOCK_INTERRUPT(0)
-DEFINE_CTR_SYSTEM_CLOCK_INTERRUPT(1)
-DEFINE_CTR_SYSTEM_CLOCK_INTERRUPT(2)
-DEFINE_CTR_SYSTEM_CLOCK_INTERRUPT(3)
 

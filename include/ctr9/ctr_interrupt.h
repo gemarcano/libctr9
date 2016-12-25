@@ -62,8 +62,10 @@ void ctr_interrupt_prepare(void);
  *	@param[in] interrupt_type Enumeration determining which exception to set up.
  *	@param[in] interrupt Handler to call when the exception is fired. The handler
  *		can be either Thumb or ARM code.
+ *	@param[in,out] data Pointer to any kind of data, passed as is to the
+ *		interrupt handler when it is invoked.
  */
-void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, void (*interrupt)(uint32_t*));
+void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, void (*interrupt)(uint32_t*, void*), void *data);
 
 #ifdef __cplusplus
 }

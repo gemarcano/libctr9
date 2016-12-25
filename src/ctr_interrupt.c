@@ -20,13 +20,14 @@ void ctr_interrupt_irq_veneer(void);
 void ctr_interrupt_fiq_veneer(void);
 
 typedef void (*interrupt_function)(void);
-typedef void (*ctr_interrupt_handler)(uint32_t* register_array);
+typedef void (*ctr_interrupt_handler)(uint32_t *register_array, void *data);
 
 ctr_interrupt_handler ctr_interrupt_handlers[7] = {0};
+void *ctr_interrupt_data[7] = {0};
 
 #define ACCESS_FUNCTION_PTR(x) (*((interrupt_function*)(x)))
 
-void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler handler)
+void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler handler, void *data)
 {
 	switch (interrupt_type)
 	{
@@ -38,6 +39,7 @@ void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler 
 		case CTR_INTERRUPT_IRQ:
 		case CTR_INTERRUPT_FIQ:
 			ctr_interrupt_handlers[interrupt_type] = handler;
+			ctr_interrupt_data[interrupt_type] = data;
 			break;
 
 		default:

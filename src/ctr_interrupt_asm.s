@@ -24,7 +24,7 @@
 .type ctr_interrupt_irq_veneer, %function
 .type ctr_interrupt_fiq_veneer, %function
 
-.extern ctr_interrupt_handlers
+.extern ctr_interrupt_handlers, ctr_interrupt_data
 
 @FIXME this code is not generally position independent
 
@@ -74,6 +74,11 @@ exception_stack:
 	add r1, r1, r2
 	ldr r2, [r1, #\table_offset]
 	mov r0, sp
+
+	adr r1, ctr_interrupt_data_location
+	ldr r3, [r1]
+	add r1, r3
+	ldr r1, [r1, #\table_offset]
 
 	@Parameters: r0 - pointer to array on stack:
 	@    cpsr, sp, lr, return, r0-r12
@@ -126,4 +131,7 @@ ctr_interrupt_fiq_veneer:
 
 ctr_interrupt_handlers_location:
 .word ctr_interrupt_handlers - .
+
+ctr_interrupt_data_location:
+.word ctr_interrupt_data - .
 

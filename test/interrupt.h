@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
-void abort_interrupt(uint32_t *registers);
-void undefined_instruction(uint32_t *registers);
-void prefetch_abort(uint32_t *registers);
+void abort_interrupt(uint32_t *registers, void *data);
+void undefined_instruction(uint32_t *registers, void *data);
+void prefetch_abort(uint32_t *registers, void *data);
 
 #endif//CTR_TEST_INTERRUPT_H_
 
