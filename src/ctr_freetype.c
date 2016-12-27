@@ -23,7 +23,7 @@ typedef struct
 
 static ctr_face faceid;
 
-extern uint8_t ctr_font_data_begin;
+extern unsigned char *ctr_font_data_begin;
 extern long int ctr_font_data_size;
 
 static FT_Error face_requester(FTC_FaceID face_id, FT_Library lib, FT_Pointer data, FT_Face *aface)
@@ -32,7 +32,7 @@ static FT_Error face_requester(FTC_FaceID face_id, FT_Library lib, FT_Pointer da
 	if (face->filepath)
 		return FT_New_Face(library, face->filepath, face->index, aface);
 	else
-		return FT_New_Memory_Face(library, &ctr_font_data_begin, ctr_font_data_size, face->index, aface);
+		return FT_New_Memory_Face(library, ctr_font_data_begin, ctr_font_data_size, face->index, aface);
 }
 
 int ctr_freetype_initialize(void)
