@@ -43,6 +43,9 @@ Dependencies
     to find it. The build tools will attempt to find it within the prefix where
     libctr9 was configured to be installed in.
 
+ - libctrelf - https://github.com/gemarcano/libctrelf
+    Used for helping to parse and handle ELF data.
+
  - Autotools in general. These are used to create the build scripts.
 
 
@@ -110,7 +113,7 @@ the linker to link in the static library.
 Example:
   arm-none-eabi-gcc -I$HOME/.local/usr/arm-none-eabi-9/include \
     -L$HOME/.local/usr/arm-none-eabi-9/lib -Os -Wall -Wextra -Wpedantic hello.c\
-    -lctr9
+    -lctr9 -lfreetype2 -lctrelf
 
 One setup that is recommended is to export a variable such as, CTRARM9, to point
 to the root of the prefix where libctr9 is installed. This way, it is easier to
