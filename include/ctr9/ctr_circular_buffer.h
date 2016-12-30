@@ -1,16 +1,12 @@
 #ifndef CTR_CIRCULAR_BUFFER_H_
 #define CTR_CIRCULAR_BUFFER_H_
 
+#include <ctr_core/ctr_core_circular_buffer.h>
+
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef struct
-{
-	unsigned char *buffer;
-	unsigned char *begin, *end;
-	size_t size;
-	size_t count;
-} ctr_circular_buffer;
+typedef ctr_core_circular_buffer ctr_circular_buffer;
 
 void ctr_circular_buffer_initialize(ctr_circular_buffer *buffer, size_t size);
 bool ctr_circular_buffer_push_back(ctr_circular_buffer *buffer, char data);

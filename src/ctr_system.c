@@ -24,28 +24,23 @@
 
 ctr_system_type ctr_get_system_type(void)
 {
-	//This is seemingly not confirmed on 3dbrew, but it seems PDN_MPCORE_CFG's
-	//second and third bit are only set on the N3DS, while the first bit is
-	//set for all systems. Use that to detect the type of system.
-	return 0x07 == *PDN_MPCORE_CFG ? SYSTEM_N3DS : SYSTEM_O3DS;
+	return ctr_core_get_system_type();
 }
 
 bool ctr_detect_a9lh_entry(void)
 {
 	//Aurora determined that this register isn't yet set when a9lh launches.
-	return *PDN_SPI_CNT == 0;
+	return ctr_core_detect_a9lh_entry();
 }
 
 void ctr_system_poweroff(void)
 {
-	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1);
-	while (true);
+	ctr_core_system_poweroff();
 }
 
 void ctr_system_reset(void)
 {
-	i2cWriteRegister(I2C_DEV_MCU, 0x20, 1 << 2);
-	while (true);
+	ctr_core_system_reset();
 }
 
 void ctr_twl_keyslot_setup(void)

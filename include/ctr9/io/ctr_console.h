@@ -16,6 +16,8 @@
 #include <ctr9/ctr_screen.h>
 #include <ctr9/ctr_circular_buffer.h>
 
+#include <ctr_core/ctr_core_console.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,37 +30,12 @@ extern "C" {
  */
 int ctr_console_initialize(const ctr_screen *screen);
 
-typedef struct
-{
-	unsigned int width;
-	unsigned int height;
-
-	unsigned int font_pt;
-
-	uint32_t fg;
-	uint32_t bg;
-
-	uint32_t default_fg;
-	uint32_t default_bg;
-
-	uint16_t xpos;
-	uint16_t ypos;
-
-	uint16_t saved_xpos;
-	uint16_t saved_ypos;
-
-	bool negative;
-
-	ctr_screen screen;
-
-	size_t buffer_ptr; //Points to the character where the cursor is at
-	ctr_circular_buffer buffer;
-
-} ctr_console;
+typedef ctr_core_console ctr_console;
 
 void ctr_console_draw(char c);
 short ctr_console_get_char_width(char c);
 unsigned int ctr_console_get_char_height(void);
+void ctr_console_clear(void);
 
 #ifdef __cplusplus
 }

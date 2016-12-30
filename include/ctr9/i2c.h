@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ctr_core/ctr_core_i2c.h>
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>

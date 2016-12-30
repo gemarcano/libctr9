@@ -11,42 +11,17 @@
 
 bool ctr_hid_button_status(ctr_hid_button_type buttons)
 {
-	return (~(*CTR_HID_REG) & 0xFFF) == buttons;
+	return ctr_core_hid_button_status(buttons);
 }
 
 ctr_hid_button_type ctr_hid_get_buttons(void)
 {
-	return ~(*CTR_HID_REG) & 0xFFF;
+	return ctr_core_hid_get_buttons();
 }
 
 //This was taken and adapted from b1l1s's hid.c
 void ctr_input_wait(void)
 {
-	uint32_t prev = *CTR_HID_REG;
-	uint32_t key;
-	do
-	{
-		// Wait for state change
-		while((key = *CTR_HID_REG) == prev);
-
-		// Ignore key releases
-		if(key > prev)
-		{
-			prev = key;
-			continue;
-		}
-
-		// Simple debounce
-		uint32_t deb = 0x7FFF;
-		while(--deb)
-		{
-			if(key != *CTR_HID_REG)
-			{
-				// State changed, redo
-				key = prev;
-				break;
-			}
-		}
-	} while(key == prev);
+	ctr_core_input_wait();
 }
 

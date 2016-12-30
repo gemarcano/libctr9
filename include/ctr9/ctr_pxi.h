@@ -11,6 +11,8 @@
 #ifndef CTR_PXI_H_
 #define CTR_PXI_H_
 
+#include <ctr_core/ctr_core_pxi.h>
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -19,10 +21,10 @@ extern "C" {
 #endif
 
 //PXI registers
-#define PXI_SYNC9 (*(uint32_t*)0x10008000)
-#define PXI_CNT9 (*(uint32_t*)0x10008004)
-#define PXI_SEND9 (*(uint32_t*)0x10008008)
-#define PXI_RECV9 (*(uint32_t*)0x1000800C)
+#define PXI_SYNC11 (*(uint32_t*)0x10163000)
+#define PXI_CNT11 (*(uint32_t*)0x10163004)
+#define PXI_SEND11 (*(uint32_t*)0x10163008)
+#define PXI_RECV11 (*(uint32_t*)0x1016300C)
 
 /**	@brief Checks if the send PXI queue is empty.
  *

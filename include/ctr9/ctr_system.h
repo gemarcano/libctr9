@@ -11,6 +11,8 @@
 #ifndef CTR_SYSTEM_H_
 #define CTR_SYSTEM_H_
 
+#include <ctr_core/ctr_core_system.h>
+
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -19,11 +21,7 @@ extern "C" {
 
 /** @brief Enumeration describing the running system.
  */
-typedef enum
-{
-    SYSTEM_O3DS,
-    SYSTEM_N3DS,
-} ctr_system_type;
+typedef ctr_core_system_type ctr_system_type;
 
 /**	@brief Returns whether the arm9 entry was a9lh or not.
  *

@@ -11,6 +11,8 @@
 #ifndef CTR_SCREEN_H_
 #define CTR_SCREEN_H_
 
+#include <ctr_core/ctr_core_screen.h>
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -20,13 +22,7 @@ extern "C" {
 
 /**	@brief Enum describing screen configurations.
  */
-typedef enum
-{
-	CTR_SCREEN_NONE = 0,
-	CTR_SCREEN_TOP = 1,
-	CTR_SCREEN_BOTTOM = 2,
-	CTR_SCREEN_BOTH = 3
-} ctr_screen_enum;
+typedef ctr_core_screen_enum ctr_screen_enum;
 
 /**	@brief Enables the backlight for the screens specified.
  *
@@ -47,36 +43,19 @@ void ctr_screen_disable_backlight(ctr_screen_enum aScreens);
 /**	@brief Represents the different framebuffer formats supported by the 3DS
  *		GPU.
  */
-typedef enum
-{
-	CTR_GFX_PIXEL_RGBA8,
-	CTR_GFX_PIXEL_RGB8,
-	CTR_GFX_PIXEL_RGB565,
-	CTR_GFX_PIXEL_A1_RGB5,
-	CTR_GFX_PIXEL_RGBA4
-} ctr_screen_pixel;
+typedef ctr_core_screen_pixel ctr_screen_pixel;
 
 /**	@brief Represents a single 3DS screen.
  */
-typedef struct
-{
-	uint8_t *framebuffer;
-	size_t width;
-	size_t height;
-	size_t pixel_size;
-	ctr_screen_pixel format;
-} ctr_screen;
+typedef ctr_core_screen ctr_screen;
 
 //FIXME currently bitmaps must start at the beginning of a byte
 /**	@brief Represents a single bitmap entity.
  */
-typedef struct
-{
-	size_t width, height;
-	void *data;
-} ctr_screen_bitmap;
+typedef ctr_core_screen_bitmap ctr_screen_bitmap;
 
-extern ctr_screen ctr_screen_top, ctr_screen_bottom;
+//These are defined and declared in libctr_core
+//extern ctr_screen ctr_screen_top, ctr_screen_bottom;
 
 /**	@brief Initializes the given screen.
  *
@@ -142,13 +121,19 @@ void ctr_screen_set_pixel(ctr_screen *screen, size_t x, size_t y, uint32_t pixel
  */
 void ctr_screen_draw_bitmap(ctr_screen *screen, size_t x, size_t y, uint32_t pixel, ctr_screen_bitmap *bitmap);
 
+/**	@brief Clears the screen with the given pixel.
+ *
+ *	@paran[in] screen Screen to clear.
+ *	@param[in] pixel Pixel to clear screen with.
+ *
+ *	@post Screen is cleared with the given pixel.
+ */
+void ctr_screen_clear(ctr_screen *screen, uint32_t pixel);
+
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif//CTR_SCREEN_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 

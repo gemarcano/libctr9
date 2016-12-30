@@ -11,6 +11,8 @@
 #ifndef CTR_FIRM_H_
 #define CTR_FIRM_H_
 
+#include <ctr_core/ctr_core_firm.h>
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -20,41 +22,15 @@ extern "C" {
 /**	@brief Represents the information found in the firm header describing
  *		section information.
  */
-typedef struct
-{
-	uint32_t offset;
-	uint32_t load_address;
-	uint32_t size;
-	uint32_t type;
-	uint8_t sha256hash[0x20];
-} ctr_firm_section_header;
+typedef ctr_core_firm_section_header ctr_firm_section_header;
 
 /**	@brief Represents the information found in the firm header.
  */
-typedef struct
-{
-	uint32_t magic;
-	uint8_t reserved1[4];
-	uint32_t arm11_entry;
-	uint32_t arm9_entry;
-	uint8_t reserved2[0x30];
-	ctr_firm_section_header section_headers[4];
-	uint8_t rsa2048signature[0x100]; //signature of header's hash
-} ctr_firm_header;
+typedef ctr_core_firm_header ctr_firm_header;
 
 /**	@brief Represents the information found in the arm9bin header.
  */
-typedef struct
-{
-	uint8_t enc_keyx[16];
-	uint8_t keyy[16];
-	uint8_t ctr[16];
-	uint8_t ascii_size[8];
-	uint8_t unknown[8]; //FIXME
-	uint8_t control_block[16];
-	uint8_t hardware_debug[16]; //9.5+
-	uint8_t enc_key16x[16]; //9.5+
-} ctr_arm9bin_header;
+typedef ctr_core_arm9bin_header ctr_arm9bin_header;
 
 /**	@brief Loads the given firm section header structure with the values found
  *		in memory.

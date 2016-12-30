@@ -12,6 +12,8 @@
 #define CTR_FREETYPE_H_
 
 #include <ctr9/ctr_screen.h>
+#include <ctr_core/ctr_core_freetype.h>
+
 #include <stdint.h>
 
 #include <ft2build.h>

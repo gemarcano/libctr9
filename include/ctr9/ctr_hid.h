@@ -11,6 +11,8 @@
 #ifndef CTR_HID_H_
 #define CTR_HID_H_
 
+#include <ctr_core/ctr_core_hid.h>
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -19,25 +21,25 @@ extern "C" {
 #endif
 
 //Button type
-typedef uint32_t ctr_hid_button_type;
+typedef ctr_core_hid_button_type ctr_hid_button_type;
 
 //HID Register
-#define CTR_HID_REG     ((volatile ctr_hid_button_type*)0x10146000)
+#define CTR_HID_REG     CTR_CORE_HID_REG
 
 //Button definitions
-#define CTR_HID_NONE     0x000u
-#define CTR_HID_A       0x001u
-#define CTR_HID_B       0x002u
-#define CTR_HID_SELECT  0x004u
-#define CTR_HID_START   0x008u
-#define CTR_HID_RIGHT   0x010u
-#define CTR_HID_LEFT    0x020u
-#define CTR_HID_UP      0x040u
-#define CTR_HID_DOWN    0x080u
-#define CTR_HID_RT      0x100u
-#define CTR_HID_LT      0x200u
-#define CTR_HID_X       0x400u
-#define CTR_HID_Y       0x800u
+#define CTR_HID_NONE    CTR_CORE_HID_NONE
+#define CTR_HID_A       CTR_CORE_HID_A
+#define CTR_HID_B       CTR_CORE_HID_B
+#define CTR_HID_SELECT  CTR_CORE_HID_SELECT
+#define CTR_HID_START   CTR_CORE_HID_START
+#define CTR_HID_RIGHT   CTR_CORE_HID_RIGHT
+#define CTR_HID_LEFT    CTR_CORE_HID_LEFT
+#define CTR_HID_UP      CTR_CORE_HID_UP
+#define CTR_HID_DOWN    CTR_CORE_HID_DOWN
+#define CTR_HID_RT      CTR_CORE_HID_RT
+#define CTR_HID_LT      CTR_CORE_HID_LT
+#define CTR_HID_X       CTR_CORE_HID_X
+#define CTR_HID_Y       CTR_CORE_HID_Y
 
 /**	@brief Returns whether the given button combination is pressed or not.
  *
