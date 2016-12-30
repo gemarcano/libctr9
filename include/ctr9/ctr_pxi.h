@@ -21,10 +21,16 @@ extern "C" {
 #endif
 
 //PXI registers
-#define PXI_SYNC11 (*(uint32_t*)0x10163000)
-#define PXI_CNT11 (*(uint32_t*)0x10163004)
-#define PXI_SEND11 (*(uint32_t*)0x10163008)
-#define PXI_RECV11 (*(uint32_t*)0x1016300C)
+#define PXI_SYNC9 PXI_SYNC((volatile uint32_t*)0x10008000)
+#define PXI_CNT9 PXI_CNT((volatile uint32_t*)0x10008000)
+#define PXI_SEND9 PXI_SEND((volatile uint32_t*)0x10008000)
+#define PXI_RECV9 PXI_RECV((volatile uint32_t*)0x10008000)
+
+/**	@brief Initializes the PXI plumbing for libctr9.
+ *
+ *	Make sure to call this before using any other libctr9 PXI function.
+ */
+void ctr_pxi_initialize(void);
 
 /**	@brief Checks if the send PXI queue is empty.
  *
