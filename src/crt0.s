@@ -146,28 +146,22 @@ _start:
 	blx r0
 
 	@ Restore argc and argv
-	mov r2, r0
-	mov r3, r0
 	adr r0, argc_offset
 	ldr r1, [r0]
 	add r0, r1
-	ldr r2, [r0]
+	ldr r0, [r0]
 
-	adr r0, argv_offset
-	ldr r1, [r0]
-	add r0, r1
-	ldr r3, [r0]
-
-	mov r0, r2
-	mov r1, r3
+	adr r1, argv_offset
+	ldr r2, [r1]
+	add r1, r2
+	ldr r1, [r1]
 
 	@ Launch main(argc, argv)
 
 	adr r2, main_offset
 	ldr r3, [r2]
-	add r2, r3, r2
+	add r2, r3
 	blx r2
-	bx lr
 
 	@if we do return, make sure to call exit functions.
 	adr r1, exit_offset
