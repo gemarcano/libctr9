@@ -71,7 +71,7 @@ static void inittarget(struct mmcdevice *ctx)
 }
 
 //
-//cmd: 0xFFFF -- command. 1 << 16 getSDRESP, 1 << 17 readdata. 1 << 18 writedata. 
+//cmd: 0xFFFF -- command. 1 << 16 getSDRESP, 1 << 17 readdata. 1 << 18 writedata.
 static void NO_INLINE sdmmc_send_command(struct mmcdevice *ctx, uint32_t cmd, uint32_t args)
 {
 	//cmd & 0xFFFF is the actual command. Anything beyond is Normmatt's extra data
@@ -507,6 +507,24 @@ int SD_Init()
 	sdmmc_send_command(&handelSD,0x10410,0x200);
 	if((handelSD.error & 0x4)) return -8;
 	handelSD.clk |= 0x200;
+
+	return 0;
+}
+
+int sdmmc_get_csd(bool isNand, uint32_t *info)
+{
+	struct mmcdevice *device;
+	if(isNand)
+		device = &handelNAND;
+	else
+		device = &handelSD;
+
+	inittarget(device);
+	sdmmc_send_command(device,0x10507,0);
+	sdmmc_send_command(device,0x10609,device->initarg << 0x10);
+	if((device->error & 0x4)) return -3;
+	memcpy(info, device->ret, 16);
+	sdmmc_send_command(device,0x10507,device->initarg << 0x10);
 
 	return 0;
 }

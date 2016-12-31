@@ -107,6 +107,7 @@ extern "C" {
 	int sdmmc_nand_writesectors(uint32_t sector_no, uint32_t numsectors, const uint8_t *in);
 
 	int sdmmc_get_cid(bool isNand, uint32_t *info);
+	int sdmmc_get_csd(bool isNand, uint32_t *info);
 
 	mmcdevice *getMMCDevice(int drive);
 
