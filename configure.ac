@@ -19,10 +19,6 @@ AC_MSG_ERROR(
  that the right -I flag is set.])
 fi
 
-AC_CHECK_HEADERS([ctr/draw.h ctr/console.h], ,[AC_MSG_ERROR(
-[unable to find a ctr header, make sure ctr is installed and\
- that the right -I flag is set.] )])
-
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile examples/Makefile])
 
 AC_OUTPUT
