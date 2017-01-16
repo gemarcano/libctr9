@@ -46,6 +46,8 @@ int ctr_load_segment(const Elf32_Phdr *header, FILE *file)
 	{
 		case PT_LOAD:
 			break;
+		case PT_ARM_EXIDX:
+			return 0; //Ignore this segment
 		default:
 			return 1;
 	}
