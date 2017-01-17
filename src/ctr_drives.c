@@ -150,7 +150,7 @@ static int ctr_drives_open_r(const char *drive, struct _reent *r, void *fileStru
 	return (int)file_ex;
 }
 
-static int ctr_drives_close_r(struct _reent *r, int fd)
+static int ctr_drives_close_r(struct _reent *r, void *fd)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	int err = f_close_(&file_ex->file);
@@ -158,7 +158,7 @@ static int ctr_drives_close_r(struct _reent *r, int fd)
 	return process_error(r, err);
 }
 
-static ssize_t ctr_drives_write_r(const char *drive, struct _reent *r, int fd, const char *ptr, size_t len)
+static ssize_t ctr_drives_write_r(const char *drive, struct _reent *r, void *fd, const char *ptr, size_t len)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	UINT wb;
@@ -171,7 +171,7 @@ static ssize_t ctr_drives_write_r(const char *drive, struct _reent *r, int fd, c
 	return (ssize_t)wb;
 }
 
-static ssize_t ctr_drives_read_r(const char *drive, struct _reent *r, int fd, char *ptr, size_t len)
+static ssize_t ctr_drives_read_r(const char *drive, struct _reent *r, void *fd, char *ptr, size_t len)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	UINT rb;
@@ -183,7 +183,7 @@ static ssize_t ctr_drives_read_r(const char *drive, struct _reent *r, int fd, ch
 	return (ssize_t)rb;
 }
 
-static off_t ctr_drives_seek_r(struct _reent *r, int fd, off_t pos, int dir)
+static off_t ctr_drives_seek_r(struct _reent *r, void *fd, off_t pos, int dir)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	size_t offset = 0;
@@ -212,7 +212,7 @@ static off_t ctr_drives_seek_r(struct _reent *r, int fd, off_t pos, int dir)
 }
 
 static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st);
-static int ctr_drives_fstat_r(struct _reent *r, int fd, struct stat *st)
+static int ctr_drives_fstat_r(struct _reent *r, void *fd, struct stat *st)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	return ctr_drives_stat_r(file_ex->drive, r, file_ex->filename, st);
@@ -393,7 +393,7 @@ static int ctr_drives_statvfs_r(const char *drive, struct _reent *r, const char 
 	return 0;
 }
 
-static int ctr_drives_ftruncate_r(struct _reent *r, int fd, off_t len)
+static int ctr_drives_ftruncate_r(struct _reent *r, void *fd, off_t len)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	int err = f_truncate_(&file_ex->file);
@@ -401,7 +401,7 @@ static int ctr_drives_ftruncate_r(struct _reent *r, int fd, off_t len)
 	return process_error(r, err);
 }
 
-static int ctr_drives_fsync_r(struct _reent *r, int fd)
+static int ctr_drives_fsync_r(struct _reent *r, void *fd)
 {
 	FIL_extension *file_ex = (FIL_extension*)fd;
 	int err = f_sync_(&file_ex->file);
@@ -417,8 +417,8 @@ static int ctr_drives_rmdir_r(struct _reent *r, const char *name)
 
 #define PREPARE_DOTAB(DEV) \
 static int DEV##_drives_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode);\
-static ssize_t DEV##_drives_write_r(struct _reent *r, int fd, const char *ptr, size_t len);\
-static ssize_t DEV##_drives_read_r(struct _reent *r, int fd, char *ptr, size_t len);\
+static ssize_t DEV##_drives_write_r(struct _reent *r, void *fd, const char *ptr, size_t len);\
+static ssize_t DEV##_drives_read_r(struct _reent *r, void *fd, char *ptr, size_t len);\
 static int DEV##_drives_stat_r(struct _reent *r, const char *file, struct stat *st);\
 static int DEV##_drives_unlink_r(struct _reent *r, const char *name);\
 static int DEV##_drives_chdir_r(struct _reent *r, const char *name);\
@@ -461,12 +461,12 @@ static int DEV##_drives_open_r(struct _reent *r, void *fileStruct, const char *p
 	return ctr_drives_open_r(#DEV":", r, fileStruct, path, flags, mode);\
 }\
 \
-static ssize_t DEV##_drives_write_r(struct _reent *r, int fd, const char *ptr, size_t len)\
+static ssize_t DEV##_drives_write_r(struct _reent *r, void *fd, const char *ptr, size_t len)\
 {\
 	return ctr_drives_write_r(#DEV":", r, fd, ptr, len);\
 }\
 \
-static ssize_t DEV##_drives_read_r(struct _reent *r, int fd, char *ptr, size_t len)\
+static ssize_t DEV##_drives_read_r(struct _reent *r, void *fd, char *ptr, size_t len)\
 {\
 	return ctr_drives_read_r(#DEV":", r, fd, ptr, len);\
 }\

@@ -43,17 +43,16 @@ void ctr_file_interface_destroy(ctr_file_interface *io)
 static int set_position(FILE *file, uint64_t position)
 {
 	if (fseek(file, 0, SEEK_SET)) return -1;
-	while (position > LONG_MAX)
+	while (position > INT_MAX)
 	{
-		long pos = LONG_MAX;
+		int pos = INT_MAX;
 		if (fseek(file, pos, SEEK_CUR)) return -1;
-		position -= LONG_MAX;
+		position -= INT_MAX;
 	}
 
-	if (fseek(file, position, SEEK_CUR)) return -1;
+	if (fseek(file, (int)position, SEEK_CUR)) return -1;
 	return 0;
 }
-
 
 int ctr_file_interface_read(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count)
 {

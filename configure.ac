@@ -19,7 +19,6 @@ AC_MSG_ERROR(
  that the right -I flag is set.])
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile examples/Makefile])
-
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile examples/Makefile libctr9.pc])
 AC_OUTPUT
 

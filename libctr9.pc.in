@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Description: Baremetal ARM9 library for the Nintendo 3DS
+URL: https://github.com/gemarcano/@PACKAGE_NAME@
+Version: @VERSION@
+Requires.private: ctr_core
+Libs: -L$(libdir) -lctr9
+Cflags: -I(includedir)
+

@@ -1,29 +1,30 @@
 include $(top_srcdir)/common.mk
 
-lib_LIBRARIES = libctr9.a
-libctr9_a_CCASFLAGS = -I$(top_srcdir)/data
-libctr9_a_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
+noinst_LTLIBRARIES = libctr9_arm.la
+libctr9_arm_la_SOURCES = ctr_interrupt.c ctr_irq.c
+libctr9_arm_la_CFLAGS = $(AM_CFLAGS) -marm
+
+lib_LTLIBRARIES = libctr9.la
+libctr9_la_CCASFLAGS = -I$(top_srcdir)/data
+libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
 	ctr_io_interface.c ctr_nand_interface.c sdmmc/delay.s sdmmc/sdmmc.c i2c.c \
 	ctr_rtc.c fatfs/diskio.c fatfs/ff.c fatfs/option/unicode.c ctr_system.c \
-	fatfs/ctr_fatfs_disk.c ctr_disks.c \
-	fatfs/ctr_fatfs_disk.c ctr_fatfs.c ctr_interrupt.c \
+	fatfs/ctr_fatfs_disk.c ctr_disks.c ctr_fatfs.c \
 	ctr_interrupt_asm.s ctr_screen.c ctr_hid.c ctr_pxi.c gamecart/command_ctr.c \
 	gamecart/command_ntr.c  gamecart/protocol.c  gamecart/protocol_ctr.c  \
 	gamecart/protocol_ntr.c ctr_cart_interface.c gamecart/delay.s ctr_headers.c \
-	ctr_timer.c ctr_irq.c ctr_system_clock.c ctr_cache.s \
+	ctr_timer.c ctr_system_clock.c ctr_cache.s \
 	ctr_crypto_interface.c ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
 	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
 	ctr_elf_loader.c
-
-
-ctr_interrupt.o : AM_CFLAGS += -marm #Force ARM mode for ctr_interrupt
-ctr_irq.o : AM_CFLAGS += -marm #Force ARM mode for ctr_system_ARM
+libctr9_la_LIBADD = libctr9_arm.la -lctr_core
+libctr9_la_LDFLAGS = $(AM_LDFLAGS) -static
 
 libctr9dir = $(pkgdatadir)
 libctr9_DATA=linker.ld
 
-EXTRA_libctr9_a_SOURCES = fatfs/option/cc932.c fatfs/option/cc936.c \
+EXTRA_libctr9_la_SOURCES = fatfs/option/cc932.c fatfs/option/cc936.c \
 	fatfs/option/cc949.c fatfs/option/cc950.c fatfs/option/ccsbcs.c \
 	fatfs/option/syscall.c fatfs/option/unicode.c
 
