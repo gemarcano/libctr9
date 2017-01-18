@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+__attribute__((noinline))
 void ctr_irq_master_disable(void)
 {
 	asm volatile(
@@ -22,6 +23,7 @@ void ctr_irq_master_disable(void)
 	);
 }
 
+__attribute__((noinline))
 void ctr_irq_master_enable(void)
 {
 	asm volatile (
@@ -36,6 +38,7 @@ void ctr_irq_master_enable(void)
 static uint32_t critical_count = 0;
 static uint32_t saved_status = 0;
 
+__attribute__((noinline))
 void ctr_irq_critical_enter(void)
 {
 	uint32_t status = 0;
@@ -55,6 +58,7 @@ void ctr_irq_critical_enter(void)
 	}
 }
 
+__attribute__((noinline))
 void ctr_irq_critical_exit(void)
 {
 	if (!--critical_count)

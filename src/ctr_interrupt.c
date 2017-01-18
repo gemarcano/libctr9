@@ -47,6 +47,7 @@ void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler 
 	}
 }
 
+__attribute__((noinline))
 void ctr_interrupt_prepare(void)
 {
 	//Secondary handler. Read payload address from next word

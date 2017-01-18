@@ -2,7 +2,7 @@ include $(top_srcdir)/common.mk
 
 noinst_LTLIBRARIES = libctr9_arm.la
 libctr9_arm_la_SOURCES = ctr_interrupt.c ctr_irq.c
-libctr9_arm_la_CFLAGS = $(AM_CFLAGS) -marm
+libctr9_arm_la_CFLAGS = $(ARM_ONLY) -marm
 
 lib_LTLIBRARIES = libctr9.la
 libctr9_la_CCASFLAGS = -I$(top_srcdir)/data
@@ -18,7 +18,7 @@ libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c 
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
 	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
 	ctr_elf_loader.c
-libctr9_la_LIBADD = libctr9_arm.la -lctr_core
+libctr9_la_LIBADD = libctr9_arm.la -lctr_core -lctrelf -lfreetype
 libctr9_la_LDFLAGS = $(AM_LDFLAGS) -static
 
 libctr9dir = $(pkgdatadir)
