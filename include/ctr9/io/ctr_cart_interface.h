@@ -117,9 +117,9 @@ int ctr_cart_interface_noop_write(void *io, const void* buffer, size_t buffer_si
  */
 int ctr_cart_interface_noop_write_sector(void *io, const void* buffer, size_t buffer_size, size_t sector);
 
-/**	@brief Returns the size of the underlying disk for the given io interface. 
- * 
- *	@returns The size of the 3DS ROM as reported by it. 
+/**	@brief Returns the size of the underlying disk for the given io interface.
+ *
+ *	@returns The size of the 3DS ROM as reported by it.
  */
 uint64_t ctr_cart_interface_disk_size(void *io);
 
