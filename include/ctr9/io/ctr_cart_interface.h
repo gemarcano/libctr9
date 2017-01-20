@@ -56,7 +56,7 @@ bool ctr_cart_inserted(void);
  *
  *	3DS carts define their own sector size. They refer to these as the unit
  *	media size. Most, if not all carts seem to use 512 bytes.
- *	
+ *
  *	This implementation automatically returns the NCCH header when reading carts
  *	at 0x1000, and from 0x1200 to 0x2000 it returns 0xFF bytes.
  *

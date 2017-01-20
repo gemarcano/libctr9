@@ -66,7 +66,7 @@ static bool twl_test3(void *ctx)
 			test1 = written == 1;
 			fclose(file2);
 		}
-		
+
 	}
 
 	return test1;

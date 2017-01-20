@@ -72,13 +72,6 @@ uint8_t otp_sha[32];
 #include <errno.h>
 #include <ctr9/io/ctr_drives.h>
 
-typedef struct draw_s
-{
-	void* top_left;
-	void* top_right;
-	void* sub;
-} draw_s;
-
 inline static void vol_memcpy(volatile void *dest, volatile void *sorc, size_t size)
 {
 	volatile uint8_t *dst = dest;
@@ -97,10 +90,6 @@ int main(int argc, char *argv[])
 
 	ctr_freetype_initialize();
 
-	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
-	ctr_screen top_screen, bottom_screen;
-	ctr_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
-	ctr_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
 
 	printf("UNIT TESTING\n");
 
@@ -315,15 +304,15 @@ int main(int argc, char *argv[])
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
-	ctr_screen_set_pixel(&top_screen, 0 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 2 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 4 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 0 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 0 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 2 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 4 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 2 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 4 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 0 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 2 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 4 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 0 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 0 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 2 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 4 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 2 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_top, 4 + 100, 4, 0xFF00FFu);
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -341,25 +330,25 @@ int main(int argc, char *argv[])
 	}
 
 
-	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 0 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 2 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 4 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 0 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 0 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 2 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 4 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 2 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(ctr_screen_bottom, 4 + 100, 4, 0xFF00FFu);
 
 
 	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
 	ctr_screen_bitmap bitmap = { 20, 4, bitmap_data };
-	ctr_screen_draw_bitmap(&top_screen, 0, 0, 0xFF00FF, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 20, 4, 0x00FFFF, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 40, 8, 0x0000FF, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 20, 14, 0x00FF00, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 0, 20, 0xFF0000, &bitmap);
-	ctr_screen_draw_bitmap(&bottom_screen, 200, 200, 0xFF0000, &bitmap);
+	ctr_screen_draw_bitmap(ctr_screen_top, 0, 0, 0xFF00FF, &bitmap);
+	ctr_screen_draw_bitmap(ctr_screen_top, 20, 4, 0x00FFFF, &bitmap);
+	ctr_screen_draw_bitmap(ctr_screen_top, 40, 8, 0x0000FF, &bitmap);
+	ctr_screen_draw_bitmap(ctr_screen_top, 20, 14, 0x00FF00, &bitmap);
+	ctr_screen_draw_bitmap(ctr_screen_top, 0, 20, 0xFF0000, &bitmap);
+	ctr_screen_draw_bitmap(ctr_screen_bottom, 200, 200, 0xFF0000, &bitmap);
 
 	printf("Testing aes\n");
 

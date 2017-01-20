@@ -28,7 +28,7 @@ int main()
 
 	//The IO subsystem implements polymorphism, so any io interface can be used
 	//as an input to the ctr_io_* functions.
-	
+
 	//Read the size of the buffer into the buffer we allocated earlier, starting
 	//from the beginning of NAND. Effectively, read the NCSD header.
 	ctr_io_read(&nand_io, buffer, sizeof(buffer), 0x0, sizeof(buffer));

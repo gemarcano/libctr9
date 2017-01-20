@@ -27,7 +27,7 @@ int main()
 	//To initialize io crypto layer objects, they require knowing which keyslot
 	//to use for en/decryption as well as which mode of operation. The layer
 	//used here tries to set up the keys for TWL and CTRNAND on its own.
-	
+
 	//For CTRNAND decryption, use keyslot 0x04, used for the o3DS, set the
 	//mode for CTR, and pass in the nand object as the object to wrap in the
 	//crypto layer.

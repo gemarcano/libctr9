@@ -57,17 +57,24 @@ typedef ctr_core_screen_bitmap ctr_screen_bitmap;
 //These are defined and declared in libctr_core
 //extern ctr_screen ctr_screen_top, ctr_screen_bottom;
 
-/**	@brief Initializes the given screen.
+/**	@brief Creates a screen object.
  *
- *	@param[out] screen Screen structure to initialize.
  *	@param[in] framebuffer Pointer to framebuffer in memory.
  *	@param[in] width Width of the framebuffer in pixels.
  *	@param[in] height Height of the framebuffer in pixels.
  *	@param[in] format Format of the pixels in the framebuffer.
  *
- *	@post The screen object has been initialized and is ready for use.
+ *	@returns The created screen object.
  */
-void ctr_screen_initialize(ctr_screen *screen, uint8_t *framebuffer, size_t width, size_t height, ctr_screen_pixel format);
+ctr_screen *ctr_screen_initialize(uint8_t *framebuffer, size_t width, size_t height, ctr_screen_pixel format);
+
+/**	@brief Destroys the given screen object.
+ *
+ *	@brief screen Screen object to destroy.
+ *
+ *	@post Screen object has been destroyed, releasing resources used by it.
+ */
+void ctr_screen_destroy(ctr_screen *screen);
 
 //FIXME these functions are bound to change. I can't say I'm happy about the API
 

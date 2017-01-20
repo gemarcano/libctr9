@@ -28,7 +28,7 @@ extern "C" {
  *		suceed. If it does not, this means that the underling libc and graphics
  *		handling for libctr9 is broken.
  */
-int ctr_console_initialize(const ctr_screen *screen);
+int ctr_console_initialize(ctr_screen *screen);
 
 typedef ctr_core_console ctr_console;
 

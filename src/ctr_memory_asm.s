@@ -29,7 +29,7 @@
 ctr_memory_get_itcm_register_:
 	mrc p15, 0, r0, c9, c1, 1
 	bx lr
-	
+
 ctr_memory_get_dtcm_register_:
 	mrc p15, 0, r0, c9, c1, 0
 	bx lr
@@ -37,7 +37,7 @@ ctr_memory_get_dtcm_register_:
 ctr_memory_set_itcm_register_:
 	mcr p15, 0, r0,  c9, c1, 1
 	bx lr
-	
+
 ctr_memory_set_dtcm_register_:
 	mcr p15, 0, r0,  c9, c1, 0
 	bx lr

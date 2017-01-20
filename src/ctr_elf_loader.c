@@ -121,7 +121,7 @@ bool ctr_check_elf(Elf32_Ehdr *header)
 
 	if (header->e_ehsize == 0)
 		return false;
-	
+
 	return true;
 }
 
