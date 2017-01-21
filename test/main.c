@@ -6,6 +6,7 @@
 #include <ctr9/ctr_system.h>
 #include <ctr9/ctr_interrupt.h>
 #include <ctr9/ctr_screen.h>
+#include <ctr9/ctr_surface.h>
 
 #include <ctr9/ctr_rtc.h>
 #include <ctr9/io/ctr_cart_interface.h>
@@ -304,15 +305,15 @@ int main(int argc, char *argv[])
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
-	ctr_screen_set_pixel(ctr_screen_top, 0 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 2 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 4 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 0 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 0 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 2 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 4 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 2 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_top, 4 + 100, 4, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 0 + 100, 0, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 2 + 100, 0, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 4 + 100, 0, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 0 + 100, 2, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 0 + 100, 4, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 2 + 100, 2, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 4 + 100, 2, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 2 + 100, 4, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_top, 4 + 100, 4, 0xFF00FFu);
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -330,25 +331,25 @@ int main(int argc, char *argv[])
 	}
 
 
-	ctr_screen_set_pixel(ctr_screen_bottom, 0 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 2 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 4 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 0 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 0 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 2 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 4 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 2 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(ctr_screen_bottom, 4 + 100, 4, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 0 + 100, 0, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 2 + 100, 0, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 4 + 100, 0, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 0 + 100, 2, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 0 + 100, 4, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 2 + 100, 2, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 4 + 100, 2, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 2 + 100, 4, 0xFF00FFu);
+	ctr_surface_set_pixel(ctr_screen_bottom, 4 + 100, 4, 0xFF00FFu);
 
 
 	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
-	ctr_screen_bitmap bitmap = { 20, 4, bitmap_data };
-	ctr_screen_draw_bitmap(ctr_screen_top, 0, 0, 0xFF00FF, &bitmap);
-	ctr_screen_draw_bitmap(ctr_screen_top, 20, 4, 0x00FFFF, &bitmap);
-	ctr_screen_draw_bitmap(ctr_screen_top, 40, 8, 0x0000FF, &bitmap);
-	ctr_screen_draw_bitmap(ctr_screen_top, 20, 14, 0x00FF00, &bitmap);
-	ctr_screen_draw_bitmap(ctr_screen_top, 0, 20, 0xFF0000, &bitmap);
-	ctr_screen_draw_bitmap(ctr_screen_bottom, 200, 200, 0xFF0000, &bitmap);
+	ctr_surface_bitmap bitmap = { 20, 4, bitmap_data };
+	ctr_surface_draw_bitmap(ctr_screen_top, 0, 0, 0xFF00FF, &bitmap);
+	ctr_surface_draw_bitmap(ctr_screen_top, 20, 4, 0x00FFFF, &bitmap);
+	ctr_surface_draw_bitmap(ctr_screen_top, 40, 8, 0x0000FF, &bitmap);
+	ctr_surface_draw_bitmap(ctr_screen_top, 20, 14, 0x00FF00, &bitmap);
+	ctr_surface_draw_bitmap(ctr_screen_top, 0, 20, 0xFF0000, &bitmap);
+	ctr_surface_draw_bitmap(ctr_screen_bottom, 200, 200, 0xFF0000, &bitmap);
 
 	printf("Testing aes\n");
 

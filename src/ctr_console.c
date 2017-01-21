@@ -16,7 +16,7 @@
 
 int ctr_console_initialize(ctr_screen *screen)
 {
-	return ctr_core_console_initialize(screen);
+	return ctr_core_console_initialize((ctr_core_surface*)screen);
 }
 
 short ctr_console_get_char_width(char c)

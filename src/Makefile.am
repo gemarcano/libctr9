@@ -17,7 +17,7 @@ libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c 
 	ctr_crypto_interface.c ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
 	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
-	ctr_elf_loader.c
+	ctr_elf_loader.c ctr_window.cpp ctr_surface.cpp
 libctr9_la_LIBADD = libctr9_arm.la -lctr_core -lctrelf -lfreetype
 libctr9_la_LDFLAGS = $(AM_LDFLAGS) -static
 
@@ -61,7 +61,9 @@ ctrinclude_HEADERS = $(includedirectory)/ctr9/aes.h \
 	$(includedirectory)/ctr9/ctr_firm.h \
 	$(includedirectory)/ctr9/ctr_freetype.h \
 	$(includedirectory)/ctr9/ctr_circular_buffer.h \
-	$(includedirectory)/ctr9/ctr_elf_loader.h
+	$(includedirectory)/ctr9/ctr_elf_loader.h \
+	$(includedirectory)/ctr9/ctr_window.h \
+	$(includedirectory)/ctr9/ctr_surface.h
 
 ctrgamecartinclude_HEADERS = $(includedirectory)/ctr9/gamecart/protocol.h \
 	$(includedirectory)/ctr9/gamecart/command_ctr.h \
