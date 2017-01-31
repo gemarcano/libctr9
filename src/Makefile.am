@@ -18,7 +18,7 @@ libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c 
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
 	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
 	ctr_elf_loader.c ctr_window.cpp ctr_surface.cpp
-libctr9_la_LIBADD = libctr9_arm.la -lctr_core -lctrelf -lfreetype
+libctr9_la_LIBADD = libctr9_arm.la -lctr_core -lctrelf
 libctr9_la_LDFLAGS = $(AM_LDFLAGS) -static
 
 libctr9dir = $(pkgdatadir)

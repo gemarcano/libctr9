@@ -14,7 +14,7 @@
 
 #include <ctr9/ctr_freetype.h>
 
-int ctr_console_initialize(ctr_screen *screen)
+int ctr_console_initialize(void *screen)
 {
 	return ctr_core_console_initialize((ctr_core_surface*)screen);
 }

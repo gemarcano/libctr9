@@ -119,7 +119,7 @@ void ctr_surface_draw_bitmap(void *surface, size_t x, size_t y, uint32_t pixel, 
 
 #include <ctr_core/ctr_core_surface.h>
 
-namespace ctr_core
+namespace ctr9
 {
 	template<class Pixel>
 	using surface = ctr_core::surface<Pixel>;

@@ -16,6 +16,7 @@
 #include <ctr9/ctr_cache.h>
 #include <ctr9/ctr_hid.h>
 #include <ctr9/io/ctr_console.h>
+#include <ctr9/ctr_window.h>
 
 #include <string.h>
 #include <stdbool.h>
@@ -85,6 +86,8 @@ int main(int argc, char *argv[])
 {
 	printf("argc: %i\n", argc);
 	printf("argv: %s\n", argv[0]);
+	ctr_window *window = ctr_window_initialize(ctr_screen_top, 10, 10, 200, 200);
+	ctr_console_initialize(window);
 	ctr_input_wait();
 	memset(otp_sha, 0, 0x20);
 	vol_memcpy(otp_sha, REG_SHAHASH, 0x20);
