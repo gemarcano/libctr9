@@ -33,7 +33,7 @@ static inline void process_aes_ctr_blocks(void *buffer, void *ctr, uint64_t bloc
 	ctr_decrypt(buffer, buffer, blocks, mode, ctr);
 }
 
-static inline void check_and_do_n3ds_init()
+static inline void check_and_do_n3ds_init(void)
 {
 	static bool setup = false;
 	if (!setup && ctr_detect_a9lh_entry() && ctr_get_system_type() == SYSTEM_N3DS)
@@ -42,7 +42,7 @@ static inline void check_and_do_n3ds_init()
 	}
 }
 
-static inline void check_and_do_twl_init()
+static inline void check_and_do_twl_init(void)
 {
 	static bool setup = false;
 	if (!setup && ctr_detect_a9lh_entry())

@@ -17,6 +17,9 @@
 
 #ifdef __cplusplus
 extern "C" {
+#define CTR_NORETURN [[noreturn]]
+#else
+#define CTR_NORETURN _Noreturn
 #endif
 
 /** @brief Enumeration describing the running system.
@@ -50,7 +53,7 @@ void ctr_twl_keyslot_setup(void);
  *
  *	@post 3DS has powered off.
  */
-void ctr_system_poweroff(void);
+CTR_NORETURN void ctr_system_poweroff(void);
 
 /**	@brief Resets the 3DS.
  *
@@ -58,7 +61,7 @@ void ctr_system_poweroff(void);
  *
  *	@post 3DS has restarted.
  */
-void ctr_system_reset(void);
+CTR_NORETURN void ctr_system_reset(void);
 
 /**	@brief Returns the enumeration corresponding to the running system.
  *

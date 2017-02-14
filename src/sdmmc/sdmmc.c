@@ -318,7 +318,7 @@ static uint32_t calcSDSize(uint8_t* csd, int type)
   return result;
 }
 
-void InitSD()
+void InitSD(void)
 {
 	//sdmmc_mask16(0x100,0x800,0);
 	//sdmmc_mask16(0x100,0x1000,0);
@@ -380,7 +380,7 @@ void InitSD()
 	*(volatile uint16_t*)0x10006008 = 0; //SDSTOP
 }
 
-int Nand_Init()
+int Nand_Init(void)
 {
 	//NAND
 	handelNAND.isSDHC = 0;
@@ -441,7 +441,7 @@ int Nand_Init()
 	return 0;
 }
 
-int SD_Init()
+int SD_Init(void)
 {
 	//SD
 	handelSD.isSDHC = 0;
@@ -566,7 +566,7 @@ int sdmmc_get_cid(bool isNand, uint32_t *info)
 	return 0;
 }
 
-int sdmmc_sdcard_init()
+int sdmmc_sdcard_init(void)
 {
 	InitSD();
 	int nand_res = Nand_Init();

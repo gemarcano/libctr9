@@ -18,7 +18,7 @@ bool ctr_pxi_send_full_status(void)
 	return ctr_core_pxi_send_full_status();
 }
 
-bool ctr_pxi_get_send_empty_irq()
+bool ctr_pxi_get_send_empty_irq(void)
 {
 	return ctr_core_pxi_get_send_empty_irq();
 }

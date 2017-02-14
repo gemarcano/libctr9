@@ -1,7 +1,5 @@
 #include <ctr9/ctr_screen.h>
 #include <ctr_core/ctr_core_screen.h>
-#include <ctr9/i2c.h>
-#include <climits>
 
 void ctr_screen_enable_backlight(ctr_screen_enum aScreens)
 {

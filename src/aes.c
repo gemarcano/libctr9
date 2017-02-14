@@ -266,23 +266,23 @@ uint32_t read_aesrdfifo(void)
     return *REG_AESRDFIFO;
 }
 
-uint32_t aes_getwritecount()
+uint32_t aes_getwritecount(void)
 {
     return *REG_AESCNT & 0x1F;
 }
 
-uint32_t aes_getreadcount()
+uint32_t aes_getreadcount(void)
 {
     return (*REG_AESCNT >> 5) & 0x1F;
 }
 
-uint32_t aescnt_checkwrite()
+uint32_t aescnt_checkwrite(void)
 {
     size_t ret = aes_getwritecount();
     return (ret > 0xF);
 }
 
-uint32_t aescnt_checkread()
+uint32_t aescnt_checkread(void)
 {
     size_t ret = aes_getreadcount();
     return (ret <= 3);

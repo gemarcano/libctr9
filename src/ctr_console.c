@@ -13,10 +13,13 @@
 //FIXME Freetype interactions are wonky. I'm not handling the cases where metrics can be negative due to changes in text orientation
 
 #include <ctr9/ctr_freetype.h>
+#include <ctr9/ctr_cache.h>
+
+static void null_func(void){}
 
 int ctr_console_initialize(void *screen)
 {
-	return ctr_core_console_initialize((ctr_core_surface*)screen);
+	return ctr_core_console_initialize((ctr_core_surface*)screen, null_func);
 }
 
 short ctr_console_get_char_width(char c)
