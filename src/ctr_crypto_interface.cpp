@@ -16,18 +16,6 @@
 
 #include <stdalign.h>
 
-//FIXME these are unique per instance... or are they?
-
-static const ctr_io_interface crypto_base =
-{
-	ctr_crypto_interface_read,
-	ctr_crypto_interface_write,
-	ctr_crypto_interface_read_sector,
-	ctr_crypto_interface_write_sector,
-	ctr_crypto_interface_disk_size,
-	ctr_crypto_interface_sector_size
-};
-
 static inline size_t get_chunk(uint64_t position, size_t chunk_size);
 static inline size_t get_chunk_following(uint64_t position, size_t chunk_size);
 static inline uint64_t get_chunk_position(size_t chunk, size_t chunk_size);

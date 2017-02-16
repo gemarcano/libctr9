@@ -30,7 +30,6 @@ typedef struct
 	size_t sector_offset;	//Offset to the desired fatfs partition start
 	size_t sectors;			//Disk size in sectors
 	DSTATUS status;			//Status of disk
-
 } ctr_fatfs_disk;
 
 /**	@brief Convenience function to initialize the fatfs system with the io

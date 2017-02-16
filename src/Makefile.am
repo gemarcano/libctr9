@@ -6,15 +6,15 @@ libctr9_arm_la_CFLAGS = $(ARM_ONLY) -marm
 
 lib_LTLIBRARIES = libctr9.la
 libctr9_la_CCASFLAGS = -I$(top_srcdir)/data
-libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.c ctr_sd_interface.c sha.c \
-	ctr_io_interface.c ctr_nand_interface.c sdmmc/delay.s sdmmc/sdmmc.c i2c.c \
+libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.cpp ctr_sd_interface.cpp sha.c \
+	ctr_io_interface.cpp ctr_nand_interface.cpp sdmmc/delay.s sdmmc/sdmmc.c i2c.c \
 	ctr_rtc.c fatfs/diskio.c fatfs/ff.c fatfs/option/unicode.c ctr_system.c \
 	fatfs/ctr_fatfs_disk.c ctr_disks.c ctr_fatfs.c \
 	ctr_interrupt_asm.s ctr_screen.cpp ctr_hid.c ctr_pxi.c gamecart/command_ctr.c \
 	gamecart/command_ntr.c  gamecart/protocol.c  gamecart/protocol_ctr.c  \
 	gamecart/protocol_ntr.c ctr_cart_interface.c gamecart/delay.s ctr_headers.c \
 	ctr_timer.c ctr_system_clock.c ctr_cache.s \
-	ctr_crypto_interface.c ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
+	ctr_crypto_interface.cpp ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
 	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
 	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
 	ctr_elf_loader.c ctr_window.cpp ctr_surface.cpp
@@ -76,12 +76,12 @@ ctrioinclude_HEADERS = \
 	$(includedirectory)/ctr9/io/ctr_nand_crypto_interface.h \
 	$(includedirectory)/ctr9/io/ctr_nand_interface.h \
 	$(includedirectory)/ctr9/io/ctr_sd_interface.h \
-	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.h \
-	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.c \
+	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.hpp \
+	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.ipp \
 	$(includedirectory)/ctr9/io/ctr_disks.h \
 	$(includedirectory)/ctr9/io/ctr_cart_interface.h \
-	$(includedirectory)/ctr9/io/ctr_io_implementation.h \
-	$(includedirectory)/ctr9/io/ctr_io_implementation.c \
+	$(includedirectory)/ctr9/io/ctr_io_implementation.hpp \
+	$(includedirectory)/ctr9/io/ctr_io_implementation.ipp \
 	$(includedirectory)/ctr9/io/ctr_crypto_interface.h \
 	$(includedirectory)/ctr9/io/ctr_memory_interface.h \
 	$(includedirectory)/ctr9/io/ctr_drives.h \

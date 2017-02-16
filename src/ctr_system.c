@@ -94,13 +94,11 @@ static inline void load_key_from_sha(uint8_t key)
 
 static inline void load_key_from_secret_sector(uint8_t index, uint8_t keyslot)
 {
-	ctr_nand_interface io;
-	ctr_nand_interface_initialize(&io);
-	ctr_crypto_interface cr;
+	ctr_nand_interface *io = ctr_nand_interface_initialize();
 	uint8_t ctr[16];
-	ctr_crypto_interface_initialize(&cr, 0x11, AES_CNT_ECB_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, ctr, &io.base);
+	ctr_crypto_interface *cr = ctr_crypto_interface_initialize(0x11, AES_CNT_ECB_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, ctr, io);
 	uint8_t key[16];
-	ctr_io_read(&cr, key, sizeof(key), 0x96 * 512 + (uint64_t)index * 16, 16);
+	ctr_io_read(cr, key, sizeof(key), 0x96 * 512 + (uint64_t)index * 16, 16);
 
 	//get first key in secret sector (FIXME do we always want this to happen??? even for 9.5+?)
 	setup_aeskey(keyslot, key);
@@ -124,12 +122,10 @@ static inline void load_key15(const ctr_arm9bin_header *a9_header)
 	uint8_t key15x[16];
 	uint8_t ctr[16];
 	memcpy(key15x_enc, a9_header->enc_keyx, sizeof(key15x_enc));
-	ctr_memory_interface mem_io;
-	ctr_memory_interface_initialize(&mem_io, key15x_enc, sizeof(key15x));
-	ctr_crypto_interface ecb_io;
-	ctr_crypto_interface_initialize(&ecb_io, 0x11, AES_CNT_ECB_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, ctr, &mem_io.base);
+	ctr_memory_interface *mem_io = ctr_memory_interface_initialize(key15x_enc, sizeof(key15x));
+	ctr_crypto_interface *ecb_io = ctr_crypto_interface_initialize(0x11, AES_CNT_ECB_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, ctr, mem_io);
 
-	ctr_io_read(&ecb_io, key15x, sizeof(key15x), 0, 16);
+	ctr_io_read(ecb_io, key15x, sizeof(key15x), 0, 16);
 
 	setup_aeskeyX(0x15, key15x);
 	setup_aeskeyY(0x15, a9_header->keyy);
@@ -192,21 +188,19 @@ static size_t hash_search(const void *data, size_t data_size, uint32_t target_ha
 void ctr_n3ds_ctrnand_keyslot_setup(void)
 {
 	char data2[16];
-	ctr_nand_interface io;
-	ctr_nand_crypto_interface io2;
-	ctr_nand_interface_initialize(&io);
-	ctr_nand_crypto_interface_initialize(&io2, 0x03, NAND_TWL, &io.base);
+	ctr_nand_interface *io = ctr_nand_interface_initialize();
+	ctr_nand_crypto_interface *io2 = ctr_nand_crypto_interface_initialize(0x03, NAND_TWL, io);
 
 	static const char data[] = { 0x03 ,0xc3 ,0x1c ,0x0a ,0xcd ,0xc7 ,0x55 ,0x66 ,0x5d ,0xe1 ,0x57 ,0xe8 ,0x0c ,0x13 ,0x2c ,0x9e };
 
 	for (size_t i = 0; i < 2; ++i)
 	{
-		ctr_io_read(&io, data2+i*8, sizeof(data2)-i*8, 0x100, 4);
-		ctr_io_read(&io2, data2+i*8+4, sizeof(data2)-i*8-4, 0x00012E00+3, 4);
+		ctr_io_read(io, data2+i*8, sizeof(data2)-i*8, 0x100, 4);
+		ctr_io_read(io2, data2+i*8+4, sizeof(data2)-i*8-4, 0x00012E00+3, 4);
 	}
 
-	ctr_nand_crypto_interface_destroy(&io2);
-	ctr_nand_interface_destroy(&io);
+	ctr_nand_crypto_interface_destroy(io2);
+	ctr_nand_interface_destroy(io);
 
 	for (size_t i = 0; i < 16; ++i)
 	{

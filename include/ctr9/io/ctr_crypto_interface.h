@@ -48,27 +48,8 @@ typedef enum
  */
 typedef struct ctr_crypto_interface ctr_crypto_interface;
 
-struct ctr_crypto_interface
-{
-	ctr_io_interface base;
-	ctr_io_interface *lower_io;
-
-	uint8_t keySlot;
-	uint8_t ctr[16];
-	uint32_t input_mode;
-	uint32_t output_mode;
-
-	void (*advance_ctr_input)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
-	void (*advance_ctr_output)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
-	void (*crypto_input)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
-	void (*crypto_output)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
-
-	size_t block_size;
-};
-
 /**	@brief Initialize the given crypto io interface object.
  *
- *	@param[out] io IO crypto interface to initialize.
  *	@param[in] key_slot Nintendo 3DS AES key slot to use for CTR.
  *	@param[in] mode AES mode flags to use.
  *	@param[in] disk_type Encryption state of the underlying disk.
@@ -80,10 +61,10 @@ struct ctr_crypto_interface
  *		pointer must remain valid while the crypto io interface object is in
  *		use.
  *
- *	@post The io interface has been initialized and can be used for decrypting
- *		and encrypting.
+ *	@returns The initialized io interface that can be used for decrypting
+ *		and encrypting, NULL if there was an error.
  */
-int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, ctr_io_interface *lower_io);
+ctr_crypto_interface *ctr_crypto_interface_initialize(uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, void *lower_io);
 
 /** @brief Destroys the given crypto io interface object.
  *
@@ -95,74 +76,99 @@ int ctr_crypto_interface_initialize(ctr_crypto_interface *crypto_io, uint8_t key
  */
 void ctr_crypto_interface_destroy(ctr_crypto_interface *io);
 
-/** @brief Reads bytes from the given io interface.
- *
- *  @param[in,out] io The io interface to use for reading.
- *  @param[out] buffer Pointer to the buffer.
- *  @param[in] buffer_size The size of the buffer in bytes.
- *  @param[in] position Position/address in the io interface to read from.
- *  @param[in] count The number of bytes to read.
- *
- *  @returns 0 upon success, anything else means an error.
- */
-int ctr_crypto_interface_read(void *io, void *buffer, size_t buffer_size, uint64_t position, size_t count);
-
-/** @brief Writes bytes to the given io interface.
- *
- *  @param[in,out] io The io interface to use for writing.
- *  @param[in] buffer Pointer to the buffer.
- *  @param[in] buffer_size The size of the buffer, and the number of bytes to
- *      write.
- *  @param[in] position Position/address in the io interface to write to.
- *
- *  @returns 0 upon success, anything else means an error.
- */
-int ctr_crypto_interface_write(void *io, const void *buffer, size_t buffer_size, uint64_t position);
-
-/** @brief Reads sectors from the given io interface.
- *
- *  Uses whatever the underlying io interface uses for sector size.
- *
- *  @param[in,out] io The io interface to use for reading.
- *  @param[out] buffer Pointer to the buffer.
- *  @param[in] buffer_size The size of the buffer in bytes.
- *  @param[in] sector Sector position in the io interface to read from.
- *  @param[in] count The number of sectors to read.
- *
- *  @returns 0 upon success, anything else means an error.
- */
-int ctr_crypto_interface_read_sector(void *io, void *buffer, size_t buffer_size, size_t sector, size_t count);
-
-/** @brief Writes sectors from the given io interface.
- *
- *  Uses whatever the underlying io interface uses for sector size.
- *
- *  @param[in,out] io The io interface to use for writing.
- *  @param[in] buffer Pointer to the buffer.
- *  @param[in] buffer_size The size of the buffer, and the number of bytes to
- *      write. If the number is not a multiple of the sector size, this function
- *      will only write all the full sectors it can, ignoring the end of the
- *      buffer that doesn't fit a sector.
- *  @param[in] sector Sector Position in the io interface to write to.
- *
- *  @returns 0 upon success, anything else means an error.
- */
-int ctr_crypto_interface_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector);
-
-/** @brief Returns the size of the underlying disk for the given io interface.
- *
- *  @returns The size of the underlying io interface as reported by it.
- */
-uint64_t ctr_crypto_interface_disk_size(void *io);
-
-/** @brief Returns the size of the sectors used by the underlying io interface.
- *
- *  @returns The size in bytes of the underlying io interface.
- */
-size_t ctr_crypto_interface_sector_size(void *io);
 
 #ifdef __cplusplus
 }
+
+namespace ctr9
+{
+	template<class IO>
+	class crypto_interface
+	{
+	public:
+		crypto_interface(uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, IO& lower_io);
+
+		/** @brief Reads bytes from the given io interface.
+		 *
+		 *  @param[out] buffer Pointer to the buffer.
+		 *  @param[in] buffer_size The size of the buffer in bytes.
+		 *  @param[in] position Position/address in the io interface to read from.
+		 *  @param[in] count The number of bytes to read.
+		 *
+		 *  @returns 0 upon success, anything else means an error.
+		 */
+		int read(void *buffer, size_t buffer_size, uint64_t position, size_t count);
+
+		/** @brief Writes bytes to the given io interface.
+		 *
+		 *  @param[in] buffer Pointer to the buffer.
+		 *  @param[in] buffer_size The size of the buffer, and the number of bytes to
+		 *      write.
+		 *  @param[in] position Position/address in the io interface to write to.
+		 *
+		 *  @returns 0 upon success, anything else means an error.
+		 */
+		int write(const void *buffer, size_t buffer_size, uint64_t position);
+
+		/** @brief Reads sectors from the given io interface.
+		 *
+		 *  Uses whatever the underlying io interface uses for sector size.
+		 *
+		 *  @param[out] buffer Pointer to the buffer.
+		 *  @param[in] buffer_size The size of the buffer in bytes.
+		 *  @param[in] sector Sector position in the io interface to read from.
+		 *  @param[in] count The number of sectors to read.
+		 *
+		 *  @returns 0 upon success, anything else means an error.
+		 */
+		int read_sector(void *buffer, size_t buffer_size, size_t sector, size_t count);
+
+		/** @brief Writes sectors from the given io interface.
+		 *
+		 *  Uses whatever the underlying io interface uses for sector size.
+		 *
+		 *  @param[in] buffer Pointer to the buffer.
+		 *  @param[in] buffer_size The size of the buffer, and the number of bytes to
+		 *      write. If the number is not a multiple of the sector size, this function
+		 *      will only write all the full sectors it can, ignoring the end of the
+		 *      buffer that doesn't fit a sector.
+		 *  @param[in] sector Sector Position in the io interface to write to.
+		 *
+		 *  @returns 0 upon success, anything else means an error.
+		 */
+		int write_sector(const void *buffer, size_t buffer_size, size_t sector);
+
+		/** @brief Returns the size of the underlying disk for the given io interface.
+		 *
+		 *  @returns The size of the underlying io interface as reported by it.
+		 */
+		uint64_t disk_size() const;
+
+		/** @brief Returns the size of the sectors used by the underlying io interface.
+		 *
+		 *  @returns The size in bytes of the underlying io interface.
+		 */
+		size_t sector_size() const;
+
+	private:
+		IO& lower_io_;
+
+		uint8_t key_slot_;
+		uint8_t ctr_[16];
+		uint32_t input_mode_;
+		uint32_t output_mode_;
+
+		void (*advance_ctr_input)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
+		void (*advance_ctr_output)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
+		void (*crypto_input)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+		void (*crypto_output)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
+
+		size_t block_size_;
+	};
+
+	typedef io_interface_impl<crypto_interface<io_interface&>> crypto_generic_interface;
+}
+
 #endif
 
 #endif//CTR_CRYPTO_INTERFACE_H_
