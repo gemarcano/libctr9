@@ -16,30 +16,30 @@
 #include <ctr9/io/ctr_disks.h>
 
 int ctr_fatfs_initialize(
-	ctr_nand_interface *nand_io,
-	ctr_nand_crypto_interface *ctr_io,
-	ctr_nand_crypto_interface *twl_io,
-	ctr_sd_interface *sd_io)
+	ctr_nand_interface **nand_io,
+	ctr_nand_crypto_interface **ctr_io,
+	ctr_nand_crypto_interface **twl_io,
+	ctr_sd_interface **sd_io)
 {
 	int result = ctr_disks_initialize(nand_io, ctr_io, twl_io, sd_io);
-	ctr_fatfs_default_setup(ctr_io, twl_io, sd_io);
+	ctr_fatfs_default_setup(*ctr_io, *twl_io, *sd_io);
 	return result;
 }
 
 int ctr_fatfs_internal_initialize(
-	ctr_nand_interface *nand_io,
-	ctr_nand_crypto_interface *ctr_io,
-	ctr_nand_crypto_interface *twl_io)
+	ctr_nand_interface **nand_io,
+	ctr_nand_crypto_interface **ctr_io,
+	ctr_nand_crypto_interface **twl_io)
 {
 	int result = ctr_disks_initialize(nand_io, ctr_io, twl_io, NULL);
-	ctr_fatfs_default_setup(ctr_io, twl_io, NULL);
+	ctr_fatfs_default_setup(*ctr_io, *twl_io, NULL);
 	return result;
 }
 
-int ctr_fatfs_sd_initialize(ctr_sd_interface *sd_io)
+int ctr_fatfs_sd_initialize(ctr_sd_interface **sd_io)
 {
 	int result = ctr_disks_initialize(NULL, NULL, NULL, sd_io);
-	ctr_fatfs_default_setup(NULL, NULL, sd_io);
+	ctr_fatfs_default_setup(NULL, NULL, *sd_io);
 	return result;
 }
 

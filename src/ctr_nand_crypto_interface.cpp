@@ -79,62 +79,14 @@ ctr_nand_crypto_interface *ctr_nand_crypto_interface_initialize(uint8_t keySlot,
 			return NULL; //Unknown type
 	}
 
-	ctr_crypto_interface_initialize(keySlot, mode, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, (uint8_t*)ctr, lower_io);
-	ctr9::io_interface &lower = *reinterpret_cast<ctr9::io_interface*>(lower_io);
-	return reinterpret_cast<ctr_nand_crypto_interface*>(new (std::nothrow) ctr9::nand_crypto_generic_interface(keySlot, crypto_type, std::forward<decltype(lower)>(lower)));//FIXME
+	ctr_crypto_interface *io = ctr_crypto_interface_initialize(keySlot, mode, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, (uint8_t*)ctr, lower_io);
+	return reinterpret_cast<ctr_nand_crypto_interface*>(io);//FIXME
 }
 
 void ctr_nand_crypto_interface_destroy(ctr_nand_crypto_interface *crypto_io)
 {
-	ctr9::nand_crypto_generic_interface *io = reinterpret_cast<ctr9::nand_crypto_generic_interface*>(crypto_io);
+	ctr9::crypto_generic_interface *io = reinterpret_cast<ctr9::crypto_generic_interface*>(crypto_io);
 	//ctr_crypto_interface_destroy(&crypto_io->crypto_io);
 	delete io;
-}
-
-namespace ctr9
-{
-	template<class IO>
-	int nand_crypto_interface<IO>::read(void *buffer, size_t buffer_size, uint64_t position, size_t count)
-	{
-		return ctr_io_implementation_read(*this, buffer, buffer_size, position, count);
-	}
-
-	template<class IO>
-	int nand_crypto_interface<IO>::write(const void *buffer, size_t buffer_size, uint64_t position)
-	{
-		return ctr_io_implementation_write(*this, buffer, buffer_size, position);
-	}
-
-	template<class IO>
-	int nand_crypto_interface<IO>::read_sector(void *buffer, size_t buffer_size, size_t sector, size_t count)
-	{
-		//ctr_nand_crypto_interface *crypto_io = io;
-		//return ctr_crypto_interface_read_sector(&crypto_io->crypto_io, buffer, buffer_size, sector, count);
-		return -1;
-	}
-
-	template<class IO>
-	int nand_crypto_interface<IO>::write_sector(const void *buffer, size_t buffer_size, size_t sector)
-	{
-		//ctr_nand_crypto_interface *crypto_io = io;
-		//return ctr_crypto_interface_write_sector(&crypto_io->crypto_io, buffer, buffer_size, sector);
-		return -1;
-	}
-
-	template<class IO>
-	uint64_t nand_crypto_interface<IO>::disk_size() const
-	{
-		//ctr_nand_crypto_interface *crypto_io = io;
-		//return crypto_io->crypto_io.base.disk_size(&crypto_io->crypto_io);
-		return 0;
-	}
-
-	template<class IO>
-	constexpr size_t nand_crypto_interface<IO>::sector_size() const
-	{
-		//ctr_nand_crypto_interface *crypto_io = io;
-		//return crypto_io->crypto_io.base.sector_size(&crypto_io->crypto_io);
-		return 0;
-	}
 }
 

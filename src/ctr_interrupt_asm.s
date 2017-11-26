@@ -28,18 +28,9 @@
 
 @FIXME this code is not generally position independent
 
-@I'm aware this choice of canary is not secure-- the idea behind this is to
-@prevent program execution from continuing in the case of an accidental
-@overflow
-exception_canary:
-.word exception_stack_end
-exception_stack_end:
-.skip 8192 * 4
-exception_stack:
-
 .macro CTR_INTERRUPT_VENEER table_offset=0
 	@Exceptions stack. Currently we don't support nested exceptions
-	ldr sp, =exception_stack
+	ldr sp, =_istack
 	push {r0-r12,r14} @push "normal" registers
 
 	@switch to previous mode to get previous sp and lr, then switch back
@@ -83,17 +74,6 @@ exception_stack:
 	@Parameters: r0 - pointer to array on stack:
 	@    cpsr, sp, lr, return, r0-r12
 	blx r2
-
-	@determine if the simple canary was damaged
-	ldr r0, =exception_canary
-	ldr r0, [r0]
-	ldr r1, =exception_stack_end
-	cmp r0, r1
-
-	beq 2f
-	@Who knows what was overwritten, just forcibly hang.
-	b .
-	2:
 
 	@now determine the mode we were in previously
 	@if Thumb, make sure LR is updated

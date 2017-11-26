@@ -64,10 +64,10 @@ static size_t drive_to_index(const char *drive)
 	return _VOLUMES;
 }
 static FATFS fatfs[_VOLUMES];
-static ctr_nand_interface nand;
-static ctr_sd_interface sd;
-static ctr_nand_crypto_interface ctr;
-static ctr_nand_crypto_interface twl;
+static ctr_nand_interface *nand;
+static ctr_sd_interface *sd;
+static ctr_nand_crypto_interface *ctr;
+static ctr_nand_crypto_interface *twl;
 
 typedef struct
 {

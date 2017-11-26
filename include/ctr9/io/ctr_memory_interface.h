@@ -48,6 +48,8 @@ namespace ctr9
 	class memory_interface
 	{
 	public:
+		memory_interface(std::uint8_t *buffer, size_t buffer_size);
+
 		/** @brief Reads bytes from the given io interface.
 		 *
 		 *  @param[out] buffer Pointer to the buffer.
@@ -96,7 +98,7 @@ namespace ctr9
 		 *
 		 *  @returns 0 upon success, anything else means an error.
 		 */
-		int write_sector(const void *buffer, size_t buffer_size, size_t sectorn);
+		int write_sector(const void *buffer, size_t buffer_size, size_t sector);
 
 		/** @brief Returns the size of the underlying disk for the given io interface.
 		 *
@@ -112,10 +114,11 @@ namespace ctr9
 		static constexpr size_t sector_size();
 
 	private:
-		void *buffer;
-		size_t buffer_size;
+		std::uint8_t *buffer_;
+		std::size_t buffer_size_;
 	};
 
+	typedef io_interface_impl<memory_interface> memory_generic_interface;
 }
 
 #endif

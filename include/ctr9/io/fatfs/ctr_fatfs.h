@@ -44,10 +44,10 @@ extern "C" {
  *	@returns 0 on success, anything else on failure.
  */
 int ctr_fatfs_initialize(
-	ctr_nand_interface *nand_io,
-	ctr_nand_crypto_interface *ctr_io,
-	ctr_nand_crypto_interface *twl_io,
-	ctr_sd_interface *sd_io);
+	ctr_nand_interface **nand_io,
+	ctr_nand_crypto_interface **ctr_io,
+	ctr_nand_crypto_interface **twl_io,
+	ctr_sd_interface **sd_io);
 
 /**	@brief Initializes the IO subsystem for the NAND internal disks.
  *
@@ -72,9 +72,9 @@ int ctr_fatfs_initialize(
  *	@returns 0 on success, anything else on failure.
  */
 int ctr_fatfs_internal_initialize(
-	ctr_nand_interface *nand_io,
-	ctr_nand_crypto_interface *ctr_io,
-	ctr_nand_crypto_interface *twl_io);
+	ctr_nand_interface **nand_io,
+	ctr_nand_crypto_interface **ctr_io,
+	ctr_nand_crypto_interface **twl_io);
 
 /**	@brief Initializes the IO subsystem for the SD card.
  *
@@ -91,7 +91,7 @@ int ctr_fatfs_internal_initialize(
  *	@returns 0 on success, anything else on failure. Returns a failure if the SD
  *		card was not inserted.
  */
-int ctr_fatfs_sd_initialize(ctr_sd_interface *sd_io);
+int ctr_fatfs_sd_initialize(ctr_sd_interface **sd_io);
 
 
 #ifdef __cplusplus

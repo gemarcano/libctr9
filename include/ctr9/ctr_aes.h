@@ -12,45 +12,17 @@ extern "C" {
 
 #include <cstddef>
 #include <cstdint>
+#include <array>
+
 
 namespace ctr9
 {
-	class aes_hardware
+	constexpr std::size_t aes_block_size()
 	{
-	public:
-		std::uint8_t write_fifo_count() const;
-		void write_fifo_count(std::uint8_t count);
-		std::uint8_t read_fifo_count();
-		void read_fifo_count(std::uint8_t count);
-		void flush_write_fifo();
-		void flush_read_fifo();
-		std::uint8_t write_fifo_dma_size();
-		void write_fifo_dma_size(std::uint8_t size);
-		std::uint8_t read_fifo_dma_size();
-		void read_fifo_dma_size(std::uint8_t size);
-		std::uint8_t mac_size();
-		void mac_size(std::uint8_t size);
-		bool mac_status();
-		void mac_status(bool status);
-		bool output_endian();
-		void output_endian(bool big_endian);
-		bool input_endian();
-		void input_endian(bool big_endian);
-		bool output_word_order();
-		void output_word_order(bool normal);
-		bool input_word_order();
-		void input_word_order(bool normal);
-		void update_keyslot();
-		void mode(uint8_t mode);
-		bool interrupt_enable();
-		bool interrupt_enable(bool enable);
-		bool start();
-		void start(bool start);
-	};
+		return AES_BLOCK_SIZE;
+	}
 
-	constexpr std::size_t aes_block_size() {return AES_BLOCK_SIZE;}
-
-	
+	// C++ crypto classes
 	class ecb_crypto
 	{
 	public:
@@ -104,6 +76,7 @@ namespace ctr9
 		std::array<std::uint8_t, aes_block_size()> ctr_;
 	};
 
+	//Disk crypto classes ---------------------------
 	class ecb_disk_crypto
 	{
 	public:
@@ -133,6 +106,8 @@ namespace ctr9
 	typedef ctr_disk_crypto_impl<ctr_crypto> ctr_disk_crypto;
 	typedef ctr_disk_crypto_impl<cbc_crypto> cbc_disk_crypto;
 	typedef ctr_disk_crypto_impl<ccm_crypto> ccm_disk_crypto;
+
+	//Generic classes to help implement C API--------------------------------
 
 	class generic_crypto
 	{

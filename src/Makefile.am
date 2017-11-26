@@ -6,17 +6,17 @@ libctr9_arm_la_CFLAGS = $(ARM_ONLY) -marm
 
 lib_LTLIBRARIES = libctr9.la
 libctr9_la_CCASFLAGS = -I$(top_srcdir)/data
-libctr9_la_SOURCES = aes.c ctr_nand_crypto_interface.cpp ctr_sd_interface.cpp sha.c \
+libctr9_la_SOURCES = aes.c ctr_sd_interface.cpp sha.c \
 	ctr_io_interface.cpp ctr_nand_interface.cpp sdmmc/delay.s sdmmc/sdmmc.c i2c.c \
 	ctr_rtc.c fatfs/diskio.c fatfs/ff.c fatfs/option/unicode.c ctr_system.c \
-	fatfs/ctr_fatfs_disk.c ctr_disks.c ctr_fatfs.c \
+	fatfs/ctr_fatfs_disk.c ctr_disks.c ctr_fatfs.c ctr_nand_crypto_interface.cpp \
 	ctr_interrupt_asm.s ctr_screen.cpp ctr_hid.c ctr_pxi.c gamecart/command_ctr.c \
 	gamecart/command_ntr.c  gamecart/protocol.c  gamecart/protocol_ctr.c  \
-	gamecart/protocol_ntr.c ctr_cart_interface.c gamecart/delay.s ctr_headers.c \
+	gamecart/protocol_ntr.c ctr_cart_interface.cpp gamecart/delay.s ctr_headers.c \
 	ctr_timer.c ctr_system_clock.c ctr_cache.s \
-	ctr_crypto_interface.cpp ctr_memory_interface.c ctr_memory.c ctr_memory_asm.s \
-	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c \
-	ctr_file_interface.c ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
+	ctr_crypto_interface.cpp ctr_memory_interface.cpp ctr_memory.c ctr_memory_asm.s \
+	ctr_aeskeydb.c ctr_firm.c ctr_drives.c ctr_console.c ctr_aes.cpp\
+	ctr_file_interface.cpp ctr_freetype.c crt0.s ctr_init.c ctr_circular_buffer.c\
 	ctr_elf_loader.c ctr_window.cpp ctr_surface.cpp
 libctr9_la_LIBADD = libctr9_arm.la -lctr_core -lctrelf
 libctr9_la_LDFLAGS = $(AM_LDFLAGS) -static
@@ -73,8 +73,8 @@ ctrgamecartinclude_HEADERS = $(includedirectory)/ctr9/gamecart/protocol.h \
 
 ctrioinclude_HEADERS = \
 	$(includedirectory)/ctr9/io/ctr_io_interface.h \
-	$(includedirectory)/ctr9/io/ctr_nand_crypto_interface.h \
 	$(includedirectory)/ctr9/io/ctr_nand_interface.h \
+	$(includedirectory)/ctr9/io/ctr_nand_crypto_interface.h \
 	$(includedirectory)/ctr9/io/ctr_sd_interface.h \
 	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.hpp \
 	$(includedirectory)/ctr9/io/ctr_sdmmc_implementation.ipp \
