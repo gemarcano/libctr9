@@ -1,5 +1,7 @@
 #include <ctr9/aes.h>
 
+#include <type_traits>
+
 namespace ctr9
 {
 	constexpr std::size_t ecb_crypto::block_size()
@@ -31,25 +33,19 @@ namespace ctr9
 		crypto_.set_ctr(ctr);
 	}
 
+	template<>
+	void generic_crypto_ctr_impl<ecb_crypto>::set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr);
+	
 	template<class Crypto>
 	std::size_t generic_crypto_ctr_impl<Crypto>::block_size() const
 	{
 		return crypto_.block_size();
 	}
 
-	
-	constexpr std::size_t ecb_disk_crypto::block_size()
+	template<class Crypto>
+	constexpr std::size_t ctr_disk_crypto_impl<Crypto>::block_size()
 	{
-		return decltype(crypto_)::block_size();
+		return std::decay_t<decltype(crypto_)>::block_size();
 	}
-
-
-	template<class CtrCrypto>
-	constexpr std::size_t ctr_disk_crypto_impl<CtrCrypto>::block_size()
-	{
-		return aes_block_size();
-	}
-
-	
 }
 

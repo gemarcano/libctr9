@@ -20,25 +20,7 @@
 
 namespace ctr9
 {
-	ecb_disk_crypto_wrapper::ecb_disk_crypto_wrapper(ecb_crypto& crypto, const std::array<std::uint8_t, aes_block_size()>&)
-	:crypto_(crypto)
-	{}
-	
-	void ecb_disk_crypto_wrapper::encrypt(const void *in, void *out, size_t blocks, size_t block_position)
-	{
-		crypto_.encrypt(in, out, blocks, block_position);
 	}
-	
-	void ecb_disk_crypto_wrapper::decrypt(const void *in, void *out, size_t blocks, size_t block_position)
-	{
-		crypto_.decrypt(in, out, blocks, block_position);
-	}
-	
-	constexpr std::size_t ecb_disk_crypto_wrapper::block_size()
-	{
-		return std::decay_t<decltype(crypto_)>::block_size();
-	}
-}
 
 namespace ctr9
 {
@@ -54,8 +36,7 @@ namespace ctr9
 		So, the generic crypto interface needs a key_slot, an Accessor, and the lower layer
 			The generic_accessor needs a generic_CryptoDisk
 				The generic_CryptoDisk needs a generic_crypto and ctr
-					generic_crypto needs the actual crypto class to use
-						crypto class needs the mode of encryption
+					generic_crypto needs the mode of encryption (it figures out which encryption to use from it).
 
 		GM - Remember, CryptoDisk isn't a disk, it merely holds logic for accessing a disk, namely tracks ctr.
 
@@ -64,8 +45,7 @@ namespace ctr9
 			key_slot, mode, lower layer, ctr
 
 		 * */
-		ctr9::ecb_crypto ecb(mode);
-		ctr9::ecb_generic_crypto crypto(ecb);
+		ctr9::generic_crypto crypto(mode);
 		ctr9::generic_disk_crypto disk(crypto, ctr);
 		ctr9::generic_encrypted_storage_accessor acc(disk);
 		ctr9::crypto_generic_interface *result = nullptr;// new (std::nothrow) ctr9::crypto_generic_interface(key_slot, acc, reinterpret_cast<ctr9::io_interface*>(lower_io));

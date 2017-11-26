@@ -162,18 +162,6 @@ namespace ctr9
 		uint8_t key_slot_;
 	};
 
-	//Used to make an object with identical construction as all the other crypto ones
-	class ecb_disk_crypto_wrapper
-	{
-	public:
-		ecb_disk_crypto_wrapper(ecb_crypto& crypto, const std::array<std::uint8_t, aes_block_size()>&);
-		void encrypt(const void *in, void *out, size_t blocks, size_t block_position);
-		void decrypt(const void *in, void *out, size_t blocks, size_t block_position);
-		static constexpr std::size_t block_size();
-	private:
-		ecb_disk_crypto crypto_;
-	};
-
 	//wrapper to determine the direction of access (enc->dec, or dec->enc)
 	template<class CryptoDisk, ctr_crypto_disk_type Type>
 	class storage_accessor
@@ -198,23 +186,21 @@ namespace ctr9
 	};
 
 	//Convenience implementation class for generic storage accessors (FIXME should this be in the ipp file, since this is an implementation detail?).
-	template<class Accessor>
+	template<class CryptoDisk, ctr_crypto_disk_type Type>
 	class generic_storage_accessor_impl : public generic_storage_accessor
 	{
 	public:
-		template<class... Args>
-		generic_storage_accessor_impl(Args&&... args);
-
+		generic_storage_accessor_impl(CryptoDisk &disk);
 		virtual void input(const void *in, void *out, size_t blocks, size_t block_position) override;
 		virtual void output(const void *in, void *out, size_t blocks, size_t block_position) override;
 		virtual std::size_t block_size() const;
 	private:
-		Accessor accessor_;
+		CryptoDisk &disk_;
 	};
 
 	typedef io_interface_impl<crypto_interface<io_interface, generic_storage_accessor>> crypto_generic_interface;
-	using generic_encrypted_storage_accessor = generic_storage_accessor_impl<storage_accessor<generic_disk_crypto, CTR_CRYPTO_ENCRYPTED>>;
-	using generic_plaintext_storage_accessor = generic_storage_accessor_impl<storage_accessor<generic_disk_crypto, CTR_CRYPTO_PLAINTEXT>>;
+	using generic_encrypted_storage_accessor = generic_storage_accessor_impl<generic_disk_crypto, CTR_CRYPTO_ENCRYPTED>;
+	using generic_plaintext_storage_accessor = generic_storage_accessor_impl<generic_disk_crypto, CTR_CRYPTO_PLAINTEXT>;
 }
 
 #include "ctr_crypto_interface.ipp"

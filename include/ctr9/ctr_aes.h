@@ -88,6 +88,18 @@ namespace ctr9
 	private:
 		ecb_crypto crypto_;
 	};
+	
+	//Used to make an object with identical construction as all the other crypto ones
+	class ecb_disk_crypto_wrapper
+	{
+	public:
+		ecb_disk_crypto_wrapper(ecb_crypto& crypto, const std::array<std::uint8_t, aes_block_size()>&);
+		void encrypt(const void *in, void *out, size_t blocks, size_t block_position);
+		void decrypt(const void *in, void *out, size_t blocks, size_t block_position);
+		static constexpr std::size_t block_size();
+	private:
+		ecb_disk_crypto crypto_;
+	};
 
 	template<class CtrCrypto>
 	class ctr_disk_crypto_impl
@@ -109,30 +121,18 @@ namespace ctr9
 
 	//Generic classes to help implement C API--------------------------------
 
-	class generic_crypto
+	class generic_crypto_base
 	{
 	public:
-		virtual ~generic_crypto() = default;
-		virtual void encrypt(const void *in, void *out, size_t blocks);
-		virtual void decrypt(const void *in, void *out, size_t blocks);
-		virtual void set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr);
-		virtual std::size_t block_size() const;
-	};
-
-	class ecb_generic_crypto : public generic_crypto
-	{
-	public:
-		ecb_generic_crypto(ecb_crypto& crypto);
-		virtual void encrypt(const void *in, void *out, size_t blocks) override;
-		virtual void decrypt(const void *in, void *out, size_t blocks) override;
-		virtual void set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr) override;
-		virtual std::size_t block_size() const override;
-	private:
-		ecb_crypto& crypto_;
+		virtual ~generic_crypto_base() = default;
+		virtual void encrypt(const void *in, void *out, size_t blocks) = 0;
+		virtual void decrypt(const void *in, void *out, size_t blocks) = 0;
+		virtual void set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr) = 0;
+		virtual std::size_t block_size() const = 0;
 	};
 
 	template<class Crypto>
-	class generic_crypto_ctr_impl : public generic_crypto
+	class generic_crypto_ctr_impl : public generic_crypto_base
 	{
 	public:
 		template<class... Args>
@@ -142,12 +142,26 @@ namespace ctr9
 		virtual void set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr) override;
 		virtual std::size_t block_size() const override;
 	private:
-		Crypto& crypto_;
+		Crypto crypto_;
 	};
 	
-	typedef generic_crypto_ctr_impl<ctr_disk_crypto> ctr_generic_crypto;
-	typedef generic_crypto_ctr_impl<cbc_disk_crypto> cbc_generic_crypto;
-	typedef generic_crypto_ctr_impl<ccm_disk_crypto> ccm_generic_crypto;
+	typedef generic_crypto_ctr_impl<ecb_crypto> ecb_generic_crypto;
+	typedef generic_crypto_ctr_impl<ctr_crypto> ctr_generic_crypto;
+	typedef generic_crypto_ctr_impl<cbc_crypto> cbc_generic_crypto;
+	typedef generic_crypto_ctr_impl<ccm_crypto> ccm_generic_crypto;
+	
+	class generic_crypto : public generic_crypto_base
+	{
+	public:
+		generic_crypto(std::uint32_t mode);
+		~generic_crypto();
+		virtual void encrypt(const void *in, void *out, size_t blocks) override;
+		virtual void decrypt(const void *in, void *out, size_t blocks) override;
+		virtual void set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr) override;
+		virtual std::size_t block_size() const override;
+	private:
+		generic_crypto_base *crypto_;
+	};
 
 	class generic_disk_crypto
 	{

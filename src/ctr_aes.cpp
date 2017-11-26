@@ -1,4 +1,5 @@
 #include <ctr9/ctr_aes.h>
+#include <type_traits>
 
 namespace ctr9
 {
@@ -16,7 +17,6 @@ namespace ctr9
 		ecb_decrypt(in, out, blocks, mode_ | AES_ECB_DECRYPT_MODE);
 	}
 
-	
 	ctr_crypto::ctr_crypto(std::uint32_t mode)
 	:mode_(mode & ~(7u << 27))
 	{}
@@ -89,27 +89,41 @@ namespace ctr9
 		return aes_block_size();
 	}
 
-	ecb_generic_crypto::ecb_generic_crypto(ecb_crypto &crypto)
-	:crypto_(crypto)
-	{}
+	template<>
+	void generic_crypto_ctr_impl<ecb_crypto>::set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr)
+	{ /*Do nothing*/ }
 
-	void ecb_generic_crypto::encrypt(const void *in, void *out, size_t blocks)
+	generic_crypto::generic_crypto(std::uint32_t mode)
 	{
-		crypto_.encrypt(in, out, blocks);
+		crypto_ = new ecb_generic_crypto(mode); //FIXME, determine which crypto to use based on mode
 	}
 
-	void ecb_generic_crypto::decrypt(const void *in, void *out, size_t blocks)
+	generic_crypto::~generic_crypto()
 	{
-		crypto_.decrypt(in, out, blocks);
+		delete crypto_;
 	}
 
-	void ecb_generic_crypto::set_ctr(const std::array<std::uint8_t, aes_block_size()>&)
-	{}
-
-	std::size_t ecb_generic_crypto::block_size() const
+	void generic_crypto::encrypt(const void *in, void *out, size_t blocks)
 	{
-		return crypto_.block_size();
+		crypto_->encrypt(in, out, blocks);
 	}
+
+	void generic_crypto::decrypt(const void *in, void *out, size_t blocks)
+	{
+		crypto_->decrypt(in, out, blocks);
+	}
+
+	void generic_crypto::set_ctr(const std::array<std::uint8_t, aes_block_size()>& ctr)
+	{
+		crypto_->set_ctr(ctr);
+	}
+
+	std::size_t generic_crypto::block_size() const
+	{
+		return crypto_->block_size();
+	}
+
+	//Disk section
 
 	ecb_disk_crypto::ecb_disk_crypto(ecb_crypto &crypto)
 	:crypto_(crypto)
@@ -120,6 +134,30 @@ namespace ctr9
 	
 	void ecb_disk_crypto::decrypt(const void *in, void *out, size_t blocks, size_t block_position)
 	{}
+
+	constexpr std::size_t ecb_disk_crypto::block_size()
+	{
+		return decltype(crypto_)::block_size();
+	}
+
+	ecb_disk_crypto_wrapper::ecb_disk_crypto_wrapper(ecb_crypto& crypto, const std::array<std::uint8_t, aes_block_size()>&)
+	:crypto_(crypto)
+	{}
+	
+	void ecb_disk_crypto_wrapper::encrypt(const void *in, void *out, size_t blocks, size_t block_position)
+	{
+		crypto_.encrypt(in, out, blocks, block_position);
+	}
+	
+	void ecb_disk_crypto_wrapper::decrypt(const void *in, void *out, size_t blocks, size_t block_position)
+	{
+		crypto_.decrypt(in, out, blocks, block_position);
+	}
+	
+	constexpr std::size_t ecb_disk_crypto_wrapper::block_size()
+	{
+		return std::decay_t<decltype(crypto_)>::block_size();
+	}
 
 	generic_disk_crypto::generic_disk_crypto(generic_crypto& crypto, const std::array<std::uint8_t, aes_block_size()>& ctr)
 	:crypto_(crypto), ctr_(ctr)

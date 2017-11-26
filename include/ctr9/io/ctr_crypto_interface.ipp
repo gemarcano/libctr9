@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <vector>
 #include <cstring>
+#include <type_traits>
 
 #include <ctr9/ctr_aes.h>
 
@@ -34,7 +35,7 @@ namespace ctr9
 	template<class Crypto, ctr_crypto_disk_type Type>
 	constexpr std::size_t storage_accessor<Crypto, Type>::block_size()
 	{
-		return decltype(crypto_)::block_size();
+		return std::decay_t<decltype(crypto_)>::block_size();
 	}
 
 	template<class IO, class CryptoDisk>
@@ -125,29 +126,33 @@ namespace ctr9
 		return 0;
 	}
 
-	template<class Accessor>
-	template<class... Args>
-	generic_storage_accessor_impl<Accessor>::generic_storage_accessor_impl(Args&&... args)
-	:accessor_(std::forward<Args&&>(args)...)
+	template<class CryptoDisk, ctr_crypto_disk_type Type>
+	generic_storage_accessor_impl<CryptoDisk, Type>::generic_storage_accessor_impl(CryptoDisk &disk)
+	:disk_(disk)
 	{}
 
-	template<class Accessor>
-	void generic_storage_accessor_impl<Accessor>::input(const void *in, void *out, size_t blocks, size_t block_position)
+	template<class CryptoDisk, ctr_crypto_disk_type Type>
+	void generic_storage_accessor_impl<CryptoDisk, Type>::input(const void *in, void *out, size_t blocks, size_t block_position)
 	{
-		accessor_.input(in, out, blocks, block_position);
+		if (Type == CTR_CRYPTO_ENCRYPTED)
+			disk_.encrypt(in, out, blocks, block_position);
+		else
+			disk_.decrypt(in, out, blocks, block_position);
 	}
 
-	template<class Accessor>
-	void generic_storage_accessor_impl<Accessor>::output(const void *in, void *out, size_t blocks, size_t block_position)
+	template<class CryptoDisk, ctr_crypto_disk_type Type>
+	void generic_storage_accessor_impl<CryptoDisk, Type>::output(const void *in, void *out, size_t blocks, size_t block_position)
 	{
-		accessor_.input(in, out, blocks, block_position);
+		if (Type == CTR_CRYPTO_ENCRYPTED)
+			disk_.decrypt(in, out, blocks, block_position);
+		else
+			disk_.encrypt(in, out, blocks, block_position);
 	}
-
-	template<class Accessor>
-	std::size_t generic_storage_accessor_impl<Accessor>::block_size() const
+	
+	template<class CryptoDisk, ctr_crypto_disk_type Type>
+	std::size_t generic_storage_accessor_impl<CryptoDisk, Type>::block_size() const
 	{
-		return accessor_.block_size();
+		return disk_.block_size();;
 	}
-
 }
 
