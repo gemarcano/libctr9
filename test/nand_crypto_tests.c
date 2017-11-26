@@ -16,9 +16,9 @@ static bool nand_ctrnand_test1(void *ctx)
 {
 	nand_crypto_test_data *data = ctx;
 
-	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x04, NAND_CTR, data->lower_io);
+	data->io = ctr_nand_crypto_interface_initialize(0x04, NAND_CTR, data->lower_io);
 
-	return !res;
+	return data->io != NULL;
 }
 
 static bool nand_ctrnand_test2(void *ctx)

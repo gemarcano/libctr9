@@ -46,7 +46,7 @@ typedef struct
 	char *buffer;
 	size_t buffer_size;
 
-	ctr_crypto_interface io;
+	ctr_crypto_interface *io;
 	ctr_io_interface *lower_io;
 	uint32_t ctr[4];
 
@@ -57,9 +57,9 @@ typedef struct
 
 static bool crypto_tests1(void *ctx)
 {
-	crypto_test_data *data = ctx;
-	int res = ctr_crypto_interface_initialize(&(data->io), 0x04, 1, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, (uint8_t*)data->ctr, data->lower_io);
-	return !res;
+	crypto_test_data *data = static_cast<crypto_test_data*>(ctx);
+	data->io = ctr_crypto_interface_initialize(0x04, 1, CTR_CRYPTO_ENCRYPTED, CRYPTO_CTR, (uint8_t*)data->ctr, data->lower_io);
+	return data->io != NULL;
 }
 
 
@@ -76,8 +76,8 @@ uint8_t otp_sha[32];
 
 inline static void vol_memcpy(volatile void *dest, volatile void *sorc, size_t size)
 {
-	volatile uint8_t *dst = dest;
-	volatile uint8_t *src = sorc;
+	volatile uint8_t *dst = static_cast<volatile uint8_t*>(dest);
+	volatile uint8_t *src = static_cast<volatile uint8_t*>(sorc);
 	while(size--)
 	dst[size] = src[size];
 }
@@ -116,25 +116,25 @@ int main(int argc, char *argv[])
 	ctr_interrupt_set(CTR_INTERRUPT_PREABRT, prefetch_abort, (void*)0x3);
 
 	char buffer[0x1000] = {0};
-	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
-	nand_crypto_test_data nand_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &nand_ctx.nand_io.base);
-	nand_crypto_test_data twl_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &nand_ctx.nand_io.base);
-	sd_test_data sd_ctx = {buffer, sizeof(buffer), {{0}}};
-	memory_test_data memory_ctx = memory_test_data_initialize(buffer, sizeof(buffer));
-	nand_crypto_test_data crypto_memory_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &memory_ctx.mem_io.base);
-
+	nand_test_data nand_ctx = {buffer, sizeof(buffer), NULL};
 	ctr_unit_test nand_tests_f[11];
 	ctr_unit_tests nand_tests;
 	nand_tests_initialize(&nand_tests, nand_tests_f, 11, &nand_ctx);
 
-	ctr_unit_test nand_crypto_tests_f[7];
-	ctr_unit_tests nand_crypto_tests;
-	nand_crypto_tests_initialize(&nand_crypto_tests, nand_crypto_tests_f, 7, &nand_crypto_ctx);
-
+	sd_test_data sd_ctx = {buffer, sizeof(buffer), NULL};
 	ctr_unit_test sd_tests_f[4];
 	ctr_unit_tests sd_tests;
 	sd_tests_initialize(&sd_tests, sd_tests_f, 4, &sd_ctx);
 
+	nand_crypto_test_data nand_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), (ctr_io_interface*)nand_ctx.nand_io);
+	nand_crypto_test_data twl_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), (ctr_io_interface*)nand_ctx.nand_io);
+	memory_test_data memory_ctx = memory_test_data_initialize(buffer, sizeof(buffer));
+	nand_crypto_test_data crypto_memory_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), (ctr_io_interface*)memory_ctx.mem_io);
+
+	ctr_unit_test nand_crypto_tests_f[7];
+	ctr_unit_tests nand_crypto_tests;
+	nand_crypto_tests_initialize(&nand_crypto_tests, nand_crypto_tests_f, 7, &nand_crypto_ctx);
+	
 	ctr_unit_test twl_crypto_tests_f[3];
 	ctr_unit_tests twl_crypto_tests;
 	twl_tests_initialize(&twl_crypto_tests, twl_crypto_tests_f, 3, &twl_crypto_ctx);
@@ -163,9 +163,9 @@ int main(int argc, char *argv[])
 	ctr_setup_disk_parameters params = {&nand_crypto_ctx.io, 0x0B930000/0x200, 0x2F5D0000/0x200};
 	disk_ioctl_(0, CTR_SETUP_DISK, &params);
 
-	ctr_sd_interface_destroy(&sd_ctx.io);
-	ctr_nand_crypto_interface_destroy(&nand_crypto_ctx.io);
-	ctr_nand_interface_destroy(&nand_ctx.nand_io);
+	ctr_sd_interface_destroy(sd_ctx.io);
+	ctr_nand_crypto_interface_destroy(nand_crypto_ctx.io);
+	ctr_nand_interface_destroy(nand_ctx.nand_io);
 
 	printf("Press any key to continue...\n");
 	ctr_input_wait();
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
 	ctr_input_wait();
 	ctr_screen_disable_backlight(CTR_SCREEN_BOTH);
 	ctr_input_wait();
-	ctr_screen_enable_backlight(CTR_SCREEN_BOTTOM | CTR_SCREEN_TOP);
+	ctr_screen_enable_backlight(ctr_screen_enum(CTR_SCREEN_BOTTOM | CTR_SCREEN_TOP));
 	printf("Trying to turn off both screens\n");
 	ctr_input_wait();
 
@@ -253,8 +253,8 @@ int main(int argc, char *argv[])
 */
 	mmcdevice dev1= *getMMCDevice(1);
 	mmcdevice dev0= *getMMCDevice(0);
-	printf("SDHandle: %"PRIu32"\n", dev0.isSDHC);
-	printf("SDHandle: %"PRIu32"\n", dev1.isSDHC);
+	printf("SDHandle: %" PRIu32 "\n", dev0.isSDHC);
+	printf("SDHandle: %" PRIu32 "\n", dev1.isSDHC);
 
 	printf("Trying timer stuff\n");
 	ctr_timer_disable_irq(CTR_TIMER0);
@@ -265,35 +265,35 @@ int main(int argc, char *argv[])
 	ctr_timer_set_value(CTR_TIMER0, 0);
 
 	printf("Timer value: %u\n", starting_timer);
-	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer reg: %08" PRIX32 "\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_enable(CTR_TIMER0);
 
-	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer effective fq: %" PRIu32 "\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08" PRIX32 "\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV64);
 
-	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer effective fq: %" PRIu32 "\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08" PRIX32 "\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV256);
 
-	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
-	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer effective fq: %" PRIu32 "\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer reg: %08" PRIX32 "\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
 	ctr_timer_set_prescaler(CTR_TIMER0, CTR_TIMER_DIV1024);
 
-	printf("Timer effective fq: %"PRIu32"\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
+	printf("Timer effective fq: %" PRIu32 "\n", ctr_timer_get_effective_frequency(CTR_TIMER0));
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
-	printf("Timer reg: %08"PRIX32"\n", *(uint32_t*)CTR_TIMER_REG_BASE);
+	printf("Timer reg: %08" PRIX32 "\n", *(uint32_t*)CTR_TIMER_REG_BASE);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 	printf("Timer value delta: %u\n", ctr_timer_get_value(CTR_TIMER0) - starting_timer);
 
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
 			time = ctr_system_clock_get_time(&clock);
 		}
 		printf("second: %zu ", i);
-		printf("time: %"PRId64" %"PRId32"\n", time.seconds, time.nanoseconds);
+		printf("time: %" PRId64 " %" PRId32 "\n", time.seconds, time.nanoseconds);
 
 	}
 
@@ -364,33 +364,33 @@ int main(int argc, char *argv[])
 	uint8_t ctr2[16] = {0};
 
 	set_ctr(ctr);
-	aes_decrypt(input_buffer, output_buffer, 5, AES_CTR_MODE);
+	aes_decrypt(input_buffer, output_buffer, 5, AES_CTR_DECRYPT_MODE);
 	set_ctr(ctr);
-	aes_decrypt(output_buffer, output_buffer2, 5, AES_CTR_MODE);
+	aes_decrypt(output_buffer, output_buffer2, 5, AES_CTR_DECRYPT_MODE);
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*4));
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*5));
 
 
 	memset(ctr, 0, sizeof(ctr));
 	memset(ctr2, 0, sizeof(ctr2));
-	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE, ctr);
+	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_DECRYPT_MODE, ctr);
 	set_ctr(ctr2);
-	aes_decrypt(input_buffer, output_buffer2, 0x20000, AES_CTR_MODE);
+	aes_decrypt(input_buffer, output_buffer2, 0x20000, AES_CTR_DECRYPT_MODE);
 
 	printf("Comparing mid aes results: %d\n", memcmp(output_buffer, output_buffer2, sizeof(output_buffer)));
 
 	memset(ctr, 0, sizeof(ctr));
-	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE, ctr);
+	ctr_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_DECRYPT_MODE, ctr);
 	memset(ctr2, 0, sizeof(ctr2));
-	ctr_decrypt(output_buffer, output_buffer3, 0x20000, AES_CTR_MODE, ctr2);
+	ctr_decrypt(output_buffer, output_buffer3, 0x20000, AES_CTR_DECRYPT_MODE, ctr2);
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer3, 0x10*4));
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer3, sizeof(output_buffer)));
 
 	memset(ctr2, 0, sizeof(ctr2));
 	set_ctr(ctr2);
-	aes_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_MODE);
+	aes_decrypt(input_buffer, output_buffer, 0x20000, AES_CTR_DECRYPT_MODE);
 	set_ctr(ctr2);
-	aes_decrypt(output_buffer, output_buffer2, 0x20000, AES_CTR_MODE);
+	aes_decrypt(output_buffer, output_buffer2, 0x20000, AES_CTR_DECRYPT_MODE);
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, 0x10*4));
 	printf("Comparing aes results: %d\n", memcmp(input_buffer, output_buffer2, sizeof(output_buffer)));
 	printf("Comparing aes results: %d\n", memcmp(output_buffer2, output_buffer3, sizeof(output_buffer)));
@@ -426,10 +426,10 @@ int main(int argc, char *argv[])
 	printf("\n");
 
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
-	ctr_memory_interface mem_io;
-	ctr_memory_interface_initialize(&mem_io, cipher_cbc, sizeof(cipher_cbc));
-	ctr_crypto_interface test1;
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io.base);
+	ctr_memory_interface *mem_io;
+	mem_io = ctr_memory_interface_initialize(cipher_cbc, sizeof(cipher_cbc));
+	ctr_crypto_interface *test1;
+	test1 = ctr_crypto_interface_initialize(0x11, AES_CNT_CBC_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, mem_io);
 	memset(output_buffer, 0xFF, sizeof(output_buffer));
 	ctr_io_read(&test1, output_buffer, sizeof(output_buffer), 0, 32);
 	for (size_t i = 0; i < 32; ++i)
@@ -439,15 +439,16 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("Comparing ctr_crypto cbc results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
 
-
 	ecb_decrypt(cipher_ecb, output_buffer, 0x2, AES_CNT_ECB_DECRYPT_MODE);
 	printf("Comparing ecb results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
 
-	ctr_memory_interface_initialize(&mem_io, cipher_ecb, sizeof(cipher_ecb));
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io.base);
+	ctr_crypto_interface_destroy(test1);
+	ctr_memory_interface_destroy(mem_io);
+	mem_io = ctr_memory_interface_initialize(cipher_ecb, sizeof(cipher_ecb));
+	test1 = ctr_crypto_interface_initialize(0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, mem_io);
 	memset(output_buffer, 0xFF, sizeof(output_buffer));
-	ctr_io_read(&test1, output_buffer, sizeof(output_buffer), 0, 32);
+	ctr_io_read(test1, output_buffer, sizeof(output_buffer), 0, 32);
 	printf("Comparing ctr_crypto ecb results: %d\n", memcmp(output_buffer, plaintext, AES_BLOCK_SIZE * 2));
 
 
@@ -456,18 +457,24 @@ int main(int argc, char *argv[])
 
 	memcpy(iv, test_iv, AES_BLOCK_SIZE);
 	memset(output_buffer, 0xFF, sizeof(output_buffer));
-	ctr_memory_interface_initialize(&mem_io, output_buffer, sizeof(output_buffer));
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_CBC_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, &mem_io.base);
-	ctr_io_write(&test1, plaintext, sizeof(plaintext), 0);
-	ctr_io_read(&mem_io, output_buffer2, sizeof(output_buffer2), 0, 32);
+	ctr_crypto_interface_destroy(test1);
+	ctr_memory_interface_destroy(mem_io);
+	mem_io = ctr_memory_interface_initialize(output_buffer, sizeof(output_buffer));
+	test1 = ctr_crypto_interface_initialize(0x11, AES_CNT_CBC_ENCRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_CBC, iv, mem_io);
+	ctr_io_write(test1, plaintext, sizeof(plaintext), 0);
+	ctr_io_read(mem_io, output_buffer2, sizeof(output_buffer2), 0, 32);
 
+	ctr_crypto_interface_destroy(test1);
+	ctr_memory_interface_destroy(mem_io);
 	printf("Comparing ctr_crypto cbc results: %d\n", memcmp(output_buffer2, cipher_cbc, AES_BLOCK_SIZE * 2));
-	ctr_memory_interface_initialize(&mem_io, cipher_ecb, sizeof(cipher_ecb));
-	ctr_crypto_interface_initialize(&test1, 0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, &mem_io.base);
+	mem_io = ctr_memory_interface_initialize(cipher_ecb, sizeof(cipher_ecb));
+	test1 = ctr_crypto_interface_initialize(0x11, AES_CNT_ECB_DECRYPT_MODE, CTR_CRYPTO_ENCRYPTED, CRYPTO_ECB, iv, mem_io);
 
 	aes_decrypt(plaintext, output_buffer, 0x2, AES_CNT_ECB_ENCRYPT_MODE);
 	printf("Comparing ecb results: %d\n", memcmp(output_buffer, cipher_ecb, AES_BLOCK_SIZE * 2));
 
+	ctr_crypto_interface_destroy(test1);
+	ctr_memory_interface_destroy(mem_io);
 
 	for (size_t i = 0; i < 0x1FFFF * 16; ++i)
 	{

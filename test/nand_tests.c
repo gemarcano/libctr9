@@ -7,9 +7,9 @@ static bool nand_test1(void *ctx)
 {
 	nand_test_data *data = ctx;
 
-	int res = ctr_nand_interface_initialize(&data->nand_io);
+	data->nand_io = ctr_nand_interface_initialize();
 
-	return !res;
+	return data->nand_io != NULL;
 }
 
 static bool nand_test2(void *ctx)

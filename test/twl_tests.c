@@ -15,9 +15,9 @@ static bool twl_test1(void *ctx)
 
 	ctr_twl_keyslot_setup();
 
-	int res = ctr_nand_crypto_interface_initialize(&data->io, 0x03, NAND_TWL, data->lower_io);
+	data->io = ctr_nand_crypto_interface_initialize(0x03, NAND_TWL, data->lower_io);
 
-	return !res;
+	return data->io != NULL;
 }
 
 static bool twl_test2(void *ctx)
@@ -51,8 +51,8 @@ static bool twl_test3(void *ctx)
 	FILE *file;
 	if ((file = fopen("TWLN:/shared2/0000", "r+b")))
 	{
-		ctr_file_interface io;
-		ctr_file_interface_initialize(&io, file);
+		ctr_file_interface *io;
+		io = ctr_file_interface_initialize(file);
 
 		ctr_setup_disk_parameters params = { &io, 0, ctr_io_disk_size(&io)/0x200 };
 		disk_ioctl_(4, CTR_SETUP_DISK, &params);

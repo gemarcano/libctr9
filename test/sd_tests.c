@@ -8,9 +8,9 @@ static bool sd_test1(void *ctx)
 {
 	sd_test_data *data = ctx;
 
-	int res = ctr_sd_interface_initialize(&data->io);
+	data->io = ctr_sd_interface_initialize();
 
-	return !res;
+	return data->io != NULL;
 }
 
 static bool sd_test2(void *ctx)
