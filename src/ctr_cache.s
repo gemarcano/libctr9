@@ -1,13 +1,8 @@
-@*******************************************************************************
-@* Copyright (C) 2016 Gabriel Marcano
-@*
-@* Refer to the COPYING.txt file at the top of the project directory. If that is
-@* missing, this file is licensed under the GPL version 2.0 or later.
-@*
-@******************************************************************************/
+@ SPDX-License-Identifier: GPL-2.0-or-later
+@ Copyright: Gabriel Marcano, 2023
 
 .arm
-
+.cpu arm946e-s
 .align 4
 
 .global ctr_cache_clean_and_flush_all, ctr_cache_flush_data_all
