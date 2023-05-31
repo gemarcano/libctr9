@@ -97,7 +97,7 @@ extern "C" {
 		uint32_t res;
 	} mmcdevice;
 
-	int sdmmc_sdcard_init();
+	int sdmmc_sdcard_init(void);
 	int sdmmc_sdcard_readsector(uint32_t sector_no, uint8_t *out);
 	int sdmmc_sdcard_readsectors(uint32_t sector_no, uint32_t numsectors, uint8_t *out);
 	int sdmmc_sdcard_writesector(uint32_t sector_no, const uint8_t *in);
@@ -111,9 +111,9 @@ extern "C" {
 
 	mmcdevice *getMMCDevice(int drive);
 
-	void InitSD();
-	int Nand_Init();
-	int SD_Init();
+	void InitSD(void);
+	int Nand_Init(void);
+	int SD_Init(void);
 
 #ifdef __cplusplus
 };
@@ -147,7 +147,7 @@ static inline void sdmmc_write32(uint16_t reg, uint32_t val) {
 static inline void sdmmc_mask16(uint16_t reg, const uint16_t clear, const uint16_t set) {
 //---------------------------------------------------------------------------------
 	uint16_t val = sdmmc_read16(reg);
-	val &= ~clear;
+	val &= (uint16_t)~clear;
 	val |= set;
 	sdmmc_write16(reg, val);
 }
