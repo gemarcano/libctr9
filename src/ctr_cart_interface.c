@@ -67,11 +67,19 @@ int ctr_cart_raw_interface_read_sector(void *io, void* buffer, size_t buffer_siz
 
 int ctr_cart_interface_noop_write(void *io, const void *buffer, size_t buffer_size, uint64_t position)
 {
+	(void)io;
+	(void)buffer;
+	(void)buffer_size;
+	(void)position;
 	return 1; //Can't write
 }
 
 int ctr_cart_interface_noop_write_sector(void *io, const void *buffer, size_t buffer_size, size_t sector)
 {
+	(void)io;
+	(void)buffer;
+	(void)buffer_size;
+	(void)sector;
 	return 1; //Can't write
 }
 
@@ -225,8 +233,8 @@ static inline size_t header_ff_read(
 	size_t current_sector,
 	size_t sectors_to_read,
 	ctr_cart_interface *cart)
-
 {
+	(void)cart;
 	const size_t ff_count = MIN(sectors_to_read, ncch_end - current_sector);
 	if (ff_count)
 	{
