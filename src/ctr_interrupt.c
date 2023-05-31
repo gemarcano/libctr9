@@ -1,10 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2016 Gabriel Marcano
- *
- * Refer to the COPYING.txt file at the top of the project directory. If that is
- * missing, this file is licensed under the GPL version 2.0 or later.
- *
- ******************************************************************************/
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright: Gabriel Marcano, 2023
 
 #include <ctr9/ctr_interrupt.h>
 #include <ctr9/ctr_system.h>
@@ -47,7 +42,6 @@ void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, ctr_interrupt_handler 
 	}
 }
 
-__attribute__((noinline))
 void ctr_interrupt_prepare(void)
 {
 	//Secondary handler. Read payload address from next word
@@ -79,16 +73,32 @@ void ctr_interrupt_prepare(void)
 	ACCESS_FUNCTION_PTR(0x00008018) = (interrupt_function)0xEA00000Au;
 	ACCESS_FUNCTION_PTR(0x0000801C) = (interrupt_function)0xEA00000Bu;
 
+	// Ensure compiler does everything it needs to before we make sure to flush
+	// cache FIXME we should somehow tag the cache functions with compiler
+	// memory barries also
+	__asm volatile ("" ::: "memory");
+
 	ctr_cache_clean_data_range((void*)0x8000, (void*)0x10000);
 	ctr_cache_flush_instruction_range((void*)0x0, (void*)0x8000);
 	ctr_cache_drain_write_buffer();
 
 	//switch to low vectors
-	asm volatile (
+	__asm volatile (
 		"mrc p15, 0, r0, c1, c0, 0 \n\t"
 		"bic r0, #(1<<13) \n\t"
 		"mcr p15, 0, r0, c1, c0, 0 \n\t"
-		:::"r0"
+		::: "r0"
 	);
 }
 
+void ctr_wait_for_interrupt(void)
+{
+	//uint32_t val = 0;
+	__asm volatile (
+		"mov r0, #0\n\t"
+		"mcr p15, 0, %[value], c7, c0, 4\n\t"
+			:
+			: [value] "r" (0)
+			: "r0"
+	);
+}

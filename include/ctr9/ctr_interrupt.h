@@ -67,6 +67,11 @@ void ctr_interrupt_prepare(void);
  */
 void ctr_interrupt_set(ctr_interrupt_enum interrupt_type, void (*interrupt)(uint32_t*, void*), void *data);
 
+
+/** @brief Stops execution until an interrupt occurs.
+ */
+void ctr_wait_for_interrupt(void);
+
 #ifdef __cplusplus
 }
 #endif
