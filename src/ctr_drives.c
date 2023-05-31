@@ -242,7 +242,7 @@ static void filinfo_to_stat(const FILINFO *info, struct stat *st)
 	st->st_rdev = st->st_dev;
 	st->st_size = (off_t)info->fsize;
 	st->st_mtime = fatfs_time_to_time_t(info->ftime, info->fdate);
-	st->st_spare1 = info->fattrib;
+	//st->st_spare1 = info->fattrib;
 }
 
 static int ctr_drives_stat_r(const char *drive, struct _reent *r, const char *file, struct stat *st)
@@ -415,6 +415,7 @@ static int ctr_drives_rmdir_r(struct _reent *r, const char *name)
 	return -1; /*FIXME this can be figure out*/
 }
 
+// FIXME should I implement these? New devoptab functions at the end of the struct
 #define PREPARE_DOTAB(DEV) \
 static int DEV##_drives_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode);\
 static ssize_t DEV##_drives_write_r(struct _reent *r, void *fd, const char *ptr, size_t len);\
@@ -453,7 +454,13 @@ static const devoptab_t DEV##_tab =\
 	NULL,\
 	NULL,\
 	NULL,\
-	ctr_drives_rmdir_r\
+	ctr_drives_rmdir_r,\
+	NULL,\
+	NULL,\
+	NULL,\
+	NULL,\
+	NULL,\
+	NULL\
 };\
 \
 static int DEV##_drives_open_r(struct _reent *r, void *fileStruct, const char *path, int flags, int mode)\
