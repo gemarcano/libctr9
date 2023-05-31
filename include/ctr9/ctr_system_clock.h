@@ -31,7 +31,7 @@ typedef struct
 typedef struct
 {
 	int64_t seconds;
-	int32_t  nanoseconds;
+	int32_t nanoseconds;
 } ctr_clock_time;
 
 /**	@brief Initializes a clock, taking control of the specified timer.

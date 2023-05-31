@@ -84,4 +84,3 @@ static void ctr_system_clock_interrupt_handler(void *data)
 	ctr_timer timer = (ctr_timer)data;
 	ctr_system_clock_interrupt(timer);
 }
-
