@@ -95,13 +95,6 @@ int main(int argc, char *argv[])
 	memset(otp_sha, 0, 0x20);
 	vol_memcpy(otp_sha, REG_SHAHASH, 0x20);
 
-	ctr_freetype_initialize();
-
-	draw_s *cakehax_fbs = (draw_s*)0x23FFFE00;
-	ctr_screen top_screen, bottom_screen;
-	ctr_screen_initialize(&top_screen, cakehax_fbs->top_left, 400, 240, CTR_GFX_PIXEL_RGB8);
-	ctr_screen_initialize(&bottom_screen, cakehax_fbs->sub, 320, 240, CTR_GFX_PIXEL_RGB8);
-
 	printf("UNIT TESTING\n");
 
 	for (int i = 0; i < 32; ++i)
@@ -118,6 +111,8 @@ int main(int argc, char *argv[])
 	printf("\033[32mWHERE AM I");
 	printf("\033[33m\033[27mWHERE AM I");
 	printf("\033[B\033[6D\033[0m");
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 
 	ctr_n3ds_ctrnand_keyslot_setup();
 
@@ -130,6 +125,7 @@ int main(int argc, char *argv[])
 	nand_test_data nand_ctx = {buffer, sizeof(buffer), {{0}} };
 	nand_crypto_test_data nand_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &nand_ctx.nand_io.base);
 	nand_crypto_test_data twl_crypto_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &nand_ctx.nand_io.base);
+
 	sd_test_data sd_ctx = {buffer, sizeof(buffer), {{0}}};
 	memory_test_data memory_ctx = memory_test_data_initialize(buffer, sizeof(buffer));
 	nand_crypto_test_data crypto_memory_ctx = nand_crypto_test_data_initialize(buffer, sizeof(buffer), &memory_ctx.mem_io.base);
@@ -164,12 +160,26 @@ int main(int argc, char *argv[])
 
 	int res = ctr_execute_unit_tests(&nand_tests);
 	res |= ctr_execute_unit_tests(&nand_crypto_tests);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 	res |= ctr_execute_unit_tests(&sd_tests);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 	res |= ctr_execute_unit_tests(&twl_crypto_tests);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 	res |= ctr_execute_unit_tests(&memory_tests);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 	res |= ctr_execute_unit_tests(&crypto_memory_tests);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 	res |= ctr_execute_unit_tests(&memory_control_tests);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 	printf("Test status: %d\n", res);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 
 	ctr_setup_disk_parameters params = {&nand_crypto_ctx.io, 0x0B930000/0x200, 0x2F5D0000/0x200};
 	disk_ioctl_(0, CTR_SETUP_DISK, &params);
@@ -184,6 +194,9 @@ int main(int argc, char *argv[])
 	printf("Preparing interrupts\n");
 	printf("abort handler: %X\n", (uintptr_t)ctr_interrupt_handlers[4]);
 	printf("testing abort\n");
+
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 
 	//Cause a data abort :P
 	*(volatile uint32_t*)0x4FFFFFF0;
@@ -315,51 +328,68 @@ int main(int argc, char *argv[])
 	ctr_system_clock_initialize(&clock, CTR_TIMER0);
 	ctr_irq_master_enable();
 
-	ctr_screen_set_pixel(&top_screen, 0 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 2 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 4 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 0 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 0 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 2 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 4 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 2 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&top_screen, 4 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 0 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 2 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 4 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 0 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 0 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 2 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 4 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 2 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_top, 4 + 100, 4, 0xFF00FFu);
 
+	uint64_t start = ctr_system_clock_get_ms(&clock);
+	uint64_t ms = start;
 	for (size_t i = 0; i < 3; ++i)
 	{
-		uint64_t start = ctr_system_clock_get_ms(&clock);
-		uint64_t ms = start;
 		ctr_clock_time time;
 		while (ms - start < 1000)
 		{
+			static unsigned counter = 0;
+			ctr_screen_set_pixel(&ctr_screen_top, 0 + 100, 0, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 2 + 100, 0, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 4 + 100, 0, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 0 + 100, 2, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 0 + 100, 4, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 2 + 100, 2, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 4 + 100, 2, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 2 + 100, 4, 0xFF00FFu + counter);
+			ctr_screen_set_pixel(&ctr_screen_top, 4 + 100, 4, 0xFF00FFu + counter);
+			counter += 100;
+
+			ctr_wait_for_interrupt();
 			ms = ctr_system_clock_get_ms(&clock);
 			time = ctr_system_clock_get_time(&clock);
 		}
+		start = ms;
 		printf("second: %zu ", i);
 		printf("time: %"PRId64" %"PRId32"\n", time.seconds, time.nanoseconds);
+		printf("ms: %"PRId64"\n", ms);
 
 	}
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 
 
-	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 0, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 0 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 2, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 2 + 100, 4, 0xFF00FFu);
-	ctr_screen_set_pixel(&bottom_screen, 4 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 0 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 2 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 4 + 100, 0, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 0 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 0 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 2 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 4 + 100, 2, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 2 + 100, 4, 0xFF00FFu);
+	ctr_screen_set_pixel(&ctr_screen_bottom, 4 + 100, 4, 0xFF00FFu);
 
 
 	uint8_t bitmap_data[][3] = {{0xFF, 0xFF, 0xFF}, { 0xFF, 0x00, 0x81 }, {0x80, 0x01, 0x01}, {0xFF, 0xFF, 0xFF}};
 	ctr_screen_bitmap bitmap = { 20, 4, bitmap_data };
-	ctr_screen_draw_bitmap(&top_screen, 0, 0, 0xFF00FF, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 20, 4, 0x00FFFF, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 40, 8, 0x0000FF, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 20, 14, 0x00FF00, &bitmap);
-	ctr_screen_draw_bitmap(&top_screen, 0, 20, 0xFF0000, &bitmap);
-	ctr_screen_draw_bitmap(&bottom_screen, 200, 200, 0xFF0000, &bitmap);
+	ctr_screen_draw_bitmap(&ctr_screen_top, 0, 0, 0xFF00FF, &bitmap);
+	ctr_screen_draw_bitmap(&ctr_screen_top, 20, 4, 0x00FFFF, &bitmap);
+	ctr_screen_draw_bitmap(&ctr_screen_top, 40, 8, 0x0000FF, &bitmap);
+	ctr_screen_draw_bitmap(&ctr_screen_top, 20, 14, 0x00FF00, &bitmap);
+	ctr_screen_draw_bitmap(&ctr_screen_top, 0, 20, 0xFF0000, &bitmap);
+	ctr_screen_draw_bitmap(&ctr_screen_bottom, 200, 200, 0xFF0000, &bitmap);
 
 	printf("Testing aes\n");
 
