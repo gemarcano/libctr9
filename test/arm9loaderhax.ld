@@ -11,8 +11,8 @@ ENTRY(_start)
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
-  /* Changed default address to 0x24F00000 */
-  PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x24F00000)); . = SEGMENT_START("text-segment", 0x24F00000);
+  /* Changed default address to 0x24000000 */
+  PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x21000000)); . = SEGMENT_START("text-segment", 0x21000000);
   .interp         : { *(.interp) }
   .note.gnu.build-id : { *(.note.gnu.build-id) }
   .hash           : { *(.hash) }
@@ -113,7 +113,8 @@ SECTIONS
   .exception_ranges*) }
   /* Adjust the address for the data segment.  We want to adjust up to
      the same address within the page on the next page up.  */
-  . = ALIGN(CONSTANT (MAXPAGESIZE)) + (. & (CONSTANT (MAXPAGESIZE) - 1));
+  /*. = ALIGN(CONSTANT (MAXPAGESIZE)) + (. & (CONSTANT (MAXPAGESIZE) - 1));*/
+  /* FIXME HACK FIRMTOO */
   /* Exception handling  */
   .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) }
   .gcc_except_table   : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) }
@@ -241,7 +242,7 @@ SECTIONS
   .debug_ranges   0 : { *(.debug_ranges) }
   /* DWARF Extension.  */
   .debug_macro    0 : { *(.debug_macro) }
-  .stack         0x27F00000 :
+  .stack         0x23F00000 :
   {
     _stack = .;
     *(.stack)
