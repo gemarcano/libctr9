@@ -15,16 +15,16 @@
 #include <ctr9/io/ctr_sd_interface.h>
 
 int ctr_disks_initialize(
-	ctr_nand_interface *nand_io,
-	ctr_nand_crypto_interface *ctr_io,
-	ctr_nand_crypto_interface *twl_io,
-	ctr_sd_interface *sd_io)
+	ctr_nand_interface **nand_io,
+	ctr_nand_crypto_interface **ctr_io,
+	ctr_nand_crypto_interface **twl_io,
+	ctr_sd_interface **sd_io)
 {
 	int result = 0;
 	if (nand_io)
 	{
-		result |= ctr_nand_interface_initialize(nand_io);
-		if (!result)
+		*nand_io = ctr_nand_interface_initialize();
+		if (*nand_io)
 		{
 			if (ctr_io)
 			{
@@ -41,12 +41,12 @@ int ctr_disks_initialize(
 					keyslot = 0x05;
 					break;
 				}
-				result |= ctr_nand_crypto_interface_initialize(ctr_io, keyslot, NAND_CTR, (ctr_io_interface*)nand_io);
+				*ctr_io = ctr_nand_crypto_interface_initialize(keyslot, NAND_CTR, nand_io);
 			}
 
 			if (twl_io)
 			{
-				result |= ctr_nand_crypto_interface_initialize(twl_io, 0x03, NAND_TWL, (ctr_io_interface*)nand_io);
+				*twl_io = ctr_nand_crypto_interface_initialize(0x03, NAND_TWL, nand_io);
 			}
 		}
 	}
@@ -57,7 +57,7 @@ int ctr_disks_initialize(
 
 	if (sd_io)
 	{
-		result |= ctr_sd_interface_initialize(sd_io);
+		*sd_io = ctr_sd_interface_initialize();
 	}
 
 	return result;

@@ -64,7 +64,7 @@ typedef struct ctr_crypto_interface ctr_crypto_interface;
  *	@returns The initialized io interface that can be used for decrypting
  *		and encrypting, NULL if there was an error.
  */
-ctr_crypto_interface *ctr_crypto_interface_initialize(uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, void *lower_io);
+ctr_crypto_interface *ctr_crypto_interface_initialize(uint8_t key_slot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, void *lower_io);
 
 /** @brief Destroys the given crypto io interface object.
  *
@@ -76,17 +76,22 @@ ctr_crypto_interface *ctr_crypto_interface_initialize(uint8_t keySlot, uint32_t 
  */
 void ctr_crypto_interface_destroy(ctr_crypto_interface *io);
 
-
 #ifdef __cplusplus
 }
 
+#include <array>
+#include <cstdint>
+#include <cstddef>
+
+#include <ctr9/ctr_aes.h>
+
 namespace ctr9
 {
-	template<class IO>
+	template<class IO, class Crypto>
 	class crypto_interface
 	{
 	public:
-		crypto_interface(uint8_t keySlot, uint32_t mode, ctr_crypto_disk_type disk_type, ctr_crypto_type type, uint8_t *ctr, IO& lower_io);
+		crypto_interface(uint8_t key_slot, Crypto& crypto, IO& lower_io);
 
 		/** @brief Reads bytes from the given io interface.
 		 *
@@ -152,22 +157,60 @@ namespace ctr9
 
 	private:
 		IO& lower_io_;
+		Crypto& crypto_;
 
 		uint8_t key_slot_;
-		uint8_t ctr_[16];
-		uint32_t input_mode_;
-		uint32_t output_mode_;
-
-		void (*advance_ctr_input)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
-		void (*advance_ctr_output)(ctr_crypto_interface *io, uint8_t *buffer, size_t buffer_size, size_t block, uint8_t *ctr);
-		void (*crypto_input)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
-		void (*crypto_output)(void* inbuf, void* outbuf, size_t size, uint32_t mode, uint8_t *ctr);
-
-		size_t block_size_;
+	};
+	
+	class ecb_disk_crypto_wrapper
+	{
+	public:
+		ecb_disk_crypto_wrapper(ecb_crypto& crypto, const std::array<std::uint8_t, aes_block_size()>&);
+		void encrypt(const void *in, void *out, size_t blocks, size_t block_position);
+		void decrypt(const void *in, void *out, size_t blocks, size_t block_position);
+		static constexpr std::size_t block_size();
+	private:
+		ecb_disk_crypto crypto_;
 	};
 
-	typedef io_interface_impl<crypto_interface<io_interface&>> crypto_generic_interface;
+	template<class CryptoDisk, ctr_crypto_disk_type Type>
+	class storage_accessor
+	{
+	public:
+		storage_accessor(CryptoDisk& crypto);
+		void input(const void *in, void *out, size_t blocks, size_t block_position);
+		void output(const void *in, void *out, size_t blocks, size_t block_position);
+	private:
+		CryptoDisk &crypto_;
+	};
+
+	class generic_storage_accessor
+	{
+	public:
+		virtual ~generic_storage_accessor() = default;
+		virtual void input(const void *in, void *out, size_t blocks, size_t block_position) = 0;
+		virtual void output(const void *in, void *out, size_t blocks, size_t block_position) = 0;
+	};
+
+	template<class Accessor>
+	class generic_storage_accessor_impl : public generic_storage_accessor
+	{
+	public:
+		template<class... Args>
+		generic_storage_accessor_impl(Args&&... args);
+
+		virtual void input(const void *in, void *out, size_t blocks, size_t block_position) override;
+		virtual void output(const void *in, void *out, size_t blocks, size_t block_position) override;
+	private:
+		Accessor accessor_;
+	};
+
+	typedef io_interface_impl<crypto_interface<io_interface, generic_storage_accessor>> crypto_generic_interface;
+	using generic_encrypted_storage_accessor = generic_storage_accessor_impl<storage_accessor<generic_disk_crypto, CTR_CRYPTO_ENCRYPTED>>;
+	using generic_plaintext_storage_accessor = generic_storage_accessor_impl<storage_accessor<generic_disk_crypto, CTR_CRYPTO_PLAINTEXT>>;
 }
+
+#include "ctr_crypto_interface.ipp"
 
 #endif
 

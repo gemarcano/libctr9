@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 #include <ctr9/io/ctr_memory_interface.h>
-#include <ctr9/io/ctr_io_implementation.h>
+#include <ctr9/io/ctr_io_implementation.hpp>
 #include <string.h>
 #include <stdbool.h>
 

@@ -245,6 +245,7 @@ SECTIONS
   {
     _stack = .;
     *(.stack)
+	_istack = 0x28000000;
   }
   .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) KEEP (*(.gnu.attributes)) }
   .note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }

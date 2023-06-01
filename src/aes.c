@@ -148,15 +148,16 @@ void subtract_ctr(void* ctr, uint32_t carry)
     }
 }
 
-void ecb_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode)
+void ecb_decrypt(const void *inbuf, void *outbuf, size_t size, uint32_t mode)
 {
     aes_decrypt(inbuf, outbuf, size, mode);
 }
 
-void cbc_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+//FIXME prove that CTR is set correctly for the second round of the while loop
+void cbc_decrypt(const void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
 {
     size_t blocks_left = size;
-    uint8_t *in  = inbuf;
+    const uint8_t *in  = inbuf;
     uint8_t *out = outbuf;
 
     while (blocks_left)
@@ -171,10 +172,10 @@ void cbc_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t 
     }
 }
 
-void ctr_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
+void ctr_decrypt(const void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t *ctr)
 {
     size_t blocks_left = size;
-    uint8_t *in  = inbuf;
+    const uint8_t *in  = inbuf;
     uint8_t *out = outbuf;
 
     while (blocks_left)
@@ -189,9 +190,9 @@ void ctr_decrypt(void *inbuf, void *outbuf, size_t size, uint32_t mode, uint8_t 
     }
 }
 
-void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode)
+void aes_decrypt(const void* inbuf, void* outbuf, size_t size, uint32_t mode)
 {
-    uint8_t *in  = inbuf;
+    const uint8_t *in  = inbuf;
     uint8_t *out = outbuf;
     size_t block_count = size;
     while (block_count != 0)
@@ -203,18 +204,18 @@ void aes_decrypt(void* inbuf, void* outbuf, size_t size, uint32_t mode)
                       AES_CNT_START |
                       AES_CNT_FLUSH_READ |
                       AES_CNT_FLUSH_WRITE;
-        aes_fifos((void*)in, (void*)out, blocks);
+        aes_fifos((const void*)in, (void*)out, blocks);
         in  += blocks * AES_BLOCK_SIZE;
         out += blocks * AES_BLOCK_SIZE;
         block_count -= blocks;
     }
 }
 
-void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
+void aes_fifos(const void* inbuf, void* outbuf, size_t blocks)
 {
     if (!inbuf || !outbuf) return;
 
-    uint8_t *in = inbuf;
+    const uint8_t *in = inbuf;
     uint8_t *out = outbuf;
 
     size_t curblock = 0;
@@ -225,7 +226,7 @@ void aes_fifos(void* inbuf, void* outbuf, size_t blocks)
         size_t blocks_to_read = blocks - curblock > 4 ? 4 : blocks - curblock;
 
         for (size_t wblocks = 0; wblocks < blocks_to_read; ++wblocks)
-        for (uint8_t *ii = in + AES_BLOCK_SIZE * wblocks; ii != in + (AES_BLOCK_SIZE * (wblocks + 1)); ii += 4)
+        for (const uint8_t *ii = in + AES_BLOCK_SIZE * wblocks; ii != in + (AES_BLOCK_SIZE * (wblocks + 1)); ii += 4)
         {
             uint32_t data = ii[0];
             data |= (uint32_t)(ii[1]) << 8;
