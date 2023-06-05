@@ -227,25 +227,40 @@ int main(int argc, char *argv[])
 	printf("Testing i2c write crap\n");
 
 	ctr_rtc_data rtc = ctr_rtc_gettime();
+	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 	printf("Testing a single write\n");
 	ctr_input_wait();
-	i2cWriteRegister(I2C_DEV_MCU, 0x30, 0x11);
+	ctr_i2c_write_one(CTR_I2C2, 0x4A, 0x30, 0x11);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 
 	printf("Testing a single write from buffer\n");
 	ctr_input_wait();
 	uint8_t temp_rtc[8] = { 11, 22, 33, 44, 0xBB, 0xAA,  0x99, 0x88};
-	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 1);
+	ctr_i2c_write(CTR_I2C2, 0x4A, 0x30, temp_rtc, 1);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
 
 	printf("Testing a multiple write from buffer\n");
 	ctr_input_wait();
-	i2cWriteRegisterBuffer(I2C_DEV_MCU, 0x30, temp_rtc, 8);
+	ctr_i2c_write(CTR_I2C2, 0x4A, 0x30, temp_rtc, 8);
 	rtc = ctr_rtc_gettime();
 	printf("%d %d %d %d %d %d\n", rtc.seconds, rtc.minutes, rtc.hours, rtc.day, rtc.month, rtc.year);
+
+	uint8_t slider = 0;
+	ctr_core_i2c_read_one(CTR_I2C2, 0x4A, 0x08, &slider);
+	printf("slider: %i\n", slider);
+
+	uint8_t rtc_data1[7];
+	ctr_core_i2c_read(CTR_I2C2, 0x4A, 0x30, rtc_data1, 7);
+	printf("RTC1: ");
+	for (size_t i =0 ; i < 7; ++i)
+	{
+		printf("%i ", rtc_data1[i]);
+	}
+	printf("\nPress any key to continue\n");
+	ctr_input_wait();
 /*
 	printf("Trying to read cart header...\n");
 	ctr_cart_interface cart;
@@ -525,6 +540,7 @@ int main(int argc, char *argv[])
 	fwrite(otp_sha, 32, 1, dump);
 	fclose(dump);
 
+	printf("Press any key to shutdown...\n");
 	ctr_input_wait();
 	ctr_system_poweroff();
 	return 0;

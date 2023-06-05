@@ -33,7 +33,8 @@ void ctr_rtc_init(void)
 ctr_rtc_data ctr_rtc_gettime(void)
 {
 	ctr_rtc_data data;
-	i2cReadRegisterBuffer(I2C_DEV_MCU, 0x30, (uint8_t*)&data, sizeof(data));
+	static_assert(sizeof(data) == 7, "mismatch in RTC data size");
+	ctr_core_i2c_read(CTR_I2C2, 0x4A, 0x30, (uint8_t*)&data, sizeof(data));
 	return data;
 }
 
