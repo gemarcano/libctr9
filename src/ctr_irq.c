@@ -9,21 +9,25 @@
 
 void ctr_irq_master_disable(void)
 {
+	uint32_t tmp;
 	__asm volatile(
-		"mrs r0, cpsr \n\t"
-		"orr r0, r0, #0x80 \n\t" //disable IRQ, bit 7, active low
-		"msr cpsr_c, r0 \n\t"
-		::: "r0"
+		"mrs %[tmp], cpsr \n\t"
+		"orr %[tmp], %[tmp], #0x80 \n\t" //disable IRQ, bit 7, active low
+		"msr cpsr_c, %[tmp] \n\t"
+		:[tmp] "=&r"(tmp)
+		:: "memory"
 	);
 }
 
 void ctr_irq_master_enable(void)
 {
+	uint32_t tmp;
 	__asm volatile (
-		"mrs r0, cpsr \n\t"
-		"bic r0, r0, #0x80 \n\t" //enable IRQ, bit 7, active low
-		"msr cpsr_c, r0 \n\t"
-		::: "r0"
+		"mrs %[tmp], cpsr \n\t"
+		"bic %[tmp], %[tmp], #0x80 \n\t" //enable IRQ, bit 7, active low
+		"msr cpsr_c, %[tmp] \n\t"
+		:[tmp] "=&r"(tmp)
+		:: "memory"
 	);
 }
 
@@ -33,13 +37,14 @@ static uint32_t saved_status = 0;
 void ctr_irq_critical_enter(void)
 {
 	uint32_t status = 0;
+	uint32_t tmp;
 	__asm volatile(
-		"mrs r0, cpsr \n\t"
-		"mov %0, r0 \n\t"
-		"orr r0, r0, #0x80 \n\t" //disable IRQ, bit 7, active low
-		"msr cpsr_c, r0 \n\t"
-		:"+r"(status)
-		:: "r0", "memory"
+		"mrs %[tmp], cpsr \n\t"
+		"mov %[status], %[tmp] \n\t"
+		"orr %[tmp], %[tmp], #0x80 \n\t" //disable IRQ, bit 7, active low
+		"msr cpsr_c, %[tmp] \n\t"
+		:[status]"=r"(status), [tmp] "=&r"(tmp)
+		:: "memory"
 	);
 
 	ctr_irq_master_disable();
@@ -54,14 +59,16 @@ void ctr_irq_critical_exit(void)
 	if (!--critical_count)
 	{
 		uint32_t status = saved_status & 0x80;
+		uint32_t tmp;
 		saved_status = status;
 		__asm volatile(
-			"mrs r0, cpsr \n\t"
-			"bic r0, r0, #0x80 \n\t" //enable IRQ, bit 7, active low
-			"add r0, r0, %0 \n\t" //Restore saved
-			"msr cpsr_c, r0 \n\t"
-			::"r"(status)
-			: "r0", "memory"
+			"mrs %[tmp], cpsr \n\t"
+			"bic %[tmp], %[tmp], #0x80 \n\t" //enable IRQ, bit 7, active low
+			"add %[tmp], %[tmp], %[status] \n\t" //Restore saved
+			"msr cpsr_c, %[tmp] \n\t"
+			:[tmp]"=&r"(tmp)
+			:[status]"r"(status)
+			: "memory"
 		);
 	}
 }

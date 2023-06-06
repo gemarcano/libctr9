@@ -82,23 +82,22 @@ void ctr_interrupt_prepare(void)
 	ctr_cache_flush_instruction_range((void*)0x0, (void*)0x8000);
 	ctr_cache_drain_write_buffer();
 
+	uint32_t tmp;
 	//switch to low vectors
 	__asm volatile (
-		"mrc p15, 0, r0, c1, c0, 0 \n\t"
-		"bic r0, #(1<<13) \n\t"
-		"mcr p15, 0, r0, c1, c0, 0 \n\t"
-		::: "r0"
+		"mrc p15, 0, %[tmp], c1, c0, 0 \n\t"
+		"bic %[tmp], #(1<<13) \n\t"
+		"mcr p15, 0, %[tmp], c1, c0, 0 \n\t"
+		:[tmp] "=&r"(tmp)
+		:: "memory"
 	);
 }
 
 void ctr_wait_for_interrupt(void)
 {
-	//uint32_t val = 0;
 	__asm volatile (
-		"mov r0, #0\n\t"
 		"mcr p15, 0, %[value], c7, c0, 4\n\t"
-			:
-			: [value] "r" (0)
-			: "r0"
+			:: [value] "r" (0)
+			: "memory"
 	);
 }
