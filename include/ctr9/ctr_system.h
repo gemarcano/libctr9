@@ -72,6 +72,17 @@ ctr_system_type ctr_get_system_type(void);
  */
 void ctr_n3ds_ctrnand_keyslot_setup(void);
 
+typedef struct
+{
+	uint32_t revision: 4;
+	uint32_t primary_part_number: 12;
+	uint32_t arm_architecture: 4;
+	uint32_t variant: 4;
+	uint32_t implementor: 8;
+} ctr_id_code;
+
+ctr_id_code ctr_system_get_id_register(void);
+
 #ifdef __cplusplus
 }
 #endif

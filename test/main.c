@@ -1,6 +1,6 @@
 #include <ctr9/io.h>
 
-#include <ctr9/i2c.h>
+#include <ctr9/ctr_i2c.h>
 #include <ctr9/io/fatfs/ff.h>
 #include <ctr9/io/fatfs/diskio.h>
 #include <ctr9/ctr_system.h>
@@ -96,6 +96,15 @@ int main(int argc, char *argv[])
 	vol_memcpy(otp_sha, REG_SHAHASH, 0x20);
 
 	printf("UNIT TESTING\n");
+	printf("Information:\n");
+	ctr_id_code id = ctr_system_get_id_register();
+	printf("Revision: %1X\n", id.revision);
+	printf("Primary part number: %03X\n", id.primary_part_number);
+	printf("ARM architecture: %02X\n", id.arm_architecture);
+	printf("Variant: %1X\n", id.variant);
+	printf("Implementor: %1X\n", id.implementor);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
 
 	for (int i = 0; i < 32; ++i)
 	{

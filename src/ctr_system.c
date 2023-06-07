@@ -43,6 +43,23 @@ void ctr_system_reset(void)
 	ctr_core_system_reset();
 }
 
+ctr_id_code ctr_system_get_id_register(void)
+{
+	uint32_t id;
+	__asm volatile(
+		"mrc p15, 0, %[id], c0, c0, 0\n\t"
+		:[id] "=r"(id)
+		::);
+	ctr_id_code result = {
+		.revision = id & 0xF,
+		.primary_part_number = (id >>= 4) & 0xFFF,
+		.arm_architecture = (id >>= 12) & 0xF,
+		.variant = (id >>= 4) & 0xF,
+		.implementor = (id >>= 4) & 0xFF,
+	};
+	return result;
+}
+
 void ctr_twl_keyslot_setup(void)
 {
 	//Only a9lh really needs to bother with this, and it really only needs to happen once, before ITCM gets messed up.
