@@ -1,10 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2016 Gabriel Marcano
- *
- * Refer to the COPYING.txt file at the top of the project directory. If that is
- * missing, this file is licensed under the GPL version 2.0 or later.
- *
- ******************************************************************************/
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright: Gabriel Marcano, 2023
 
 /** @file */
 
@@ -56,6 +51,44 @@ ctr_id_code ctr_system_get_id_register(void)
 		.arm_architecture = (id >>= 12) & 0xF,
 		.variant = (id >>= 4) & 0xF,
 		.implementor = (id >>= 4) & 0xFF,
+	};
+	return result;
+}
+
+ctr_cache_type ctr_system_get_cache_type(void)
+{
+	uint32_t type;
+	__asm volatile(
+		"mrc p15, 0, %[type], c0, c0, 1\n\t"
+		:[type] "=r"(type)
+		::);
+	ctr_cache_type result = {
+		.icache_words_per_line = type & 0x3,
+		.icache_absent = (type >>= 2) & 0x1,
+		.icache_associativity = (type >>= 1) & 0x7,
+		.icache_size = (type >>= 3) & 0xF,
+		.dcache_words_per_line = (type >>= 6) & 0x3,
+		.dcache_absent = (type >>= 2) & 0x1,
+		.dcache_associativity = (type >>= 1) & 0x7,
+		.dcache_size = (type >>= 3) & 0xF,
+		.harvard = (type >>= 6) & 0x1,
+		.cache_type = (type >>= 1) & 0xF
+	};
+	return result;
+}
+
+ctr_tcm_size ctr_system_get_tcm_size(void)
+{
+	uint32_t tcm;
+	__asm volatile(
+		"mrc p15, 0, %[tcm], c0, c0, 2\n\t"
+		:[tcm] "=r"(tcm)
+		::);
+	ctr_tcm_size result = {
+		.itcm_absent = (tcm >>= 2) & 0x1,
+		.itcm_size = (tcm >>= 4) & 0xF,
+		.dtcm_absent = (tcm >>= 8) & 0x1,
+		.dtcm_size = (tcm >>= 4) & 0xF
 	};
 	return result;
 }

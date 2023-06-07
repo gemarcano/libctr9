@@ -106,6 +106,29 @@ int main(int argc, char *argv[])
 	printf("Press any key to continue...\n");
 	ctr_input_wait();
 
+	ctr_cache_type cache = ctr_system_get_cache_type();
+	printf("icache words per line: %1X\n", cache.icache_words_per_line);
+	printf("icache absent: %1X\n", cache.icache_absent);
+	printf("icache associativity: %1X\n", cache.icache_associativity);
+	printf("icache size: %1X\n", cache.icache_size);
+	printf("dcache words per line: %1X\n", cache.dcache_words_per_line);
+	printf("dcache absent: %1X\n", cache.dcache_absent);
+	printf("dcache associativity: %1X\n", cache.dcache_associativity);
+	printf("dcache size: %1X\n", cache.dcache_size);
+	printf("harvard : %1X\n", cache.harvard);
+	printf("cache type: %1X\n", cache.cache_type);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
+
+	ctr_tcm_size tcm = ctr_system_get_tcm_size();
+	printf("itcm absent: %1X\n", tcm.itcm_absent);
+	printf("itcm size: %1X\n", tcm.itcm_size);
+	printf("dtcm absent: %1X\n", tcm.dtcm_absent);
+	printf("dtcm size: %1X\n", tcm.dtcm_size);
+	printf("Press any key to continue...\n");
+	ctr_input_wait();
+
+
 	for (int i = 0; i < 32; ++i)
 	{
 		printf("%02X", ((volatile uint8_t*)REG_SHAHASH)[i]);

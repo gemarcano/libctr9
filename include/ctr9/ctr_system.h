@@ -1,10 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2016 Gabriel Marcano
- *
- * Refer to the COPYING.txt file at the top of the project directory. If that is
- * missing, this file is licensed under the GPL version 2.0 or later.
- *
- ******************************************************************************/
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright: Gabriel Marcano, 2023
 
 /** @file */
 
@@ -83,9 +78,34 @@ typedef struct
 
 ctr_id_code ctr_system_get_id_register(void);
 
+typedef struct
+{
+	uint32_t icache_words_per_line: 2;
+	uint32_t icache_absent: 1;
+	uint32_t icache_associativity: 3;
+	uint32_t icache_size: 4;
+	uint32_t dcache_words_per_line: 2;
+	uint32_t dcache_absent: 1;
+	uint32_t dcache_associativity: 3;
+	uint32_t dcache_size: 4;
+	uint32_t harvard: 1;
+	uint32_t cache_type: 4;
+} ctr_cache_type;
+
+ctr_cache_type ctr_system_get_cache_type(void);
+
+typedef struct
+{
+	uint32_t itcm_absent: 1;
+	uint32_t itcm_size: 4;
+	uint32_t dtcm_absent: 1;
+	uint32_t dtcm_size: 4;
+} ctr_tcm_size;
+
+ctr_tcm_size ctr_system_get_tcm_size(void);
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif//CTR_SYSTEM_H_
-
